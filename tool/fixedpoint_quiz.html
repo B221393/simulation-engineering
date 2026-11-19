@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>固定点の安定性・分類 暗記トレーニング（演習1・演習2 試験対策）</title>
+<script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+<style>
+  .math { font-family: "Cambria Math", "Times New Roman", Georgia, serif; }
+  .region-btn { cursor: pointer; transition: opacity 0.15s; }
+  .region-btn:hover { opacity: 0.8; }
+</style>
+</head>
+<body class="bg-[var(--background)] text-[var(--foreground)] antialiased min-h-screen">
+  <div class="max-w-4xl mx-auto px-4 py-5 space-y-4">
+
+    <!-- Header -->
+    <header class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4 space-y-3">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div class="text-xs font-mono text-[var(--muted-foreground)]">EXAM MEMORY SYSTEM // LINEAR STABILITY &amp; PHRASING</div>
+          <h1 class="text-lg font-bold">「固有値・(&tau;, &Delta;) -> 固定点の分類・丸・決まり文句」暗記システム</h1>
+          <p class="text-xs text-[var(--muted-foreground)] mt-0.5">
+            目標: 数値を見た瞬間に「理由フレーズ + 分類名 + 黒丸/白丸」をそのまま答案の日本語で書けるようにする
+          </p>
+        </div>
+        <div class="text-right text-xs">
+          <div class="text-[var(--muted-foreground)]">暗記カード達成</div>
+          <div id="mastery-readout" class="font-mono font-bold text-sm tabular-nums">0 / 8 習得</div>
+        </div>
+      </div>
+
+      <nav class="flex flex-wrap gap-2 pt-2 border-t border-[var(--card-border)] text-xs font-medium">
+        <button data-mode="map" class="mode-btn px-3 py-1.5 rounded bg-[var(--primary)] text-[var(--primary-foreground)]">1. 3ステップ判定図 (&tau;-&Delta;平面)</button>
+        <button data-mode="cards" class="mode-btn px-3 py-1.5 rounded border border-[var(--border)] bg-[var(--background)]">2. 決まり文句フラッシュカード</button>
+        <button data-mode="builder" class="mode-btn px-3 py-1.5 rounded border border-[var(--border)] bg-[var(--background)]">3. 答案文組み立てスピードテスト</button>
+      </nav>
+    </header>
+
+    <!-- MODE 1: INTERACTIVE TAU-DELTA MAP & 3-STEP FLOW -->
+    <section id="mode-map" class="mode-panel space-y-4">
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4 space-y-3">
+        <div class="text-xs font-bold border-b border-[var(--card-border)] pb-1.5">
+          迷わなくなる「3ステップ判定ルール」（上から順番にチェックするだけ）
+        </div>
+        <div class="grid sm:grid-cols-3 gap-2.5 text-xs">
+          <div class="p-2.5 rounded border border-[var(--card-border)] bg-[var(--background)]">
+            <div class="font-bold text-[var(--primary)]">Step 1: &Delta; = det J を見る</div>
+            <div class="text-[var(--muted-foreground)] mt-1">
+              <strong>&Delta; &lt; 0</strong> なら他の値を見ずに即「<strong>鞍点（不安定・白丸）</strong>」．<br>
+              <strong>&Delta; = 0</strong>（固有値0あり）なら即「<strong>線形化だけでは判定不可</strong>」．
+            </div>
+          </div>
+          <div class="p-2.5 rounded border border-[var(--card-border)] bg-[var(--background)]">
+            <div class="font-bold text-[var(--primary)]">Step 2: &Delta; &gt; 0 なら &tau; = tr J</div>
+            <div class="text-[var(--muted-foreground)] mt-1">
+              固有値の実部の符号 = &tau; の符号：<br>
+              <strong>&tau; &lt; 0</strong> -> <strong>安定（黒丸）</strong><br>
+              <strong>&tau; &gt; 0</strong> -> <strong>不安定（白丸）</strong><br>
+              <strong>&tau; = 0</strong> -> <strong>中心点（中立安定）</strong>
+            </div>
+          </div>
+          <div class="p-2.5 rounded border border-[var(--card-border)] bg-[var(--background)]">
+            <div class="font-bold text-[var(--primary)]">Step 3: 虚部の有無 (&tau;&sup2; &minus; 4&Delta;)</div>
+            <div class="text-[var(--muted-foreground)] mt-1">
+              <strong>&tau;&sup2; &minus; 4&Delta; &lt; 0</strong>（虚部あり）-> <strong>渦状点</strong>（回る）<br>
+              <strong>&tau;&sup2; &minus; 4&Delta; &gt; 0</strong>（実数のみ）-> <strong>結節点</strong>（回らず直進）
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4">
+        <div class="grid md:grid-cols-2 gap-4 items-center">
+          <div>
+            <div class="text-xs font-bold mb-1.5">&tau;-&Delta; 平面マップ（クリックすると右側に決まり文句が出ます）</div>
+            <svg viewBox="-160 -130 320 230" class="w-full max-h-[290px] border border-[var(--card-border)] rounded bg-[var(--background)]">
+              <!-- Regions -->
+              <!-- Saddle: Delta < 0 (y > 0 in SVG) -->
+              <rect data-key="saddle" class="region-btn" x="-150" y="0" width="300" height="88" fill="var(--chart-2, #dc2626)" fill-opacity="0.16" />
+              <!-- Stable Spiral: tau < 0 (x < 0), above parabola (y < -x^2/...) -->
+              <path data-key="stable_spiral" class="region-btn" d="M -150,-120 L 0,-120 L 0,0 Q -65,-10 -150,-110 Z" fill="var(--chart-1, #2563eb)" fill-opacity="0.22" />
+              <!-- Unstable Spiral: tau > 0 (x > 0), above parabola -->
+              <path data-key="unstable_spiral" class="region-btn" d="M 0,-120 L 150,-120 L 150,-110 Q 65,-10 0,0 Z" fill="var(--chart-3, #d97706)" fill-opacity="0.20" />
+              <!-- Stable Node: tau < 0, between parabola and Delta=0 -->
+              <path data-key="stable_node" class="region-btn" d="M -150,-110 Q -65,-10 0,0 L -150,0 Z" fill="var(--chart-4, #16a34a)" fill-opacity="0.22" />
+              <!-- Unstable Node: tau > 0, between parabola and Delta=0 -->
+              <path data-key="unstable_node" class="region-btn" d="M 0,0 Q 65,-10 150,-110 L 150,0 Z" fill="var(--chart-5, #9333ea)" fill-opacity="0.18" />
+
+              <!-- Axes -->
+              <line x1="-150" y1="0" x2="150" y2="0" stroke="var(--foreground)" stroke-width="1.4" />
+              <line x1="0" y1="88" x2="0" y2="-122" stroke="var(--foreground)" stroke-width="1.4" />
+              <!-- Parabola tau^2 - 4*Delta = 0 -->
+              <path d="M -150,-110 Q -65,-10 0,0 Q 65,-10 150,-110" fill="none" stroke="var(--foreground)" stroke-width="1.5" stroke-dasharray="4 3" />
+
+              <!-- Clickable special lines: Center & Degenerate -->
+              <line data-key="center" class="region-btn" x1="0" y1="-118" x2="0" y2="-4" stroke="var(--chart-1, #2563eb)" stroke-width="6" stroke-opacity="0.35" />
+              <line data-key="degenerate" class="region-btn" x1="-145" y1="0" x2="145" y2="0" stroke="var(--muted-foreground)" stroke-width="6" stroke-opacity="0.25" />
+
+              <!-- Labels -->
+              <text x="142" y="14" font-size="11" text-anchor="end" fill="var(--foreground)">&tau; (実部の和)</text>
+              <text x="6" y="-110" font-size="11" fill="var(--foreground)">&Delta; (固有値の積)</text>
+              <text x="-70" y="-74" font-size="10.5" font-weight="bold" text-anchor="middle" fill="var(--foreground)" pointer-events="none">安定渦状点 (黒)</text>
+              <text x="70" y="-74" font-size="10.5" font-weight="bold" text-anchor="middle" fill="var(--foreground)" pointer-events="none">不安定渦状点 (白)</text>
+              <text x="-105" y="-14" font-size="10" font-weight="bold" text-anchor="middle" fill="var(--foreground)" pointer-events="none">安定結節点 (黒)</text>
+              <text x="105" y="-14" font-size="10" font-weight="bold" text-anchor="middle" fill="var(--foreground)" pointer-events="none">不安定結節点 (白)</text>
+              <text x="0" y="48" font-size="11" font-weight="bold" text-anchor="middle" fill="var(--foreground)" pointer-events="none">鞍点 (不安定・白丸) [&Delta; &lt; 0]</text>
+              <text x="0" y="-26" font-size="9" text-anchor="middle" fill="var(--foreground)" pointer-events="none">中心点 (&tau;=0)</text>
+            </svg>
+          </div>
+
+          <div id="map-detail" class="bg-[var(--background)] border border-[var(--card-border)] rounded p-3.5 space-y-2 text-xs">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODE 2: FLASHCARDS WITH SPACED REPETITION -->
+    <section id="mode-cards" class="mode-panel hidden space-y-3">
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div id="card-counter" class="font-mono font-bold">カード 1 / 8</div>
+          <div class="flex gap-2">
+            <button id="filter-all" class="px-2.5 py-1 rounded bg-[var(--primary)] text-[var(--primary-foreground)]">すべて (8)</button>
+            <button id="filter-weak" class="px-2.5 py-1 rounded border border-[var(--border)]">苦手のみ復習 (0)</button>
+            <button id="shuffle-cards" class="px-2.5 py-1 rounded border border-[var(--border)]">シャッフル</button>
+          </div>
+        </div>
+
+        <div class="border border-[var(--border)] rounded-lg bg-[var(--background)] p-5 min-h-[210px] flex flex-col justify-between space-y-4">
+          <div class="space-y-2">
+            <div id="fc-badge" class="text-xs font-mono text-[var(--muted-foreground)]">PATTERN</div>
+            <div id="fc-front" class="text-base font-bold leading-relaxed"></div>
+            <div id="fc-prompt" class="text-xs text-[var(--muted-foreground)]">
+              頭の中で「(1) 根拠・(2) 分類名・(3) 黒丸か白丸か」を唱えてからめくってください．
+            </div>
+          </div>
+
+          <div id="fc-back" class="hidden pt-3 border-t border-[var(--card-border)] space-y-2 text-xs">
+            <div class="font-bold text-sm text-[var(--primary)]" id="fc-title"></div>
+            <div class="p-2.5 rounded bg-[var(--card)] border border-[var(--card-border)] leading-relaxed" id="fc-phrase"></div>
+            <div class="text-[var(--muted-foreground)]" id="fc-extra"></div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-2">
+            <button id="fc-flip" class="px-4 py-1.5 rounded text-xs font-medium bg-[var(--primary)] text-[var(--primary-foreground)]">答え・決まり文句を見る</button>
+            <div class="flex gap-2 text-xs">
+              <button id="fc-again" class="px-3 py-1.5 rounded border border-[var(--error,#dc2626)] hover:opacity-80">もう一度（苦手へ）</button>
+              <button id="fc-got" class="px-3 py-1.5 rounded border border-[var(--success,#16a34a)] hover:opacity-80">覚えた（次へ）</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODE 3: SENTENCE BUILDER SPEED DRILL -->
+    <section id="mode-builder" class="mode-panel hidden space-y-3">
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-[var(--card-border)] text-xs">
+          <div>
+            <span class="font-bold">答案文組み立てトレーニング</span>
+            <span class="text-[var(--muted-foreground)] ml-2">提示された固有値・(&tau;, &Delta;) から正しい文を組み立ててください</span>
+          </div>
+          <div class="font-mono font-bold" id="streak-readout">連続正解: 0</div>
+        </div>
+
+        <div class="p-3.5 rounded bg-[var(--background)] border border-[var(--card-border)] space-y-1">
+          <div class="text-xs text-[var(--muted-foreground)]">問題（試験で与えられる数値）</div>
+          <div id="sb-problem" class="text-base font-bold math"></div>
+          <div id="sb-sub" class="text-xs text-[var(--muted-foreground)]"></div>
+        </div>
+
+        <div class="grid sm:grid-cols-3 gap-3 text-xs">
+          <div class="space-y-1">
+            <label class="font-bold block">1. 根拠（なぜ？）</label>
+            <select id="sb-reason" class="w-full p-2 rounded border border-[var(--border)] bg-[var(--background)]">
+              <option value="">-- 選択 --</option>
+              <option value="neg_re_imag">実部が負で虚部が存在するので</option>
+              <option value="pos_re_imag">実部が正で虚部が存在するので</option>
+              <option value="zero_re_imag">実部が0の純虚数なので</option>
+              <option value="both_neg_real">2つの固有値がともに負の実数なので</option>
+              <option value="both_pos_real">2つの固有値がともに正の実数なので</option>
+              <option value="opp_real">正と負の実固有値を持つ（Δ &lt; 0）ので</option>
+              <option value="has_zero">固有値に 0（実部 0）を含むので</option>
+            </select>
+          </div>
+          <div class="space-y-1">
+            <label class="font-bold block">2. 分類名</label>
+            <select id="sb-class" class="w-full p-2 rounded border border-[var(--border)] bg-[var(--background)]">
+              <option value="">-- 選択 --</option>
+              <option value="安定渦状点">安定な渦状点（安定焦点）</option>
+              <option value="不安定渦状点">不安定な渦状点（不安定焦点）</option>
+              <option value="中心点">中心点（中立安定）</option>
+              <option value="安定結節点">安定な結節点</option>
+              <option value="不安定結節点">不安定な結節点</option>
+              <option value="鞍点">鞍点（不安定）</option>
+              <option value="判定不可">線形化だけでは安定性を判定できない</option>
+            </select>
+          </div>
+          <div class="space-y-1">
+            <label class="font-bold block">3. 相図の丸・向き</label>
+            <select id="sb-marker" class="w-full p-2 rounded border border-[var(--border)] bg-[var(--background)]">
+              <option value="">-- 選択 --</option>
+              <option value="黒丸">黒丸（漸近安定）</option>
+              <option value="白丸">白丸（不安定）</option>
+              <option value="中立">白丸または丸なし（中立周期軌道）</option>
+              <option value="非線形確認">非線形軌道で別途確認が必要</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <button id="sb-check" class="px-4 py-1.5 rounded font-medium bg-[var(--primary)] text-[var(--primary-foreground)]">判定する</button>
+          <button id="sb-next" class="px-3 py-1.5 rounded border border-[var(--border)]">次の問題へ</button>
+        </div>
+
+        <div id="sb-result" class="hidden p-3 rounded border text-xs space-y-1"></div>
+      </div>
+    </section>
+
+  </div>
+
+<script>
+const PATTERNS = [
+  {
+    key: "stable_spiral",
+    title: "安定渦状点（黒丸）",
+    badge: "複素数 / Re(λ) < 0",
+    front: "固有値 λ = -0.5 ± 0.645i  (τ < 0, Δ > 0, τ^2 - 4Δ < 0)",
+    phrase: "「実部が負で虚部が存在するので，固定点は安定な渦状点である（相図では黒丸）．」",
+    extra: "演習2 z*=1/7 (β=1) がこれ．dx/dt = v より上半分(v>0)で右向きなので必ず時計回りに黒丸へ収束．",
+    reason: "neg_re_imag", cls: "安定渦状点", marker: "黒丸"
+  },
+  {
+    key: "saddle",
+    title: "鞍点（不安定・白丸）",
+    badge: "異符号の実数 / Δ < 0",
+    front: "固有値 λ = +0.884, -1.884  (Δ < 0)",
+    phrase: "「正と負の実固有値を持つ（Δ < 0）ので，固定点は不安定な鞍点である（相図では白丸）．」",
+    extra: "演習2 z*=4/7 がこれ．正の固有値方向が外向き（離れる），負の固有値方向が内向き（近づく）．",
+    reason: "opp_real", cls: "鞍点", marker: "白丸"
+  },
+  {
+    key: "stable_node",
+    title: "安定結節点（黒丸）",
+    badge: "負の実数2個 / τ < 0, Δ > 0, τ^2 - 4Δ > 0",
+    front: "固有値 λ = -0.423, -1.577  (τ < 0, Δ > 0, τ^2 - 4Δ > 0)",
+    phrase: "「2つの固有値がともに負の実数（虚部なし）なので，固定点は安定な結節点である（相図では黒丸）．」",
+    extra: "演習2 z*=1/7 で減衰を β=2 に強めると渦状点からこれ（振動せず真っ直ぐ収束）へ変わる．",
+    reason: "both_neg_real", cls: "安定結節点", marker: "黒丸"
+  },
+  {
+    key: "unstable_spiral",
+    title: "不安定渦状点（白丸）",
+    badge: "複素数 / Re(λ) > 0",
+    front: "固有値 λ = +0.3 ± 0.7i  (τ > 0, Δ > 0, τ^2 - 4Δ < 0)",
+    phrase: "「実部が正で虚部が存在するので，固定点は不安定な渦状点である（相図では白丸）．」",
+    extra: "中心の白丸から渦を巻きながら外側へ遠ざかっていく．",
+    reason: "pos_re_imag", cls: "不安定渦状点", marker: "白丸"
+  },
+  {
+    key: "unstable_node",
+    title: "不安定結節点（白丸）",
+    badge: "正の実数2個 / τ > 0, Δ > 0, τ^2 - 4Δ > 0",
+    front: "固有値 λ = +2.0, +0.5  (τ > 0, Δ > 0, τ^2 - 4Δ > 0)",
+    phrase: "「2つの固有値がともに正の実数なので，固定点は不安定な結節点である（相図では白丸）．」",
+    extra: "2本の固有ベクトル両方に沿って白丸から外向きへ遠ざかる．",
+    reason: "both_pos_real", cls: "不安定結節点", marker: "白丸"
+  },
+  {
+    key: "center",
+    title: "中心点（中立安定）",
+    badge: "純虚数 / Re(λ) = 0",
+    front: "固有値 λ = ± 0.816i  (τ = 0, Δ > 0)",
+    phrase: "「固有値の実部が 0 の純虚数（τ = 0, Δ > 0）なので，線形化系では中心点（中立安定）である．」",
+    extra: "演習1（減衰なし単振り子 β=0）など．同心円・楕円の閉軌道になり，近づきも遠ざかりもしない．",
+    reason: "zero_re_imag", cls: "中心点", marker: "中立"
+  },
+  {
+    key: "degenerate",
+    title: "非双曲型（線形化のみでは判定不可）",
+    badge: "固有値 0 を含む / Δ = 0",
+    front: "固有値 λ = 0, -1  (Δ = 0)",
+    phrase: "「固有値に 0（実部 0）を含むため，線形化だけでは安定性を判定できない．」",
+    extra: "演習2(6) 分岐点 α = 4/27, z* = 1/3 がこれ．非線形シミュレーションでは z < 1/3 から近づき z > 1/3 から接触するため不安定（半安定）．",
+    reason: "has_zero", cls: "判定不可", marker: "非線形確認"
+  },
+  {
+    key: "rotation_rule",
+    title: "渦巻きの回転向きの覚え方",
+    badge: "相図の矢印チェック",
+    front: "z-v 相図で (1/7, 0) の渦巻きが「時計回り」になる理由は？",
+    phrase: "「1階の方程式が dz/dt = v なので，上半分 (v > 0) では z が増える右向き，下半分 (v < 0) では左向きに動くため必ず時計回りになる．」",
+    extra: "位置が横軸・速度が縦軸ならどんな力学系でも「上は右・下は左 = 時計回り」！反時計回りに描くと逆転ミスになる．",
+    reason: "neg_re_imag", cls: "安定渦状点", marker: "黒丸"
+  }
+];
+
+// ---- Mode switching ----
+const modeBtns = document.querySelectorAll(".mode-btn");
+const modePanels = document.querySelectorAll(".mode-panel");
+modeBtns.forEach(b => b.addEventListener("click", () => {
+  const m = b.dataset.mode;
+  modeBtns.forEach(x => {
+    x.className = x.dataset.mode === m
+      ? "mode-btn px-3 py-1.5 rounded bg-[var(--primary)] text-[var(--primary-foreground)]"
+      : "mode-btn px-3 py-1.5 rounded border border-[var(--border)] bg-[var(--background)]";
+  });
+  modePanels.forEach(p => p.classList.toggle("hidden", p.id !== `mode-${m}`));
+}));
+
+// ---- Mode 1: Map click ----
+const mapDetail = document.getElementById("map-detail");
+function showMapPattern(key) {
+  const item = PATTERNS.find(p => p.key === key) || PATTERNS[0];
+  mapDetail.innerHTML = `
+    <div class="text-[var(--muted-foreground)] font-mono">${item.badge}</div>
+    <div class="text-base font-bold text-[var(--primary)]">${item.title}</div>
+    <div class="font-mono text-xs">${item.front}</div>
+    <div class="p-2.5 rounded bg-[var(--card)] border border-[var(--border)] font-medium leading-relaxed">
+      答案の決まり文句：<br/>${item.phrase}
+    </div>
+    <div class="text-[var(--muted-foreground)]">${item.extra}</div>
+  `;
+}
+document.querySelectorAll(".region-btn").forEach(el => {
+  el.addEventListener("click", () => showMapPattern(el.dataset.key));
+});
+showMapPattern("stable_spiral");
+
+// ---- Mode 2: Flashcards ----
+let deck = [...PATTERNS];
+let cardIdx = 0;
+const mastered = new Set();
+const weakSet = new Set();
+let weakOnly = false;
+
+function currentList() {
+  if (!weakOnly) return deck;
+  const w = deck.filter(c => weakSet.has(c.key));
+  return w.length ? w : deck;
+}
+
+function renderCard() {
+  const list = currentList();
+  if (cardIdx >= list.length) cardIdx = 0;
+  const c = list[cardIdx];
+  document.getElementById("card-counter").textContent = `カード ${cardIdx + 1} / ${list.length}` + (weakOnly ? " [苦手復習中]" : "");
+  document.getElementById("fc-badge").textContent = c.badge;
+  document.getElementById("fc-front").textContent = c.front;
+  document.getElementById("fc-title").textContent = c.title;
+  document.getElementById("fc-phrase").textContent = c.phrase;
+  document.getElementById("fc-extra").textContent = c.extra;
+  document.getElementById("fc-back").classList.add("hidden");
+  document.getElementById("mastery-readout").textContent = `${mastered.size} / ${PATTERNS.length} 習得`;
+  document.getElementById("filter-weak").textContent = `苦手のみ復習 (${weakSet.size})`;
+}
+
+document.getElementById("fc-flip").addEventListener("click", () => {
+  document.getElementById("fc-back").classList.toggle("hidden");
+});
+document.getElementById("fc-again").addEventListener("click", () => {
+  const c = currentList()[cardIdx];
+  weakSet.add(c.key);
+  mastered.delete(c.key);
+  cardIdx = (cardIdx + 1) % currentList().length;
+  renderCard();
+});
+document.getElementById("fc-got").addEventListener("click", () => {
+  const c = currentList()[cardIdx];
+  weakSet.delete(c.key);
+  mastered.add(c.key);
+  const list = currentList();
+  cardIdx = list.length ? (cardIdx + 1) % list.length : 0;
+  renderCard();
+});
+document.getElementById("filter-all").addEventListener("click", () => { weakOnly = false; cardIdx = 0; renderCard(); });
+document.getElementById("filter-weak").addEventListener("click", () => {
+  if (weakSet.size === 0) return;
+  weakOnly = true; cardIdx = 0; renderCard();
+});
+document.getElementById("shuffle-cards").addEventListener("click", () => {
+  deck.sort(() => Math.random() - 0.5);
+  cardIdx = 0;
+  renderCard();
+});
+renderCard();
+
+// ---- Mode 3: Sentence Builder ----
+const DRILL_CASES = [
+  { expr: "λ = -0.5 ± 0.645i", sub: "τ = -1, Δ = 2/3, τ² - 4Δ = -5/3 < 0", ans: PATTERNS[0] },
+  { expr: "λ = +0.884, -1.884", sub: "τ = -1, Δ = -5/3 < 0", ans: PATTERNS[1] },
+  { expr: "λ = -0.423, -1.577", sub: "τ = -2, Δ = 2/3, τ² - 4Δ = +4/3 > 0", ans: PATTERNS[2] },
+  { expr: "λ = +0.25 ± 0.80i", sub: "τ = +0.5, Δ = 0.7025 > 0, τ² - 4Δ < 0", ans: PATTERNS[3] },
+  { expr: "λ = +1.8, +0.4", sub: "τ = +2.2, Δ = 0.72 > 0, τ² - 4Δ > 0", ans: PATTERNS[4] },
+  { expr: "λ = ± 0.816i", sub: "τ = 0, Δ = 2/3 > 0", ans: PATTERNS[5] },
+  { expr: "λ = 0, -1", sub: "τ = -1, Δ = 0 (分岐点 α = 4/27)", ans: PATTERNS[6] },
+  { expr: "τ = -3, Δ = 4", sub: "ヒント: τ² - 4Δ = 9 - 16 = -7 < 0", ans: PATTERNS[0] },
+  { expr: "τ = -1, Δ = -2", sub: "ヒント: Δ < 0", ans: PATTERNS[1] },
+  { expr: "τ = -4, Δ = 3", sub: "ヒント: τ² - 4Δ = 16 - 12 = +4 > 0", ans: PATTERNS[2] }
+];
+
+let sbIdx = 0;
+let streak = 0;
+
+function loadSb() {
+  const item = DRILL_CASES[sbIdx];
+  document.getElementById("sb-problem").textContent = item.expr;
+  document.getElementById("sb-sub").textContent = item.sub;
+  document.getElementById("sb-reason").value = "";
+  document.getElementById("sb-class").value = "";
+  document.getElementById("sb-marker").value = "";
+  document.getElementById("sb-result").classList.add("hidden");
+}
+
+document.getElementById("sb-check").addEventListener("click", () => {
+  const item = DRILL_CASES[sbIdx];
+  const r = document.getElementById("sb-reason").value;
+  const c = document.getElementById("sb-class").value;
+  const m = document.getElementById("sb-marker").value;
+  const ok = (r === item.ans.reason && c === item.ans.cls && m === item.ans.marker);
+  const res = document.getElementById("sb-result");
+  res.classList.remove("hidden");
+  if (ok) {
+    streak++;
+    res.className = "p-3 rounded border border-[var(--success,#16a34a)] bg-[var(--background)] text-xs space-y-1";
+    res.innerHTML = `<div class="font-bold">[正解] そのまま答案に書ける完成文：</div><div>${item.ans.phrase}</div>`;
+  } else {
+    streak = 0;
+    res.className = "p-3 rounded border border-[var(--error,#dc2626)] bg-[var(--background)] text-xs space-y-1";
+    res.innerHTML = `<div class="font-bold">[不正解] 正しい組み立て：</div><div>${item.ans.phrase}</div><div class="text-[var(--muted-foreground)]">丸/扱い: ${item.ans.marker} / ${item.ans.extra}</div>`;
+  }
+  document.getElementById("streak-readout").textContent = `連続正解: ${streak}`;
+});
+
+document.getElementById("sb-next").addEventListener("click", () => {
+  sbIdx = (sbIdx + 1) % DRILL_CASES.length;
+  loadSb();
+});
+loadSb();
+</script>
+</body>
+</html>

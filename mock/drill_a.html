@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>シミュレーション工学 Google Colab 全TODO攻略ドリル（解答・解説編）</title>
+<style>
+  @page { size: A4; margin: 15mm 14mm 16mm 14mm; }
+  :root { --ink:#1b1b1b; --navy:#1f4e79; --rust:#a8542a; --line:#c9ced4; --bg:#f5f7f9; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Yu Gothic", "YuGothic", "Meiryo", sans-serif;
+    color: var(--ink); font-size: 9.6pt; line-height: 1.6; margin: 0;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .page { max-width: 180mm; margin: 0 auto; padding: 3mm 0 6mm; }
+  header { border-bottom: 2.5px solid var(--navy); padding-bottom: 8px; margin-bottom: 8px; }
+  .kicker { font-size: 9pt; letter-spacing: .1em; color: var(--navy); }
+  h1 { font-size: 16.5pt; margin: 3px 0 2px; }
+  .sub { font-size: 9.2pt; color: #4a5560; }
+  .part { margin: 14px 0 6px; padding: 5px 10px; background: var(--navy); color: #fff;
+          font-size: 10.2pt; letter-spacing: .08em; break-after: avoid; }
+  .q { margin-top: 12px; break-inside: avoid; }
+  .qhead { display: flex; align-items: baseline; border-bottom: 1.4px solid var(--navy); padding-bottom: 2px; }
+  .qhead h2 { font-size: 10.6pt; margin: 0; }
+  .tag { margin-left: auto; font-size: 8.6pt; color: var(--navy); font-weight: 600; }
+  pre.code { font-family: Consolas, "Courier New", monospace; font-size: 8.4pt; line-height: 1.42;
+             background: var(--bg); border: 1px solid var(--line); padding: 6px 9px; white-space: pre-wrap; margin: 4px 0; }
+  .mono, code { font-family: Consolas, "Courier New", monospace; font-size: 8.9pt; }
+  .note { font-size: 8.9pt; color: #333; margin: 3px 0; }
+  .trap { font-size: 8.8pt; color: var(--rust); margin: 2px 0 0; }
+  .pagebreak { break-before: page; }
+  footer { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 5px;
+           font-size: 8.2pt; color: #777; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="kicker">2026年度 シミュレーション工学 / Google Colab 公式ノート全7本対応</div>
+  <h1>Google Colab 全TODO 攻略ドリル（解答・解説編）</h1>
+  <div class="sub">全20課題の模範コード（Python実行検証済み）・思考手順・引っかかりやすい罠</div>
+</header>
+
+<div class="part">第2回（02_python_intro.ipynb）：基礎演算・繰り返し・数値計算誤差</div>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-01　数式と関数定義</h2><span class="tag">検証値: y = 3.449383</span></div>
+  <pre class="code">y = x**2 + math.cos(x - 1) - math.sqrt(a)
+def triangle_area(w, h): return 0.5 * w * h
+def func1(x, a): return x**2 + math.cos(x - 1) - math.sqrt(a)
+print("f(2.1, 2) =", func1(2.1, 2))</pre>
+  <p class="note"><b>ポイント：</b>Python のべき乗は <span class="mono">**</span>（<span class="mono">^</span> は排他的論理和なので厳禁）。引数の順番 <span class="mono">func1(x, a)</span> に合わせて <span class="mono">(2.1, 2)</span> の順で渡す。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-02　for文と公式による等比級数の和</h2><span class="tag">検証値: 242</span></div>
+  <pre class="code">[1] total += a * (r ** (k - 1))
+[2] a * (1 - r**n) / (1 - r)</pre>
+  <p class="note"><b>ポイント：</b><span class="mono">range(1, n + 1)</span> では <span class="mono">k = 1, 2, ..., n</span> と動くため、初項 <span class="mono">a r<sup>0</sup></span> を表すには指数を <span class="mono">k - 1</span> にする。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-03　丸め誤差と無限級数（float32 の頭打ち）</h2><span class="tag">検証: float32 N=10^5 誤差 2.09e-4</span></div>
+  <pre class="code">[1] for k in range(1, N + 1):
+        total += 1.0 / (k ** 2)       # 単精度検証時は total += np.float32(1.0 / (k ** 2))
+[2] true_value = (np.pi ** 2) / 6.0
+[3] err = abs(partial_sum(N) - true_value)</pre>
+  <p class="note"><b>頭打ちの理由：</b><span class="mono">float32</span> の有効桁数は約7桁。<span class="mono">total ≈ 1.645</span> に対して <span class="mono">1/k<sup>2</sup></span> が <span class="mono">10<sup>-7</sup></span> 以下（<span class="mono">k ≥ 3162</span> 以降）になると<b>情報落ち</b>で小さい項が丸められて消えるため、<span class="mono">N</span> を増やしても和が一切増えなくなる。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-04　桁落ち回避（2次方程式・有理化）</h2><span class="tag">検証: 4.4 stable = 2.123450e-12</span></div>
+  <pre class="code">[1] x1_stable = c / (a * x2_stable)
+[2] y = (2.0 * x) / (math.sqrt(1 - x) * math.sqrt(1 + x) * (math.sqrt(1 - x) + math.sqrt(1 + x)))</pre>
+  <p class="note"><b>ポイント：</b>(1) 解と係数の関係 <span class="mono">x<sub>1</sub> x<sub>2</sub> = c / a</span> で近い値同士の引き算を避ける。(2) 通分して分子 <span class="mono">√(1+x) - √(1-x)</span> に共役式 <span class="mono">√(1+x) + √(1-x)</span> を掛けると分子が <span class="mono">2x</span> となり、引き算が消えて桁落ちしなくなる。</p>
+</section>
+
+<div class="part pagebreak">第3回（03_euler_intro.ipynb）：前進オイラー法・陰解法・非線形1階ODE</div>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-05　前進オイラー法（1変数線形）</h2><span class="tag">検証(dt=0.25, T=1): 2.4414</span></div>
+  <pre class="code">[1] x[n + 1] = x[n] + k * x[n] * dt</pre>
+  <p class="note"><b>発散条件：</b>更新式は <span class="mono">x<sub>n+1</sub> = (1 + k Δt) x<sub>n</sub></span> なので、増幅率 <span class="mono">|1 + k Δt| &gt; 1</span> のとき発散する。<span class="mono">k = -9</span> なら <span class="mono">Δt &gt; 2/9 ≈ 0.222</span> で発散（<span class="mono">dt = 0.25</span> では <span class="mono">1 + k Δt = -1.25</span> となり振動発散）。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-06　後退（陰解法）オイラー法</h2><span class="tag">検証(dt=0.25, T=1): 0.008963</span></div>
+  <pre class="code">[1] x[n + 1] = x[n] / (1.0 - k * dt)</pre>
+  <p class="note"><b>導出：</b><span class="mono">x<sub>n+1</sub> = x<sub>n</sub> + k x<sub>n+1</sub> Δt</span> を移項して <span class="mono">(1 - k Δt) x<sub>n+1</sub> = x<sub>n</sub></span>。<span class="mono">k &lt; 0</span> のとき常に <span class="mono">0 &lt; 1/(1 - k Δt) &lt; 1</span> となるため、任意の <span class="mono">Δt &gt; 0</span> で絶対安定（発散しない）。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-07　非自律・非線形方程式のオイラー法</h2><span class="tag">検証(dt=0.1, T=10): 0.449369</span></div>
+  <pre class="code">for n in range(n_steps):
+    x[n + 1] = x[n] + (np.sin(t[n]) - x[n] ** 3) * dt</pre>
+  <p class="trap"><b>注意：</b>時刻は必ず配列 <span class="mono">t[n]</span> を参照すること（<span class="mono">n * dt</span> でも同じだが <span class="mono">t[n]</span> が簡潔）。</p>
+</section>
+
+<div class="part">第4回（04_runge_intro.ipynb）：ホイン法・RK4・非自律系RK4</div>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-08　ホイン法（2次RK）</h2><span class="tag">検証(dt=0.1, T=1): 0.001079</span></div>
+  <pre class="code">k1 = dt * func_dx(t[n], x[n], k)
+k2 = dt * func_dx(t[n] + dt, x[n] + k1, k)
+x[n + 1] = x[n] + 0.5 * (k1 + k2)</pre>
+  <p class="note"><b>ポイント：</b>始点の傾き <span class="mono">k1</span> と、オイラー法で仮に進んだ終点 <span class="mono">(t<sub>n</sub>+Δt, x<sub>n</sub>+k<sub>1</sub>)</span> の傾き <span class="mono">k2</span> を平均する。2次精度 <span class="mono">O(Δt<sup>2</sup>)</span>。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-09　4次のルンゲ・クッタ法（RK4）</h2><span class="tag">検証(dt=0.1, T=1): 0.000137</span></div>
+  <pre class="code">k1 = dt * func_dx(t[n], x[n], k)
+k2 = dt * func_dx(t[n] + dt / 2, x[n] + k1 / 2, k)
+k3 = dt * func_dx(t[n] + dt / 2, x[n] + k2 / 2, k)
+k4 = dt * func_dx(t[n] + dt, x[n] + k3, k)
+x[n + 1] = x[n] + (k1 + 2 * k2 + 2 * k3 + k4) / 6</pre>
+  <p class="note"><b>誤差頭打ちの理由：</b>倍精度（<span class="mono">float64</span>）の表現限界（約16桁、マシンイプシロン <span class="mono">≈ 2.2e-16</span>）に達し、<span class="mono">Δt</span> を極端に小さくすると打ち切り誤差より丸め誤差の蓄積が支配的になるため。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-10　非線形・非自律系 dx/dt = sin(t) - x<sup>3</sup> のRK4</h2><span class="tag">検証(dt=0.1, T=10): 0.432153</span></div>
+  <pre class="code">k1 = dt * func_nonlinear(t[n], x[n])
+k2 = dt * func_nonlinear(t[n] + dt / 2, x[n] + k1 / 2)
+k3 = dt * func_nonlinear(t[n] + dt / 2, x[n] + k2 / 2)
+k4 = dt * func_nonlinear(t[n] + dt, x[n] + k3)
+x[n + 1] = x[n] + (k1 + 2 * k2 + 2 * k3 + k4) / 6</pre>
+  <p class="trap"><b>罠：</b><span class="mono">k2, k3</span> で第1引数を <span class="mono">t[n] + dt / 2</span>、<span class="mono">k4</span> で <span class="mono">t[n] + dt</span> にし忘れると、時刻依存項 <span class="mono">sin(t)</span> がズレて4次精度が出ない。</p>
+</section>
+
+<div class="part pagebreak">第5〜6回（05-06_2nd_order_simulation.ipynb）：2階・多変数システム</div>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-11　単振動のオイラー法（2成分同時更新）</h2><span class="tag">05-06 / Cell 5</span></div>
+  <pre class="code">[1] x[n + 1] = x[n] + dt * func_dx(t[n], x[n], v[n], m, k_spring)
+[2] v[n + 1] = v[n] + dt * func_dv(t[n], x[n], v[n], m, k_spring)</pre>
+  <p class="trap"><b>罠：</b>2行目で <span class="mono">x[n]</span> ではなく <span class="mono">x[n+1]</span> を渡すと別の手法（半陰解法／シンプレクティックオイラー法）になる。陽的オイラー法では両方とも時刻 <span class="mono">t[n]</span> の値を使う。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-12　単振動のRK4（2成分ペア計算）</h2><span class="tag">05-06 / Cell 8</span></div>
+  <pre class="code">k1x = dt * func_dx(t[n], x[n], v[n], m, k_spring)
+k1v = dt * func_dv(t[n], x[n], v[n], m, k_spring)
+k2x = dt * func_dx(t[n] + dt/2, x[n] + k1x/2, v[n] + k1v/2, m, k_spring)
+k2v = dt * func_dv(t[n] + dt/2, x[n] + k1x/2, v[n] + k1v/2, m, k_spring)
+k3x = dt * func_dx(t[n] + dt/2, x[n] + k2x/2, v[n] + k2v/2, m, k_spring)
+k3v = dt * func_dv(t[n] + dt/2, x[n] + k2x/2, v[n] + k2v/2, m, k_spring)
+k4x = dt * func_dx(t[n] + dt,   x[n] + k3x,   v[n] + k3v,   m, k_spring)
+k4v = dt * func_dv(t[n] + dt,   x[n] + k3x,   v[n] + k3v,   m, k_spring)
+x[n + 1] = x[n] + (k1x + 2*k2x + 2*k3x + k4x) / 6
+v[n + 1] = v[n] + (k1v + 2*k2v + 2*k3v + k4v) / 6</pre>
+  <p class="note"><b>鉄則：</b>各段階（<span class="mono">k1 → k2 → k3 → k4</span>）で、必ず <span class="mono">x</span> と <span class="mono">v</span> の両方をペアで計算してから次の段階へ進む。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-13　ローレンツモデル（3成分RK4）</h2><span class="tag">05-06 / Cell 19</span></div>
+  <pre class="code">[1] k2x = dt * func_dx(t[n] + dt/2, x[n] + k1x/2, y[n] + k1y/2, z[n] + k1z/2, sigma, rho, beta)
+[2] z[n + 1] = z[n] + (k1z + 2 * k2z + 2 * k3z + k4z) / 6</pre>
+  <p class="note"><b>ポイント：</b>2変数から3変数（<span class="mono">x, y, z</span>）に増えても考え方は同じ。全成分の <span class="mono">k1〜k4</span> を出し終えてから最後に3成分をまとめて更新する。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-14　ばねダンパ系の右辺関数</h2><span class="tag">05-06 / Cell 26</span></div>
+  <pre class="code">return (u - c * v - k_spring * x) / m</pre>
+  <p class="trap"><b>罠：</b>ばね定数の引数名が <span class="mono">k</span> ではなく <span class="mono">k_spring</span> である点と、<span class="mono">m</span> で割り忘れない点に注意。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-15　逆振り子（反り返り＆外力方向固定）の右辺関数</h2><span class="tag">05-06 / Cell 30, 33</span></div>
+  <pre class="code">[1] return (l * F - m * g * l * np.cos(theta) - d * omega) / (m * l ** 2)
+[2] return (l * F * np.cos(psi + theta) - m * g * l * np.cos(theta) - d * omega) / (m * l ** 2)</pre>
+  <p class="trap"><b>罠：</b>分母は <span class="mono">m * l</span> ではなく慣性モーメントの <span class="mono">m * l ** 2</span>。また <span class="mono">np.cos(psi + theta)</span> を <span class="mono">np.cos(psi) + np.cos(theta)</span> にしないこと。</p>
+</section>
+
+<div class="part pagebreak">第7〜8回・第11〜12回（07-08, 11-12）：単振り子・PD制御・ニュートン法</div>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-16　単振り子の運動方程式と右辺関数</h2><span class="tag">07-08 / Cell 3, 5</span></div>
+  <pre class="code">[1] return omega
+[2] return -(g / l) * np.sin(theta)</pre>
+  <p class="note"><b>ポイント：</b>運動方程式 <span class="mono">m l<sup>2</sup> θ'' = -m g l sinθ</span> を整理すると <span class="mono">m</span> と <span class="mono">l</span> が約分され、<span class="mono">θ'' = -(g/l) sinθ</span> となり質量 <span class="mono">m</span> に依存しない。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-17　単振り子のオイラー法およびRK4更新式</h2><span class="tag">検証(RK4 dt=0.01, T=10): |ΔE|=4.59e-8</span></div>
+  <pre class="code"># (1) オイラー法
+theta[n + 1] = theta[n] + dt * func_dtheta(t[n], theta[n], omega[n], g, l)
+omega[n + 1] = omega[n] + dt * func_domega(t[n], theta[n], omega[n], g, l)
+# (2) RK4 の k1, k2（k3, k4 も同様）
+k1t = dt * func_dtheta(t[n], theta[n], omega[n], g, l)
+k1o = dt * func_domega(t[n], theta[n], omega[n], g, l)
+k2t = dt * func_dtheta(t[n] + dt/2, theta[n] + k1t/2, omega[n] + k1o/2, g, l)
+k2o = dt * func_domega(t[n] + dt/2, theta[n] + k1t/2, omega[n] + k1o/2, g, l)
+# (k3t, k3o, k4t, k4o を計算し、最後に (k1 + 2*k2 + 2*k3 + k4)/6 で更新)</pre>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-18　逆振り子PD制御の微分方程式右辺</h2><span class="tag">11-12 / Cell 2</span></div>
+  <pre class="code">[1] u = kp * (0 - phi) - kd * omega
+[2] domega = (g / l) * np.sin(phi) + u</pre>
+  <p class="note"><b>ポイント：</b>第11〜12回の座標系では <span class="mono">φ = 0</span> が<b>真上</b>（倒立状態）なので、重力の項の符号は <span class="mono">+(g/l) sinφ</span>（第7〜8回の真下基準の <span class="mono">-</span> と逆）。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-19　1次元・2次元ニュートン法の更新式</h2><span class="tag">11-12 / Cell 5, 7, 9</span></div>
+  <pre class="code">[1] x_new = x - fx / dfx
+[2] delta = np.linalg.solve(Jz, -fz)</pre>
+  <p class="note"><b>ポイント：</b>2次元では <span class="mono">J(z) δ = -f(z)</span> の連立1次方程式を解く。<span class="mono">np.linalg.solve(左辺の行列, 右辺のベクトル)</span> の第2引数にマイナス符号 <span class="mono">-fz</span> を忘れないこと。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-20　線形連立方程式 A x = b の求解</h2><span class="tag">検証値: [-6., 2., 3.]</span></div>
+  <pre class="code">[1] x = np.linalg.solve(A, b)</pre>
+  <p class="note"><b>ポイント：</b><span class="mono">np.linalg.inv(A) @ b</span> よりも、直接 <span class="mono">np.linalg.solve(A, b)</span> を使う方が計算コスト・数値精度の両面で優れている。</p>
+</section>
+
+<footer>
+  <span>シミュレーション工学 Google Colab 全TODO攻略ドリル（解答・解説編）</span>
+  <span>全20課題 / Python実行検算済み</span>
+</footer>
+
+</div>
+</body>
+</html>

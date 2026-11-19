@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>固定点の安定性・分類 暗記シート（1枚完結版）</title>
+<style>
+  @page { size: A4; margin: 13mm 14mm 14mm 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Yu Gothic", "YuGothic", "Meiryo", sans-serif; color: #1b1b1b; font-size: 9.2pt; line-height: 1.5; margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  h1 { font-size: 15pt; margin: 0 0 2px; border-bottom: 2.5px solid #1f4e79; padding-bottom: 4px; }
+  .sub { font-size: 8.6pt; color: #4a5560; margin-bottom: 10px; }
+  .steps { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .step { border: 1px solid #c9ced4; border-top: 3.5px solid #1f4e79; padding: 7px 9px; background: #fbfcfd; }
+  .step b { color: #1f4e79; }
+  table { width: 100%; border-collapse: collapse; margin: 6px 0 10px; font-size: 8.7pt; }
+  th, td { border: 1px solid #c9ced4; padding: 5px 6px; text-align: left; vertical-align: top; }
+  th { background: #eef2f6; font-weight: 700; }
+  .box { border: 1px solid #c9ced4; border-left: 4px solid #a8542a; background: #fdfaf8; padding: 7px 10px; font-size: 8.8pt; }
+  .math { font-family: "Cambria Math", "Times New Roman", Georgia, serif; }
+</style>
+</head>
+<body>
+  <h1>固定点の安定性・分類・答案の決まり文句 暗記シート</h1>
+  <div class="sub">シミュレーション工学 演習1・演習2 共通 // 「数値を見た瞬間にそのまま日本語で書ける」ための1枚まとめ</div>
+
+  <div class="steps">
+    <div class="step">
+      <b>Step 1: まず Δ = det J を見る</b><br>
+      <b>Δ &lt; 0</b> なら迷わず即「鞍点（不安定・白丸）」．<br>
+      <b>Δ = 0</b>（固有値0を含む）なら即「線形化だけでは判定不可」．
+    </div>
+    <div class="step">
+      <b>Step 2: Δ &gt; 0 なら τ = tr J を見る</b><br>
+      固有値の実部の符号と一致：<br>
+      <b>τ &lt; 0</b> -> 安定（黒丸）<br>
+      <b>τ &gt; 0</b> -> 不安定（白丸） / <b>τ = 0</b> -> 中心点
+    </div>
+    <div class="step">
+      <b>Step 3: 虚部の有無 (τ² - 4Δ)</b><br>
+      <b>τ² - 4Δ &lt; 0</b>（虚部あり）-> 渦状点（回る）<br>
+      <b>τ² - 4Δ &gt; 0</b>（実数のみ）-> 結節点（直進）
+    </div>
+  </div>
+
+  <table>
+    <tr>
+      <th style="width:17%;">固定点の分類</th>
+      <th style="width:20%;">固有値の特徴</th>
+      <th style="width:17%;">τ, Δ の条件</th>
+      <th style="width:10%;">相図の丸</th>
+      <th>試験でそのまま書ける決まり文句</th>
+    </tr>
+    <tr>
+      <td><b>安定渦状点</b><br>（安定焦点）</td>
+      <td class="math">実部 &lt; 0，虚部あり</td>
+      <td class="math">τ &lt; 0, Δ &gt; 0<br>τ² - 4Δ &lt; 0</td>
+      <td><b>黒丸</b></td>
+      <td>「実部が負で虚部が存在するので，固定点は安定な渦状点である（相図では黒丸）．」</td>
+    </tr>
+    <tr>
+      <td><b>不安定渦状点</b><br>（不安定焦点）</td>
+      <td class="math">実部 &gt; 0，虚部あり</td>
+      <td class="math">τ &gt; 0, Δ &gt; 0<br>τ² - 4Δ &lt; 0</td>
+      <td><b>白丸</b></td>
+      <td>「実部が正で虚部が存在するので，固定点は不安定な渦状点である（相図では白丸）．」</td>
+    </tr>
+    <tr>
+      <td><b>中心点</b><br>（中立安定）</td>
+      <td class="math">実部 = 0（純虚数）</td>
+      <td class="math">τ = 0, Δ &gt; 0</td>
+      <td>白丸等<br>（閉軌道）</td>
+      <td>「固有値の実部が 0 の純虚数なので，線形化系では中心点（中立安定）である．」</td>
+    </tr>
+    <tr>
+      <td><b>安定結節点</b></td>
+      <td class="math">2つとも負の実数</td>
+      <td class="math">τ &lt; 0, Δ &gt; 0<br>τ² - 4Δ &gt; 0</td>
+      <td><b>黒丸</b></td>
+      <td>「2つの固有値がともに負の実数（虚部なし）なので，固定点は安定な結節点である（相図では黒丸）．」</td>
+    </tr>
+    <tr>
+      <td><b>不安定結節点</b></td>
+      <td class="math">2つとも正の実数</td>
+      <td class="math">τ &gt; 0, Δ &gt; 0<br>τ² - 4Δ &gt; 0</td>
+      <td><b>白丸</b></td>
+      <td>「2つの固有値がともに正の実数なので，固定点は不安定な結節点である（相図では白丸）．」</td>
+    </tr>
+    <tr>
+      <td><b>鞍点</b><br>（サドル）</td>
+      <td class="math">正と負の実数（異符号）</td>
+      <td class="math">Δ &lt; 0</td>
+      <td><b>白丸</b></td>
+      <td>「正と負の実固有値を持つ（Δ &lt; 0）ので，固定点は不安定な鞍点である（相図では白丸）．」</td>
+    </tr>
+    <tr>
+      <td><b>非双曲型</b><br>（分岐点等）</td>
+      <td class="math">固有値 0 を含む</td>
+      <td class="math">Δ = 0</td>
+      <td>非線形で<br>判定</td>
+      <td>「固有値に 0（実部 0）を含むため，線形化だけでは安定性を判定できない．」</td>
+    </tr>
+  </table>
+
+  <div class="box">
+    <b>相図の向き・固有ベクトルの覚え方（3つの即決ルール）</b><br>
+    1. <b>渦巻きの回転向き</b>：位置が横軸 z・速度が縦軸 v (= dz/dt) なら，上半分 (v &gt; 0) は右向き・下半分 (v &lt; 0) は左向きに進むため，必ず <b>時計回り</b>．<br>
+    2. <b>鞍点の固有ベクトル</b>：J の1行目が [0, 1] のとき，(J - λI)w = 0 の1行目は -λ w1 + w2 = 0 なので <b>w = (1, λ)^T</b>（傾きがそのまま固有値 λ）．<br>
+    3. <b>固有ベクトルの矢印</b>：<b>λ &gt; 0</b> の直線は白丸から離れる（<b>外向き</b>），<b>λ &lt; 0</b> の直線は白丸へ向かう（<b>内向き</b>）．
+  </div>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>人間が紙に書くこと・自分で書くことリスト（レポート＆期末試験）</title>
+<style>
+  @page { size: A4; margin: 13mm 14mm 14mm 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Yu Gothic", "YuGothic", "Meiryo", sans-serif; color: #1b1b1b; font-size: 9.2pt; line-height: 1.52; margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  h1 { font-size: 14.5pt; margin: 0 0 2px; border-bottom: 2.5px solid #1f4e79; padding-bottom: 4px; }
+  .sub { font-size: 8.5pt; color: #4a5560; margin-bottom: 9px; }
+  .sec { margin: 8px 0 4px; padding: 4px 9px; background: #1f4e79; color: #fff; font-weight: 700; font-size: 9.8pt; }
+  .sec.rust { background: #a8542a; }
+  table { width: 100%; border-collapse: collapse; margin: 4px 0 8px; font-size: 8.6pt; }
+  th, td { border: 1px solid #c9ced4; padding: 4px 6px; text-align: left; vertical-align: top; }
+  th { background: #eef2f6; font-weight: 700; }
+  .box { border: 1px solid #c9ced4; border-left: 4px solid #1f4e79; background: #fbfcfd; padding: 6px 10px; margin: 5px 0; font-size: 8.8pt; }
+  ul { margin: 3px 0; padding-left: 18px; }
+</style>
+</head>
+<body>
+  <h1>人間が紙に書くこと・自分の言葉で書くこと一覧（演習2）</h1>
+  <div class="sub">シミュレーション工学 // レポート提出時と期末試験（紙の筆記・60%）で手書き・自力作成が必要な項目の整理</div>
+
+  <div class="sec">A. レポート提出のために「紙に手描き」すること（図以外は手書き不可）</div>
+  <div class="box">
+    レポート規定により，<b>文章・数式はすべてデジタル（Word / PDF）</b>で書き，<b>紙に手描きして画像で貼ってよいのは「図」だけ</b>です．
+    <ul>
+      <li><b>[必須] 演習 3(b) 図1：固定点 (1/7, 0) 近傍の線形相図</b>（軸 z, v ／ 中心に <b>黒丸</b> ／ <b>時計回り</b> に内へ巻き込む渦巻き＋矢印）</li>
+      <li><b>[必須] 演習 3(b) 図2：固定点 (4/7, 0) 近傍の線形相図</b>（軸 z, v ／ 中心に <b>白丸</b> ／ 傾き +0.88 の直線に外向き矢印 ／ 傾き -1.88 の直線に内向き矢印 ／ 4領域の双曲線＋矢印）</li>
+    </ul>
+  </div>
+
+  <div class="sec">B. レポート上で「自分の言葉（(5).ipynb 原文）」を残しつつ最低限直す箇所</div>
+  <table>
+    <tr><th style="width:14%;">場所</th><th style="width:42%;">今の自分の文章の評価（そのまま活かせる部分）</th><th>最低限だけ直す・書き足す部分</th></tr>
+    <tr>
+      <td><b>課題1</b><br>(セル4)</td>
+      <td>u1, u2 で立てた考え方自体は合っている．</td>
+      <td>問題文指定の <b>z, v</b> で書き直し，行列2行目 0,1 -&gt; <b>1,0</b>，非線形項の縦ベクトル化，固定点条件 <b>α = z(1-z)^2</b> の変形を足す．</td>
+    </tr>
+    <tr>
+      <td><b>課題2(c)(d)</b><br>(セル8)</td>
+      <td>「図で0.2以下と0.5付近に解があるから0.1と0.6」「(1-z)(3z-1) で z=1, 1/3」という本質は <b>100点</b>．そのまま活かせる．</td>
+      <td>音声/変換ミス（近-&gt;根，買い-&gt;解，接戦-&gt;接線，指揮-&gt;式，終息-&gt;収束）と「<b>分母が0になり止まる</b>」だけ直せば完璧．</td>
+    </tr>
+    <tr>
+      <td><b>課題4</b><br>(セル14)</td>
+      <td>「(0.30,0)は1/7に収束，(0.60,0)はt=2.39で接触，4/7が不安定だから」という自分の言葉は <b>十分通じるし良い</b>．</td>
+      <td>課題(3)の分類名「<b>安定渦状点</b>」「<b>鞍点</b>」の2語だけ添えれば完璧．</td>
+    </tr>
+    <tr>
+      <td><b>課題5</b><br>(セル17)</td>
+      <td>「ばねの引き戻す力の増加と静電力の増加の大小，(1-z)^2 が小さくなり静電力が跳ね上がる」という説明は <b>物理の本質を完璧に掴んでいる</b>．</td>
+      <td>主語「<b>1/7ではばねが勝ち，4/7では静電力が勝つ</b>」と「<b>3(b)の手描き図と一致する点・境界(セパラトリクス)で違う点</b>」を自分の言葉で2〜3行足す．</td>
+    </tr>
+    <tr>
+      <td><b>課題6</b><br>(セル21)</td>
+      <td>「αの値によって」の続きを自分の言葉で書き切るだけ．</td>
+      <td>(1) α=4/27, z=1/3 の導出，(2) 固有値0で判定不可，(3) T=200図の根拠，(4) α=0.16 は常に静電力&gt;ばね力，(5) 分岐まとめ．</td>
+    </tr>
+  </table>
+
+  <div class="sec rust">C. 期末試験（紙のテスト・成績60%）で人間が白紙から書けないといけないこと</div>
+  <table>
+    <tr><th style="width:16%;">単元</th><th style="width:44%;">紙に自力で書く内容（出題される動作）</th><th>チェック基準（これが書ければ合格）</th></tr>
+    <tr>
+      <td><b>1. 1階変換と固定点</b></td>
+      <td>z'' = ... を z' = v, v' = ... の2本に分解し，z'=0, v'=0 を代入して α = z(1-z)^2 を変形導出する．</td>
+      <td>[ ] v=0 を先に言える<br>[ ] 2本とも式を暗記せず作れる</td>
+    </tr>
+    <tr>
+      <td><b>2. ニュートン法</b></td>
+      <td>f(z) = α - z(1-z)^2 を微分して f'(z) = (1-z)(3z-1) を出し，z_{k+1} = z_k - f(z_k)/f'(z_k) を書く．1ステップの分数計算と失敗点 z=1/3, 1 を答える．</td>
+      <td>[ ] f'(z)=0 の2点を言える<br>[ ] なぜ失敗するか「接線が水平・分母0」と書ける</td>
+    </tr>
+    <tr>
+      <td><b>3. ヤコビアン・固有値・相図</b></td>
+      <td>偏微分で J=[[0,1],[-1+2α/(1-z)^3, -β]] を作り，z*=1/7, 4/7 を代入して <b>分数で τ, Δ, λ</b> を計算し，固有ベクトル w=(1, λ)^T を求めて相図を2枚手描きする．</td>
+      <td>[ ] 1/7 と 4/7 を分数で通分できる<br>[ ] 決まり文句（「実部が負で虚部があるので〜」）が書ける<br>[ ] 黒丸/白丸・時計回り・傾き矢印を描ける</td>
+    </tr>
+    <tr>
+      <td><b>4-5. 物理・相図比較</b></td>
+      <td>(0, 0.5) と (0, 0.8) の違いをセパラトリクス（境界）で説明し，1/7 が安定・4/7 が不安定な理由をばねと静電力の増え方で書く．</td>
+      <td>[ ] 「傾き（増加率）の大小」を自分の言葉で書ける</td>
+    </tr>
+    <tr>
+      <td><b>6. 分岐（応用）</b></td>
+      <td>g'(z)=(1-z)(1-3z)=0 から最大値 α=4/27 (z=1/3) を出し，固有値 λ=0,-1 から「線形化だけでは判定不可」と書く．</td>
+      <td>[ ] 4/27 の計算手順を書ける<br>[ ] 半安定（左は近づき右は逃げる）を説明できる</td>
+    </tr>
+    <tr>
+      <td><b>7. 制御（発展）</b></td>
+      <td>目標 z_ref に対する入力 α(z,v) の式（例: α_ff - Kp(z-z_ref) - Kd v の 0 クリップ）と運動方程式を書く．</td>
+      <td>[ ] 「なぜ α >= 0 か（V^2 に比例）」を書ける</td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>シミュレーション工学 模擬期末試験（問題）</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 18mm 15mm; }
+  :root { --ink:#1b1b1b; --navy:#1f4e79; --rust:#a8542a; --line:#c9ced4; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Yu Gothic", "YuGothic", "Meiryo", sans-serif;
+    color: var(--ink); font-size: 10.5pt; line-height: 1.8; margin: 0;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .page { max-width: 178mm; margin: 0 auto; padding: 6mm 0 10mm; }
+  header { border-bottom: 2.5px solid var(--navy); padding-bottom: 10px; margin-bottom: 6px; }
+  .kicker { font-size: 9.5pt; letter-spacing: .12em; color: var(--navy); }
+  h1 { font-size: 19pt; margin: 4px 0 2px; letter-spacing: .02em; }
+  .sub { font-size: 10pt; color: #4a5560; }
+  .meta { width: 100%; border-collapse: collapse; margin: 10px 0 14px; font-size: 9.5pt; }
+  .meta th, .meta td { border: 1px solid var(--line); padding: 5px 8px; text-align: left; }
+  .meta th { background: #f2f4f6; width: 22%; font-weight: 600; }
+  .notice { border: 1px solid var(--line); padding: 8px 14px 8px 30px; font-size: 9.5pt; margin-bottom: 18px; }
+  .notice li { margin: 2px 0; }
+  .part { margin: 26px 0 6px; padding: 6px 12px; background: var(--navy); color: #fff;
+          font-size: 11pt; letter-spacing: .16em; break-after: avoid; }
+  .q { margin-top: 22px; break-inside: avoid; }
+  .qhead { display: flex; align-items: baseline; border-bottom: 1.5px solid var(--navy); padding-bottom: 3px; }
+  .qhead h2 { font-size: 12pt; margin: 0; }
+  .pt { margin-left: auto; font-size: 10pt; color: var(--navy); font-weight: 600; }
+  .lead { font-size: 10pt; color: #333; margin: 8px 0 4px; }
+  ol.body { padding-left: 1.6em; margin: 6px 0; }
+  ol.body > li { margin: 6px 0; }
+  .ans { border: 1px solid var(--line); margin: 6px 0 2px; padding: 4px 10px; }
+  .ans .ln { border-bottom: 1px dotted #aab2ba; height: 25px; }
+  .ans .ln:last-child { border-bottom: none; }
+  .ans.blank { background: #fbfbfc; }
+  .eq { text-align: center; margin: 10px 0; }
+  .eq-left { margin: 8px 0 8px 1.2em; }
+  .frac { display: inline-block; vertical-align: -0.55em; text-align: center; line-height: 1.15; font-size: .95em; }
+  .frac > span { display: block; padding: 0 .28em; }
+  .frac > .d { border-top: 1px solid #333; }
+  table.mat { display: inline-table; vertical-align: middle; border-collapse: collapse; margin: 0 3px; }
+  table.mat td { padding: 1px 9px; text-align: center; border: none; }
+  .bracket { display: inline-block; border-left: 1.4px solid #333; border-right: 1.4px solid #333;
+             padding: 2px 3px; vertical-align: middle; }
+  code, .mono { font-family: Consolas, "Courier New", monospace; font-size: 9.5pt; }
+  pre.code { font-family: Consolas, "Courier New", monospace; font-size: 9pt; line-height: 1.55;
+             background: #f6f7f9; border: 1px solid var(--line); padding: 8px 12px; white-space: pre; }
+  .fig { text-align: center; margin: 10px 0; }
+  .fig svg { max-width: 100%; height: auto; }
+  .cap { font-size: 9pt; color: #444; text-align: center; margin-top: 2px; }
+  .note { font-size: 9pt; color: #555; }
+  .keep { break-inside: avoid; }
+  .pagebreak { break-before: page; }
+  footer { margin-top: 26px; border-top: 1px solid var(--line); padding-top: 6px;
+           font-size: 8.5pt; color: #777; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="kicker">2026年度 シミュレーション工学 / 模擬試験</div>
+  <h1>模擬期末試験　― 時間発展シミュレーションと安定性解析</h1>
+  <div class="sub">出題範囲：第1回〜第12回の講義内容および演習1（振り子）の内容</div>
+</header>
+
+<table class="meta">
+  <tr><th>試験時間</th><td>90分</td><th>配点</th><td>60点満点</td></tr>
+  <tr><th>本番</th><td>2026年11月25日(水) 10:30-12:00 / 107講義室</td><th>持ち込み</th><td>不可（筆記具のみ）</td></tr>
+</table>
+
+<ol class="notice">
+  <li>解答は各問の解答欄に記入すること。欄が足りない場合は裏面の余白を用いてよい。</li>
+  <li>電卓・教科書・ノート・PC・スマートフォンの持ち込みは認めない。数値は有効数字3桁程度でよい。</li>
+  <li>計算過程も採点の対象とする。結果だけでなく、どの式からどの式へ変形したかを書くこと。</li>
+  <li>図を描く問題では、軸の量と目盛りの意味、固定点、矢印の向きを明記すること。</li>
+  <li>配点は各問の右上に示す。60点満点で、40点以上を合格の目安とする。</li>
+</ol>
+
+<div class="part">第1部　時間発展シミュレーション</div>
+
+<!-- ============================================================ Q1 -->
+<section class="q">
+  <div class="qhead"><h2>第1問　数値計算の誤差</h2><span class="pt">8点</span></div>
+
+  <ol class="body">
+    <li>次の4つの用語を、それぞれ1〜2文で説明せよ。さらに、それぞれが実際に現れる計算例を1つずつ挙げよ。
+      <div style="margin:4px 0 0 0;">
+        ① 丸め誤差　② 打ち切り誤差　③ 情報落ち　④ 桁落ち
+      </div>
+    </li>
+    <li>単精度（float32）と倍精度（float64）は、実数をそれぞれ約何桁の10進数で表現できるか。</li>
+    <li>数値計算の誤差を理解することが、シミュレーションを行う上でなぜ重要か。「無意味な計算をしない」という語を用いて説明せよ。</li>
+  </ol>
+
+  <div class="ans">
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+  </div>
+</section>
+
+<!-- ============================================================ Q2 -->
+<section class="q pagebreak">
+  <div class="qhead"><h2>第2問　オイラー法</h2><span class="pt">10点</span></div>
+  <p class="lead">1階の常微分方程式 <span class="mono">dx/dt = f(t, x)</span>、初期条件 <span class="mono">x(t<sub>0</sub>) = x<sub>0</sub></span> を考える。</p>
+
+  <ol class="body">
+    <li>微分の定義から出発して、前進オイラー法の更新式を導出せよ。</li>
+    <li>テイラー展開を用いて、前進オイラー法が1次精度であることを説明せよ。1ステップあたりの誤差と、一定時間後の積算誤差の次数をそれぞれ明記すること。</li>
+    <li><span class="mono">dx/dt = −9x</span>、<span class="mono">x(0) = 1</span>、<span class="mono">Δt = 0.25</span> とする。前進オイラー法で <span class="mono">x<sub>1</sub></span> と <span class="mono">x<sub>2</sub></span> を求めよ。また、この刻み幅で計算が発散する理由を、増幅率 <span class="mono">1 + kΔt</span> を用いて説明せよ。</li>
+    <li>後退オイラー法の更新式を書き、同じ条件で <span class="mono">x<sub>1</sub></span> を求めよ。前進オイラー法との安定性の違いを述べよ。</li>
+  </ol>
+
+  <div class="ans">
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+  </div>
+</section>
+
+<!-- ============================================================ Q3 -->
+<section class="q">
+  <div class="qhead"><h2>第3問　ルンゲ・クッタ法と刻み幅</h2><span class="pt">8点</span></div>
+
+  <ol class="body">
+    <li>2次のルンゲ・クッタ法（ホイン法）の更新式を、<span class="mono">k<sub>1</sub>, k<sub>2</sub></span> を用いて書け。</li>
+    <li>4次のルンゲ・クッタ法（RK4）の更新式を、<span class="mono">k<sub>1</sub></span>〜<span class="mono">k<sub>4</sub></span> を用いて書け。</li>
+    <li>オイラー法、ホイン法、RK4 について、1ステップあたりの誤差と、一定時間後の積算誤差の次数をそれぞれ答えよ。</li>
+    <li>刻み幅 <span class="mono">Δt</span> を 1/10 にしたとき、一定時間後の誤差はそれぞれ何倍になるか。上の次数を用いて答えよ。</li>
+  </ol>
+
+  <div class="ans">
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div>
+  </div>
+</section>
+
+<!-- ============================================================ Q4 -->
+<section class="q">
+  <div class="qhead"><h2>第4問　高階微分方程式の取扱い</h2><span class="pt">5点</span></div>
+  <p class="lead">質量 <span class="mono">m</span>、減衰係数 <span class="mono">c</span>、ばね定数 <span class="mono">k</span> のバネダンパ系</p>
+  <div class="eq"><span class="mono">m</span> <span class="frac"><span>d<sup>2</sup><i>x</i></span><span class="d">d<i>t</i><sup>2</sup></span></span> + <span class="mono">c</span> <span class="frac"><span>d<i>x</i></span><span class="d">d<i>t</i></span></span> + <span class="mono">k x</span> = 0</div>
+
+  <ol class="body">
+    <li>状態変数を定義し、1階の連立微分方程式に変形せよ。</li>
+    <li>ベクトル表記 <span class="mono">d<b>x</b>/dt = <b>f</b>(<b>x</b>)</span> で書け。</li>
+    <li>この系に RK4 を適用するとき、各成分の計算で注意すべき点を述べよ。</li>
+  </ol>
+
+  <div class="ans">
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div>
+  </div>
+</section>
+
+<!-- ============================================================ Q5 -->
+<section class="q">
+  <div class="qhead"><h2>第5問　モデル化</h2><span class="pt">5点</span></div>
+  <p class="lead">木から落ちるリンゴを題材にする。次の3つの目的を考える。</p>
+  <div class="eq-left">
+    目的A：地面に到達するまでの速度変化を知りたい<br>
+    目的B：地面に到達するまでの姿勢変化も知りたい<br>
+    目的C：地面に到達した後にどんな動きをするか知りたい
+  </div>
+
+  <ol class="body">
+    <li>目的A・B・Cに対応するモデルをそれぞれ1つ挙げ、状態変数とパラメータを書け。</li>
+    <li>モデルを複雑にすることの弊害を2つ、単純なモデルの利点を2つ挙げよ。</li>
+  </ol>
+
+  <div class="ans">
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+  </div>
+</section>
+
+<div class="part pagebreak">第2部　シミュレーション結果の解析</div>
+
+<!-- ============================================================ Q6 -->
+<section class="q">
+  <div class="qhead"><h2>第6問　固定点と相図（単振り子）</h2><span class="pt">8点</span></div>
+  <p class="lead">長さ <span class="mono">l</span> の単振り子の運動は、角度 <span class="mono">θ</span> と角速度 <span class="mono">ω</span> を用いて次式で表される。</p>
+  <div class="eq"><span class="frac"><span>d<i>θ</i></span><span class="d">d<i>t</i></span></span> = <i>ω</i>　,　<span class="frac"><span>d<i>ω</i></span><span class="d">d<i>t</i></span></span> = − <span class="frac"><span><i>g</i></span><span class="d"><i>l</i></span></span> sin<i>θ</i></div>
+
+  <ol class="body">
+    <li>固定点をすべて求めよ。ただし <span class="mono">θ ∈ (−π, π]</span> とする。</li>
+    <li>ヤコビアン行列を求め、各固定点での固有値を計算して、固定点の種類と安定性を判定せよ。</li>
+    <li>次の6つの初期値から始めた運動が、振り子のどのような動きに対応するかを説明せよ。
+      <div class="eq-left mono">(θ, ω) = (0, 0), (π/2, 0), (π, 0), (−π, 0), (−π, 1), (π, −1)</div>
+      <span class="note">θが周期変数（−π〜π）であることに触れること。</span></li>
+  </ol>
+
+  <div class="ans">
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+  </div>
+</section>
+
+<!-- ============================================================ Q7 -->
+<section class="q pagebreak">
+  <div class="qhead"><h2>第7問　線形系の固有値と安定性</h2><span class="pt">6点</span></div>
+  <p class="lead">次の線形系を考える。</p>
+  <div class="eq"><span class="frac"><span>d</span><span class="d">d<i>t</i></span></span>
+    <span class="bracket"><table class="mat"><tr><td><i>x</i><sub>1</sub></td></tr><tr><td><i>x</i><sub>2</sub></td></tr></table></span>
+    =
+    <span class="bracket"><table class="mat"><tr><td>1</td><td>1</td></tr><tr><td>4</td><td>−2</td></tr></table></span>
+    <span class="bracket"><table class="mat"><tr><td><i>x</i><sub>1</sub></td></tr><tr><td><i>x</i><sub>2</sub></td></tr></table></span>
+    ,　<i>A</i> = <span class="bracket"><table class="mat"><tr><td>1</td><td>1</td></tr><tr><td>4</td><td>−2</td></tr></table></span>
+  </div>
+
+  <ol class="body">
+    <li>トレース <span class="mono">τ</span> と行列式 <span class="mono">Δ</span> を求め、特性方程式から固有値を求めよ。</li>
+    <li>各固有値に対応する固有ベクトルを求めよ。</li>
+    <li>固定点の種類と安定性を答えよ。さらに、固有ベクトルの方向と軌道の向きを明記して相図の概形を描け。</li>
+  </ol>
+
+  <div style="display:flex; gap:10px; align-items:stretch; margin-top:6px;">
+    <div class="ans" style="flex:1;">
+      <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+      <div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    </div>
+    <div class="ans blank" style="width:62mm; display:flex; align-items:center; justify-content:center; color:#9aa2aa; font-size:9pt;">
+      相図（スケッチ）
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ Q8 -->
+<section class="q">
+  <div class="qhead"><h2>第8問　逆振り子のPD制御</h2><span class="pt">6点</span></div>
+  <p class="lead">支点にトルク入力を加えた振り子の運動方程式を、倒立状態を <span class="mono">φ = 0</span> とする座標で書くと次式になる。</p>
+  <div class="eq"><span class="frac"><span>d<sup>2</sup><i>φ</i></span><span class="d">d<i>t</i><sup>2</sup></span></span> =
+    <span class="frac"><span><i>g</i></span><span class="d"><i>l</i></span></span> sin<i>φ</i> + <i>u</i>　,　
+    <i>u</i> = −<i>k</i><sub>p</sub><i>φ</i> − <i>k</i><sub>d</sub><span class="frac"><span>d<i>φ</i></span><span class="d">d<i>t</i></span></span>　
+    (<i>k</i><sub>p</sub> &gt; 0, <i>k</i><sub>d</sub> &gt; 0)</div>
+
+  <ol class="body">
+    <li><span class="mono">φ = 0</span> のまわりで線形化し、状態方程式 <span class="mono">d/dt [φ, ω]<sup>T</sup> = A [φ, ω]<sup>T</sup></span> の行列 <span class="mono">A</span> を求めよ。</li>
+    <li>固定点 <span class="mono">φ = 0</span> が漸近安定となるための <span class="mono">k<sub>p</sub></span>、<span class="mono">k<sub>d</sub></span> の条件を、<span class="mono">τ</span> と <span class="mono">Δ</span> を用いて導け。</li>
+    <li><span class="mono">l = 1</span> m、<span class="mono">g = 9.8</span> m/s<sup>2</sup>、<span class="mono">k<sub>d</sub> = 6</span> のとき、臨界減衰（重解）となる <span class="mono">k<sub>p</sub></span> を求めよ。</li>
+  </ol>
+
+  <div class="ans">
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div>
+  </div>
+</section>
+
+<!-- ============================================================ Q9 -->
+<section class="q">
+  <div class="qhead"><h2>第9問　ニュートン法</h2><span class="pt">4点</span></div>
+
+  <ol class="body">
+    <li>1次元の方程式 <span class="mono">f(x) = 0</span> に対するニュートン法の更新式を、テイラー展開から導出せよ。</li>
+    <li><span class="mono">f(x) = x<sup>3</sup> − 13 = 0</span> を、初期値 <span class="mono">x<sub>0</sub> = 2</span> から2回反復して解け。各回の計算値も書くこと。</li>
+  </ol>
+
+  <div class="ans">
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div>
+  </div>
+
+  <p class="note" style="margin-top:8px;">【発展（加点なし）】(a) 連立方程式への拡張をヤコビアンを用いて書け。(b) <span class="mono">f(x) = x<sup>3</sup> − 2x + 2</span>、<span class="mono">x<sub>0</sub> = 0</span> では収束しない。その理由を説明せよ。</p>
+</section>
+
+<footer>
+  <span>シミュレーション工学 模擬期末試験（問題）</span>
+  <span>全9問 / 60点 / 90分</span>
+</footer>
+
+</div>
+</body>
+</html>

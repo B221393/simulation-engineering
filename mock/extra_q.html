@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>シミュレーション工学 模擬期末試験 追加問題（問題）</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 18mm 15mm; }
+  :root { --ink:#1b1b1b; --navy:#1f4e79; --rust:#a8542a; --line:#c9ced4; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Yu Gothic", "YuGothic", "Meiryo", sans-serif;
+    color: var(--ink); font-size: 10.5pt; line-height: 1.8; margin: 0;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .page { max-width: 178mm; margin: 0 auto; padding: 6mm 0 10mm; }
+  header { border-bottom: 2.5px solid var(--navy); padding-bottom: 10px; margin-bottom: 6px; }
+  .kicker { font-size: 9.5pt; letter-spacing: .12em; color: var(--navy); }
+  h1 { font-size: 19pt; margin: 4px 0 2px; letter-spacing: .02em; }
+  .sub { font-size: 10pt; color: #4a5560; }
+  .meta { width: 100%; border-collapse: collapse; margin: 10px 0 14px; font-size: 9.5pt; }
+  .meta th, .meta td { border: 1px solid var(--line); padding: 5px 8px; text-align: left; }
+  .meta th { background: #f2f4f6; width: 22%; font-weight: 600; }
+  .notice { border: 1px solid var(--line); padding: 8px 14px 8px 30px; font-size: 9.5pt; margin-bottom: 18px; }
+  .notice li { margin: 2px 0; }
+  .part { margin: 22px 0 6px; padding: 6px 12px; background: var(--navy); color: #fff;
+          font-size: 11pt; letter-spacing: .16em; break-after: avoid; }
+  .q { margin-top: 20px; break-inside: avoid; }
+  .qhead { display: flex; align-items: baseline; border-bottom: 1.5px solid var(--navy); padding-bottom: 3px; }
+  .qhead h2 { font-size: 12pt; margin: 0; }
+  .pt { margin-left: auto; font-size: 10pt; color: var(--navy); font-weight: 600; }
+  .lead { font-size: 10pt; color: #333; margin: 8px 0 4px; }
+  ol.body { padding-left: 1.6em; margin: 6px 0; }
+  ol.body > li { margin: 6px 0; }
+  .ans { border: 1px solid var(--line); margin: 6px 0 2px; padding: 4px 10px; }
+  .ans .ln { border-bottom: 1px dotted #aab2ba; height: 26px; }
+  .ans .ln:last-child { border-bottom: none; }
+  .ans.blank { background: #fbfbfc; }
+  .anslbl { font-size: 8.5pt; color: #7b848c; letter-spacing: .08em; margin-top: 10px; }
+  .eq { text-align: center; margin: 10px 0; }
+  .eq-left { margin: 8px 0 8px 1.2em; }
+  .frac { display: inline-block; vertical-align: -0.55em; text-align: center; line-height: 1.15; font-size: .95em; }
+  .frac > span { display: block; padding: 0 .28em; }
+  .frac > .d { border-top: 1px solid #333; }
+  table.mat { display: inline-table; vertical-align: middle; border-collapse: collapse; margin: 0 3px; }
+  table.mat td { padding: 1px 9px; text-align: center; border: none; }
+  .bracket { display: inline-block; border-left: 1.4px solid #333; border-right: 1.4px solid #333;
+             padding: 2px 3px; vertical-align: middle; }
+  table.t { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 10px 0; }
+  table.t th, table.t td { border: 1px solid var(--line); padding: 5px 8px; text-align: center; }
+  table.t th { background: #f2f4f6; font-weight: 600; }
+  code, .mono { font-family: Consolas, "Courier New", monospace; font-size: 9.5pt; }
+  .fig { text-align: center; margin: 10px 0; }
+  .cap { font-size: 9pt; color: #444; text-align: center; margin-top: 2px; }
+  .note { font-size: 9pt; color: #555; }
+  .keep { break-inside: avoid; }
+  .pagebreak { break-before: page; }
+  footer { margin-top: 26px; border-top: 1px solid var(--line); padding-top: 6px;
+           font-size: 8.5pt; color: #777; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="kicker">2026年度 シミュレーション工学 / 模擬試験 追加問題</div>
+  <h1>模擬期末試験　追加問題　― 相図・刻み幅・2次系の応答</h1>
+  <div class="sub">出題範囲：第5回〜第6回のうち、本試験（第1問〜第9問）で扱わなかった内容</div>
+</header>
+
+<table class="meta">
+  <tr><th>試験時間</th><td>90分</td><th>配点</th><td>60点満点</td></tr>
+  <tr><th>本番</th><td>2026年11月25日(水) 10:30-12:00</td><th>会場</th><td>107講義室</td></tr>
+</table>
+
+<ol class="notice">
+  <li>持ち込みは不可（筆記具のみ）。本試験（第1問〜第9問）と合わせて、第1回〜第12回の範囲をひととおり覆う。</li>
+  <li>解答は各問の解答欄に記入すること。計算過程も採点の対象とする。</li>
+  <li>図を描く問題では、軸の量と目盛りの意味、固定点、矢印の向きを明記すること。</li>
+  <li>数値は有効数字3桁程度でよい。</li>
+</ol>
+
+<div class="anslbl">計算用の余白（採点の対象外）</div>
+<div class="ans blank">
+  <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+  <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+  <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+  <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+  <div class="ln"></div><div class="ln"></div>
+</div>
+
+<div class="part pagebreak">第10問　1次元系の相図と固定点（20点）</div>
+
+<section class="q">
+  <div class="qhead"><h2>第10問</h2><span class="pt">20点</span></div>
+  <p class="lead">次の1次元の微分方程式を考える。</p>
+  <div class="eq"><span class="frac"><span>d<i>x</i></span><span class="d">d<i>t</i></span></span> = <i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup>(1 − <i>x</i>)</div>
+
+  <ol class="body">
+    <li>固定点（平衡点）をすべて求めよ。<span class="note">（4点）</span></li>
+    <li>各固定点について、<i>f</i>′(<i>x</i>) による線形化で安定性を判定せよ。線形化で判定できない固定点については、その理由と、<i>f</i> の符号から判定した結果を書け。<span class="note">（8点）</span></li>
+    <li>横軸に <i>x</i>、縦軸に d<i>x</i>/d<i>t</i> をとったグラフを描き、<i>x</i> 軸上に解の流れの矢印を書き入れよ。<span class="note">（4点）</span></li>
+    <li>初期値 <i>x</i><sub>0</sub> = −0.5、0.5、2 のそれぞれについて、<i>t</i> → ∞ で <i>x</i> がどこに近づくかを答えよ。<span class="note">（4点）</span></li>
+  </ol>
+
+  <div class="anslbl">解答欄</div>
+  <div class="ans">
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+  </div>
+</section>
+
+<div class="part pagebreak">第11問　刻み幅と精度（20点）</div>
+
+<section class="q">
+  <div class="qhead"><h2>第11問</h2><span class="pt">20点</span></div>
+  <p class="lead">d<i>x</i>/d<i>t</i> = −9<i>x</i>、<i>x</i>(0) = 1 を <i>t</i> = 0.2 まで数値的に解いた。真値は <i>e</i><sup>−1.8</sup> = 0.165299 である。刻み幅 Δ<i>t</i> を変えたときの、真値との誤差を次の表に示す。</p>
+
+  <table class="t">
+    <tr><th>Δ<i>t</i></th><th>前進オイラー法</th><th>ホイン法（2次RK）</th><th>RK4</th></tr>
+    <tr><td>0.100</td><td>1.553 × 10<sup>−1</sup></td><td>8.973 × 10<sup>−2</sup></td><td>3.489 × 10<sup>−3</sup></td></tr>
+    <tr><td>0.050</td><td>7.379 × 10<sup>−2</sup></td><td>1.458 × 10<sup>−2</sup></td><td>1.483 × 10<sup>−4</sup></td></tr>
+    <tr><td>0.025</td><td>3.516 × 10<sup>−2</sup></td><td>2.998 × 10<sup>−3</sup></td><td>7.669 × 10<sup>−6</sup></td></tr>
+    <tr><td>0.0125</td><td>1.715 × 10<sup>−2</sup></td><td>6.844 × 10<sup>−4</sup></td><td>4.363 × 10<sup>−7</sup></td></tr>
+  </table>
+
+  <ol class="body">
+    <li>前進オイラー法、ホイン法、RK4 のそれぞれについて、1ステップあたりの誤差と、一定時間後の積算誤差の次数を書け。<span class="note">（4点）</span></li>
+    <li>Δ<i>t</i> を 1/2 にしたときの誤差の比を、3つの手法それぞれについて表から計算せよ（0.100 → 0.050 の行でよい）。その比から、各手法の次数を推定せよ。<span class="note">（8点）</span></li>
+    <li>同じ精度の結果を得るために必要な <i>f</i> の計算回数を比較して、RK4 が実用上よく使われる理由を説明せよ。<span class="note">（4点）</span></li>
+    <li>この問題の刻み幅 Δ<i>t</i> = 0.100 は、前進オイラー法の安定条件 Δ<i>t</i> ≤ 2/9 を満たしているか。増幅率 1 + <i>k</i>Δ<i>t</i> の値を用いて答えよ。<span class="note">（4点）</span></li>
+  </ol>
+
+  <div class="anslbl">解答欄</div>
+  <div class="ans">
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div>
+  </div>
+</section>
+
+<div class="part pagebreak">第12問　2次系（バネダンパ系）のステップ応答（20点）</div>
+
+<section class="q">
+  <div class="qhead"><h2>第12問</h2><span class="pt">20点</span></div>
+  <p class="lead">質量 <i>m</i> = 1、減衰係数 <i>c</i> = 2、ばね定数 <i>k</i> = 1 のバネダンパ系に、<i>t</i> ≥ 0 で一定の入力 <i>u</i>(<i>t</i>) = 1 を与える。運動方程式は次式で、初期値は <i>x</i>(0) = 0、<i>v</i>(0) = 0 とする。</p>
+  <div class="eq"><span class="frac"><span>d<sup>2</sup><i>x</i></span><span class="d">d<i>t</i><sup>2</sup></span></span> + 2 <span class="frac"><span>d<i>x</i></span><span class="d">d<i>t</i></span></span> + <i>x</i> = 1</div>
+
+  <ol class="body">
+    <li>状態変数を (<i>x</i>, <i>v</i>) = (<i>x</i>, d<i>x</i>/d<i>t</i>) とおき、1階の連立微分方程式にせよ。<span class="note">（4点）</span></li>
+    <li>固定点を求めよ。<span class="note">（3点）</span></li>
+    <li>固定点まわりのヤコビアン行列を求め、固有値を計算して安定性を判定せよ。減衰の種類（不足減衰・臨界減衰・過減衰）も答えよ。<span class="note">（6点）</span></li>
+    <li>ステップ応答 <i>x</i>(<i>t</i>) の概形を描け。最終値、<i>t</i> = 0 での傾き、オーバーシュートの有無に触れること。<span class="note">（4点）</span></li>
+    <li>減衰係数 <i>c</i> を 2 より大きくした場合と小さくした場合で、応答がどう変わるかを述べよ。<span class="note">（3点）</span></li>
+  </ol>
+
+  <div style="display:flex; gap:10px; align-items:stretch; margin-top:6px;">
+    <div class="ans" style="flex:1;">
+      <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+      <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+      <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    </div>
+    <div class="ans blank" style="width:62mm; display:flex; align-items:center; justify-content:center; color:#9aa2aa; font-size:9pt;">
+      応答の概形（スケッチ）
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>シミュレーション工学 模擬期末試験 追加問題（問題）</span>
+  <span>全3問 / 60点 / 90分</span>
+</footer>
+
+</div>
+</body>
+</html>

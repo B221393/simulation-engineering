@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>シミュレーション工学 演習2（静電アクチュエータ）期末試験対策まとめ</title>
+<script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+<style>
+  .math { font-family: "Cambria Math", "Times New Roman", Georgia, serif; }
+  .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 3px; font-size: 0.88em; line-height: 1.15; }
+  .frac > span:first-child { border-bottom: 1px solid currentColor; padding: 0 4px 1px; }
+  .frac > span:last-child { padding: 1px 4px 0; }
+  .mat { display: inline-grid; grid-template-columns: auto auto; gap: 3px 12px; vertical-align: middle; border-left: 1.5px solid currentColor; border-right: 1.5px solid currentColor; border-radius: 5px; padding: 3px 9px; margin: 0 4px; text-align: center; }
+  .vec { display: inline-grid; grid-template-columns: auto; gap: 3px; vertical-align: middle; border-left: 1.5px solid currentColor; border-right: 1.5px solid currentColor; border-radius: 5px; padding: 3px 8px; margin: 0 4px; text-align: center; }
+  canvas { touch-action: none; }
+</style>
+</head>
+<body class="bg-[var(--background)] text-[var(--foreground)] antialiased min-h-screen">
+  <div class="max-w-5xl mx-auto px-4 py-5 space-y-5">
+
+    <!-- Header & Progress -->
+    <header class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4 space-y-3">
+      <div class="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div class="text-xs font-mono text-[var(--muted-foreground)]">SIMULATION ENGINEERING // EXERCISE 2 EXAM GUIDE</div>
+          <h1 class="text-xl font-bold mt-0.5">静電アクチュエータ 期末試験対策・重要知識まとめ</h1>
+          <p class="text-xs text-[var(--muted-foreground)] mt-1">
+            対象: 無次元運動方程式、ニュートン法、線形化とヤコビアン、相図手描き、4次ルンゲクッタ法、サドルノード分岐、電圧制御
+          </p>
+        </div>
+        <div class="text-right min-w-[180px]">
+          <div class="text-xs text-[var(--muted-foreground)]">理解度チェック（記述ドリル）</div>
+          <div class="text-sm font-mono font-bold tabular-nums" id="progress-text">0 / 7 完了</div>
+          <div class="w-full h-2 rounded bg-[var(--border)] mt-1 overflow-hidden">
+            <div id="progress-bar" class="h-full bg-[var(--primary)] transition-all duration-200" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex flex-wrap gap-2 pt-2 border-t border-[var(--card-border)] text-xs font-medium">
+        <button data-tab="cheat" class="tab-btn px-3 py-1.5 rounded bg-[var(--primary)] text-[var(--primary-foreground)]">1. 必須公式・知識まとめ</button>
+        <button data-tab="drill" class="tab-btn px-3 py-1.5 rounded border border-[var(--border)] bg-[var(--background)] hover:opacity-80">2. 手計算・記述 予想問題 (7問)</button>
+        <button data-tab="quiz" class="tab-btn px-3 py-1.5 rounded border border-[var(--border)] bg-[var(--background)] hover:opacity-80">3. 4択チェックテスト (6問)</button>
+        <button data-tab="sim" class="tab-btn px-3 py-1.5 rounded border border-[var(--border)] bg-[var(--background)] hover:opacity-80">4. 対話型 相図シミュレータ</button>
+      </nav>
+    </header>
+
+    <!-- TAB 1: CHEAT SHEET -->
+    <section id="tab-cheat" class="tab-panel space-y-4">
+      <div class="grid md:grid-cols-2 gap-4">
+
+        <!-- 1.1 Model & 1st-order ODE -->
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4 space-y-2.5">
+          <h2 class="text-sm font-bold border-b border-[var(--card-border)] pb-1.5">[1] 無次元運動方程式と1階変換</h2>
+          <p class="text-xs text-[var(--muted-foreground)]">
+            変位 <span class="math">z = x/d</span>（物理範囲 <span class="math">0 &le; z &lt; 1</span>、<span class="math">z=1</span> で接触）、
+            <span class="math">&alpha; = &epsilon;<sub>0</sub>AV<sup>2</sup>/(2kd<sup>3</sup>) &ge; 0</span>（電圧の強さ）、
+            <span class="math">&beta; = c/&radic;(km)</span>（減衰の強さ）。
+          </p>
+          <div class="bg-[var(--background)] border border-[var(--card-border)] rounded p-2.5 text-sm math space-y-1.5">
+            <div>z'' = &minus;&beta;z' &minus; z + <span class="frac"><span>&alpha;</span><span>(1 &minus; z)<sup>2</sup></span></span></div>
+            <div class="text-xs font-sans text-[var(--muted-foreground)]">状態変数 z, v = z' を置くと（1階連立微分方程式）:</div>
+            <div>z' = v</div>
+            <div>v' = &minus;&beta;v &minus; z + <span class="frac"><span>&alpha;</span><span>(1 &minus; z)<sup>2</sup></span></span></div>
+          </div>
+          <div class="text-xs space-y-1">
+            <div class="font-semibold">固定点条件（z' = 0 かつ v' = 0）:</div>
+            <p class="text-[var(--muted-foreground)]">
+              z' = 0 より <strong>v = 0</strong>。これを v' = 0 に代入すると
+              <span class="math">0 = &minus;z + &alpha;/(1&minus;z)<sup>2</sup></span> となり、
+              両辺に <span class="math">(1&minus;z)<sup>2</sup> &ne; 0</span> を掛けて
+              <strong><span class="math">&alpha; = z(1&minus;z)<sup>2</sup></span></strong>。
+            </p>
+          </div>
+        </div>
+
+        <!-- 1.2 Newton Method -->
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4 space-y-2.5">
+          <h2 class="text-sm font-bold border-b border-[var(--card-border)] pb-1.5">[2] ニュートン法（固定点の数値探索）</h2>
+          <div class="bg-[var(--background)] border border-[var(--card-border)] rounded p-2.5 text-sm math space-y-1.5">
+            <div>f(z) = &alpha; &minus; z(1 &minus; z)<sup>2</sup> = &minus;z<sup>3</sup> + 2z<sup>2</sup> &minus; z + &alpha;</div>
+            <div>f'(z) = &minus;(1 &minus; z)<sup>2</sup> + 2z(1 &minus; z) = (1 &minus; z)(3z &minus; 1) = &minus;3z<sup>2</sup> + 4z &minus; 1</div>
+            <div>z<sub>k+1</sub> = z<sub>k</sub> &minus; <span class="frac"><span>f(z<sub>k</sub>)</span><span>f'(z<sub>k</sub>)</span></span></div>
+          </div>
+          <ul class="text-xs text-[var(--muted-foreground)] list-disc pl-4 space-y-1">
+            <li>曲線 <span class="math">y = z(1&minus;z)<sup>2</sup></span> の山の頂上は <strong><span class="math">z = 1/3</span></strong>（極大値 <span class="math">4/27</span>）。</li>
+            <li>2つの根（<span class="math">&alpha; = 36/343</span>）は <strong><span class="math">z* = 1/7</span></strong> と <strong><span class="math">z* = 4/7</span></strong>（3つ目の根 <span class="math">9/7 &gt; 1</span> は物理範囲外）。</li>
+            <li><strong>失敗する初期値</strong>: <span class="math">z<sub>0</sub> = 1/3, 1</span> では <span class="math">f'(z<sub>0</sub>) = 0</span> でゼロ除算停止。<span class="math">z<sub>0</sub> &approx; 1/3</span> 付近は接線が水平に近く大きく飛ぶ。<span class="math">z<sub>0</sub> &gt; 1</span> は範囲外の根 <span class="math">9/7</span> へ収束。</li>
+          </ul>
+        </div>
+
+        <!-- 1.3 Jacobian & Stability Table -->
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4 space-y-2.5 md:col-span-2">
+          <h2 class="text-sm font-bold border-b border-[var(--card-border)] pb-1.5">[3] 線形化・ヤコビアン・安定性判別（最頻出）</h2>
+          <div class="grid md:grid-cols-2 gap-3 items-start">
+            <div class="bg-[var(--background)] border border-[var(--card-border)] rounded p-3 text-sm math space-y-2">
+              <div>
+                <strong>J</strong>(z, v) =
+                <span class="mat">
+                  <span>&part;z'/&part;z</span><span>&part;z'/&part;v</span>
+                  <span>&part;v'/&part;z</span><span>&part;v'/&part;v</span>
+                </span>
+                =
+                <span class="mat">
+                  <span>0</span><span>1</span>
+                  <span>&minus;1 + <span class="frac"><span>2&alpha;</span><span>(1&minus;z)<sup>3</sup></span></span></span><span>&minus;&beta;</span>
+                </span>
+              </div>
+              <div class="text-xs font-sans text-[var(--muted-foreground)]">
+                固定点 <span class="math">&alpha; = z*(1&minus;z*)<sup>2</sup></span> 上では左下の成分が
+                <span class="math">&minus;1 + 2z*/(1&minus;z*) = (3z*&minus;1)/(1&minus;z*)</span> と暗算レベルまで簡単化できる（検算に超便利）。
+              </div>
+              <div class="text-xs space-y-1">
+                <div>特性方程式: <span class="math">&lambda;<sup>2</sup> &minus; &tau;&lambda; + &Delta; = 0</span></div>
+                <div>トレース <span class="math">&tau; = tr <strong>J</strong> = &minus;&beta;</span>、行列式 <span class="math">&Delta; = det <strong>J</strong> = 1 &minus; 2&alpha;/(1&minus;z*)<sup>3</sup></span></div>
+                <div>固有値: <span class="math">&lambda; = (&tau; &plusmn; &radic;(&tau;<sup>2</sup> &minus; 4&Delta;)) / 2</span></div>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs border-collapse border border-[var(--border)]">
+                <thead>
+                  <tr class="bg-[var(--background)]">
+                    <th class="border border-[var(--border)] p-1.5 text-left">条件 (<span class="math">&tau;, &Delta;</span>)</th>
+                    <th class="border border-[var(--border)] p-1.5 text-left">固有値</th>
+                    <th class="border border-[var(--border)] p-1.5 text-left">分類と丸</th>
+                    <th class="border border-[var(--border)] p-1.5 text-left">演習での例 (<span class="math">&beta;=1</span>)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="border border-[var(--border)] p-1.5 math">&Delta; &lt; 0</td>
+                    <td class="border border-[var(--border)] p-1.5">正と負の実数</td>
+                    <td class="border border-[var(--border)] p-1.5 font-semibold">鞍点（不安定・白丸）</td>
+                    <td class="border border-[var(--border)] p-1.5">z* = 4/7 (<span class="math">&tau;=-1, &Delta;=-5/3</span>)</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-[var(--border)] p-1.5 math">&tau; &lt; 0, &Delta; &gt; 0, &tau;<sup>2</sup>&minus;4&Delta; &lt; 0</td>
+                    <td class="border border-[var(--border)] p-1.5">実部負の複素数</td>
+                    <td class="border border-[var(--border)] p-1.5 font-semibold">安定渦状点（漸近安定・黒丸）</td>
+                    <td class="border border-[var(--border)] p-1.5">z* = 1/7 (<span class="math">&tau;=-1, &Delta;=2/3</span>)</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-[var(--border)] p-1.5 math">&tau; &lt; 0, &Delta; &gt; 0, &tau;<sup>2</sup>&minus;4&Delta; &gt; 0</td>
+                    <td class="border border-[var(--border)] p-1.5">2つとも負の実数</td>
+                    <td class="border border-[var(--border)] p-1.5 font-semibold">安定結節点（漸近安定・黒丸）</td>
+                    <td class="border border-[var(--border)] p-1.5"><span class="math">z* = 1/7, &beta; = 2</span> のとき</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-[var(--border)] p-1.5 math">&Delta; = 0</span> または <span class="math">Re(&lambda;) = 0</td>
+                    <td class="border border-[var(--border)] p-1.5">固有値0を含む</td>
+                    <td class="border border-[var(--border)] p-1.5 font-semibold">非双曲型（線形化のみでは判定不可）</td>
+                    <td class="border border-[var(--border)] p-1.5">分岐点 <span class="math">&alpha; = 4/27, z* = 1/3</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="bg-[var(--background)] border border-[var(--card-border)] rounded p-2.5 text-xs space-y-1">
+            <div class="font-semibold">手描き相図の鉄則:</div>
+            <div>1) 安定なら<strong>黒丸</strong>、不安定なら<strong>白丸</strong>。2) 横軸 <span class="math">z</span>・縦軸 <span class="math">v=z'</span> なので、<strong>上半分 (<span class="math">v&gt;0</span>) は右向き、下半分 (<span class="math">v&lt;0</span>) は左向き</strong>（よって渦巻は必ず<strong>時計回り</strong>）。3) 鞍点の固有ベクトルは1行目 <span class="math">&minus;&lambda;w<sub>1</sub> + w<sub>2</sub> = 0</span> より <strong><span class="math">w = (1, &lambda;)<sup>T</sup></span></strong>（傾きがそのまま <span class="math">&lambda;</span>）。<span class="math">&lambda;&gt;0</span> は外向き、<span class="math">&lambda;&lt;0</span> は内向き矢印。</div>
+          </div>
+        </div>
+
+        <!-- 1.4 RK4 -->
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4 space-y-2">
+          <h2 class="text-sm font-bold border-b border-[var(--card-border)] pb-1.5">[4] 4次ルンゲクッタ法 (RK4) とバグ注意</h2>
+          <div class="bg-[var(--background)] border border-[var(--card-border)] rounded p-2.5 text-xs font-mono space-y-1 overflow-x-auto">
+            <div>kz1 = func_dz(t, z, v, ...) ; kv1 = func_dv(t, z, v, ...)</div>
+            <div>kz2 = func_dz(t+dt/2, z+dt*kz1/2, v+dt*kv1/2, ...)</div>
+            <div>kv2 = <strong>func_dv</strong>(t+dt/2, z+dt*kz1/2, v+dt*kv1/2, ...) &lt;-- func_dz 誤記注意!</div>
+            <div>kz3 = func_dz(t+dt/2, z+dt*kz2/2, v+dt*kv2/2, ...) ; kv3 = func_dv(...)</div>
+            <div>kz4 = func_dz(t+dt, z+dt*kz3, v+dt*kv3, ...) ; kv4 = func_dv(...)</div>
+            <div>z_next = z + dt*(kz1 + 2*kz2 + 2*kz3 + kz4)/6</div>
+            <div>v_next = v + dt*(kv1 + 2*kv2 + 2*kv3 + kv4)/6</div>
+          </div>
+          <p class="text-xs text-[var(--muted-foreground)]">
+            連立系では <strong>k1, k2, k3, k4 ごとに z と v を同時に更新した中間点</strong>を渡すこと。
+            正しいRK4では <span class="math">(0.6, 0)</span> は <span class="math">t = 2.39</span> で接触、<span class="math">(0, 0.5)</span> は収束、<span class="math">(0, 0.8)</span> は <span class="math">t = 2.91</span> で接触する。
+          </p>
+        </div>
+
+        <!-- 1.5 Bifurcation & Physics & Control -->
+        <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4 space-y-2">
+          <h2 class="text-sm font-bold border-b border-[var(--card-border)] pb-1.5">[5] 物理的解釈・サドルノード分岐・制御</h2>
+          <ul class="text-xs text-[var(--muted-foreground)] list-disc pl-4 space-y-1.5">
+            <li><strong>なぜ <span class="math">1/7</span> は安定で <span class="math">4/7</span> は不安定か</strong>: ばね力 <span class="math">z</span> は直線的に増えるが、静電力 <span class="math">&alpha;/(1&minus;z)<sup>2</sup></span> は <span class="math">z &rarr; 1</span> で急増する。<span class="math">z* &lt; 1/3</span> では「ずれてもばね（または静電力の復元側）が勝つ」が、<span class="math">z* &gt; 1/3</span> では少し近づくだけで静電力の増加がばねを上回り一気に引き込まれる（プルイン）。</li>
+            <li><strong>分岐条件 (<span class="math">g(z) = z(1&minus;z)<sup>2</sup></span>)</strong>: <span class="math">g'(z) = (1&minus;z)(1&minus;3z) = 0</span> より <span class="math">z = 1/3</span> で極大値 <span class="math">4/27</span>。
+              <span class="math">0 &lt; &alpha; &lt; 4/27</span> で2個、<span class="math">&alpha; = 4/27</span> で1個（<span class="math">z*=1/3</span>、固有値 <span class="math">0, -1</span>）、<span class="math">&alpha; &gt; 4/27</span> で0個（全域で接触）。</li>
+            <li><strong>制御（発展）</strong>: 目標 <span class="math">z<sub>ref</sub> &gt; 1/3</span> に止めるには定常補償 <span class="math">&alpha;<sub>ff</sub> = z<sub>ref</sub>(1&minus;z<sub>ref</sub>)<sup>2</sup></span> に PD制御を加え、<span class="math">&alpha; = max(0, &alpha;<sub>ff</sub> &minus; K<sub>p</sub>(z&minus;z<sub>ref</sub>) &minus; K<sub>d</sub>v)</span> と非負制約を課す。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: HAND CALCULATION / ESSAY DRILLS -->
+    <section id="tab-drill" class="tab-panel hidden space-y-3">
+      <div class="text-xs text-[var(--muted-foreground)] bg-[var(--card)] border border-[var(--border)] rounded-lg p-3">
+        演習(1)〜(7)をベースに期末試験で出題されやすい手計算・記述問題をまとめました。まず自力で紙に書いてから「ヒント」「解答・採点基準」を開いてください。
+      </div>
+      <div id="drill-container" class="space-y-3"></div>
+    </section>
+
+    <!-- TAB 3: MULTIPLE CHOICE QUIZ -->
+    <section id="tab-quiz" class="tab-panel hidden space-y-4">
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-sm font-bold">理解度チェック 4択ミニテスト（全6問）</h2>
+          <p class="text-xs text-[var(--muted-foreground)]">選択肢をクリックして「採点する」を押すと、正誤と解説が表示されます。</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span id="quiz-score" class="text-sm font-mono font-bold"></span>
+          <button id="grade-btn" class="px-3 py-1.5 rounded text-xs font-medium bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90">採点する</button>
+          <button id="reset-quiz-btn" class="px-3 py-1.5 rounded text-xs font-medium border border-[var(--border)] hover:opacity-80">リセット</button>
+        </div>
+      </div>
+      <div id="quiz-container" class="space-y-3"></div>
+    </section>
+
+    <!-- TAB 4: INTERACTIVE PHASE PORTRAIT SIMULATOR -->
+    <section id="tab-sim" class="tab-panel hidden space-y-4">
+      <div class="bg-[var(--card)] border border-[var(--border)] rounded-lg p-4 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-[var(--card-border)]">
+          <div>
+            <h2 class="text-sm font-bold">対話型・非線形相図シミュレータ (RK4)</h2>
+            <p class="text-xs text-[var(--muted-foreground)]">グラフ上をクリックすると、その点 <span class="math">(z<sub>0</sub>, v<sub>0</sub>)</span> からの軌道をリアルタイムに計算・描画します。</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 text-xs">
+            <label class="flex items-center gap-1.5">
+              <span>電圧 &alpha;:</span>
+              <select id="sim-alpha" class="px-2 py-1 rounded border border-[var(--border)] bg-[var(--background)]">
+                <option value="0.10495626822157435">36/343 (~0.105) [演習1-5]</option>
+                <option value="0.14">0.14 [分岐直前]</option>
+                <option value="0.14814814814814814">4/27 (~0.148) [分岐点]</option>
+                <option value="0.16">0.16 [分岐後・固定点なし]</option>
+              </select>
+            </label>
+            <label class="flex items-center gap-1.5">
+              <span>減衰 &beta;:</span>
+              <select id="sim-beta" class="px-2 py-1 rounded border border-[var(--border)] bg-[var(--background)]">
+                <option value="1.0">1.0 [標準: 渦状点]</option>
+                <option value="2.0">2.0 [強減衰: 結節点]</option>
+                <option value="0.0">0.0 [無減衰: 中心点]</option>
+              </select>
+            </label>
+            <button id="sim-preset" class="px-2.5 py-1 rounded border border-[var(--border)] hover:opacity-80">代表軌道を追加</button>
+            <button id="sim-clear" class="px-2.5 py-1 rounded border border-[var(--border)] hover:opacity-80">クリア</button>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-4 items-start">
+          <div class="md:col-span-2">
+            <canvas id="sim-canvas" width="640" height="400" class="w-full h-auto border border-[var(--border)] rounded cursor-crosshair bg-[var(--background)]"></canvas>
+          </div>
+          <div class="space-y-3 text-xs">
+            <div class="bg-[var(--background)] border border-[var(--card-border)] rounded p-3 space-y-1.5">
+              <div class="font-bold">現在の固定点と固有値</div>
+              <div id="sim-fp-info" class="space-y-1 text-[var(--muted-foreground)] font-mono"></div>
+            </div>
+            <div class="bg-[var(--background)] border border-[var(--card-border)] rounded p-3 space-y-1.5">
+              <div class="font-bold">クリックした軌道の履歴</div>
+              <div id="sim-log" class="space-y-1 max-h-[210px] overflow-y-auto text-[var(--muted-foreground)] font-mono">
+                グラフ上をクリックしてください
+              </div>
+            </div>
+            <div class="text-[var(--muted-foreground)]">
+              凡例: 黒丸 = 安定固定点 / 白丸 = 不安定固定点(鞍点・分岐点) / 青線 = 収束軌道 / 赤破線 = プルイン接触 (<span class="math">z &ge; 0.95</span>)
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+<script>
+// ================= TABS =================
+const tabBtns = document.querySelectorAll(".tab-btn");
+const tabPanels = document.querySelectorAll(".tab-panel");
+tabBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const t = btn.dataset.tab;
+    tabBtns.forEach(b => {
+      b.className = b.dataset.tab === t
+        ? "tab-btn px-3 py-1.5 rounded bg-[var(--primary)] text-[var(--primary-foreground)]"
+        : "tab-btn px-3 py-1.5 rounded border border-[var(--border)] bg-[var(--background)] hover:opacity-80";
+    });
+    tabPanels.forEach(p => p.classList.toggle("hidden", p.id !== `tab-${t}`));
+    if (t === "sim") drawSim();
+  });
+});
+
+// ================= DRILLS (7 PROBLEMS) =================
+const drills = [
+  {
+    id: 1,
+    title: "問1（基本・必須）: 1階微分方程式と固定点条件の導出",
+    question: `無次元化された運動方程式 <span class="math">z'' = &minus;&beta;z' &minus; z + &alpha;/(1&minus;z)<sup>2</sup></span> を、変位 <span class="math">z</span> と速度 <span class="math">v = z'</span> を状態変数とする1階連立微分方程式に変換し、固定点において <span class="math">v = 0</span> かつ <span class="math">&alpha; = z(1&minus;z)<sup>2</sup></span> が成り立つことを示せ。`,
+    hint: `1) v = z' と置くと v' = z'' となる。2) 固定点では時間変化がゼロなので z' = 0 かつ v' = 0 を代入して整理する。`,
+    answer: `
+      <div class="space-y-1.5">
+        <div><strong>(1) 1階連立微分方程式:</strong> <span class="math">v = z'</span> より <span class="math">v' = z''</span> なので、</div>
+        <div class="math pl-3">z' = v, &emsp; v' = &minus;&beta;v &minus; z + &alpha;/(1&minus;z)<sup>2</sup></div>
+        <div><strong>(2) 固定点条件:</strong> 固定点では <span class="math">z' = 0</span> かつ <span class="math">v' = 0</span>。第1式より <span class="math">v = 0</span>。これを第2式に代入すると</div>
+        <div class="math pl-3">0 = &minus;&beta;(0) &minus; z + &alpha;/(1&minus;z)<sup>2</sup> &rArr; z = &alpha;/(1&minus;z)<sup>2</sup></div>
+        <div>物理領域 <span class="math">0 &le; z &lt; 1</span> では <span class="math">(1&minus;z)<sup>2</sup> &ne; 0</span> より両辺に掛けて <strong><span class="math">&alpha; = z(1&minus;z)<sup>2</sup></span></strong>。</div>
+        <div class="text-[var(--muted-foreground)]">[採点注意] 行列 A u だけで書かないこと（非線形項があるため）。</div>
+      </div>`
+  },
+  {
+    id: 2,
+    title: "問2（手計算）: ニュートン法 1ステップ計算と失敗する初期値",
+    question: `<span class="math">&alpha; = 36/343</span>、<span class="math">f(z) = &alpha; &minus; z(1&minus;z)<sup>2</sup></span> とする。(a) <span class="math">f'(z)</span> を求め、<span class="math">f'(z) = 0</span> となる <span class="math">z</span> をすべて答えよ。(b) 初期値 <span class="math">z<sub>0</sub> = 1/2</span> からニュートン法を1回適用した値 <span class="math">z<sub>1</sub></span> を分数で求めよ。`,
+    hint: `f'(z) = -(1-z)^2 + 2z(1-z) を (1-z) でくくるとすぐ因数分解できます。`,
+    answer: `
+      <div class="space-y-1.5">
+        <div><strong>(a)</strong> <span class="math">f'(z) = &minus;(1&minus;z)<sup>2</sup> + 2z(1&minus;z) = (1&minus;z)(&minus;1+z+2z) = (1&minus;z)(3z&minus;1)</span>。よって <span class="math">f'(z) = 0</span> となるのは <strong><span class="math">z = 1/3</span> と <span class="math">z = 1</span></strong>。この2点を初期値に選ぶと更新式の分母が0になり計算が停止する。</div>
+        <div><strong>(b)</strong> <span class="math">z<sub>0</sub> = 1/2</span> のとき、<span class="math">f(1/2) = 36/343 &minus; (1/2)(1/2)<sup>2</sup> = 36/343 &minus; 1/8 = &minus;55/2744</span>。<span class="math">f'(1/2) = (1/2)(3/2 &minus; 1) = 1/4</span>。</div>
+        <div class="math pl-3">z<sub>1</sub> = 1/2 &minus; (&minus;55/2744)/(1/4) = 1/2 + 55/686 = <strong>199/343</strong> (&approx; 0.5802)</div>
+      </div>`
+  },
+  {
+    id: 3,
+    title: "問3（最頻出）: ヤコビアン・固有値・固有ベクトル・手描き相図",
+    question: `<span class="math">&alpha; = 36/343, &beta; = 1</span> における2つの固定点 <span class="math">z* = 1/7</span> と <span class="math">z* = 4/7</span> について、(a) ヤコビアン <span class="math"><strong>J</strong></span>、<span class="math">&tau;</span>、<span class="math">&Delta;</span>、固有値を分数で求めよ。(b) <span class="math">z* = 4/7</span> については固有ベクトルも求め、2点の相図の描き方（黒丸/白丸・矢印の向き）を述べよ。`,
+    hint: `1-1/7 = 6/7、(6/7)^3 = 216/343。1-4/7 = 3/7、(3/7)^3 = 27/343。固有ベクトルは1行目 -λ w1 + w2 = 0 から w = (1, λ)^T。`,
+    answer: `
+      <div class="space-y-1.5">
+        <div><strong>z* = 1/7</strong>: <span class="math">2&alpha;/(1&minus;1/7)<sup>3</sup> = (72/343)/(216/343) = 1/3</span> より <span class="math">J<sub>21</sub> = &minus;1 + 1/3 = &minus;2/3</span>。</div>
+        <div class="math pl-3"><strong>J</strong> = <span class="mat"><span>0</span><span>1</span><span>&minus;2/3</span><span>&minus;1</span></span>, &tau; = &minus;1, &Delta; = 2/3, &tau;<sup>2</sup>&minus;4&Delta; = &minus;5/3 &lt; 0 &rArr; &lambda; = (&minus;1 &plusmn; i&radic;(5/3))/2</div>
+        <div>分類: <strong>安定渦状点（漸近安定・黒丸）</strong>。上半分 (<span class="math">v&gt;0</span>) 右向き・下半分左向きなので <strong>時計回り</strong> に黒丸へ巻き込む。</div>
+        <div class="pt-1"><strong>z* = 4/7</strong>: <span class="math">2&alpha;/(1&minus;4/7)<sup>3</sup> = (72/343)/(27/343) = 8/3</span> より <span class="math">J<sub>21</sub> = &minus;1 + 8/3 = 5/3</span>。</div>
+        <div class="math pl-3"><strong>J</strong> = <span class="mat"><span>0</span><span>1</span><span>5/3</span><span>&minus;1</span></span>, &tau; = &minus;1, &Delta; = &minus;5/3 &lt; 0 &rArr; &lambda;<sub>&plusmn;</sub> = (&minus;3 &plusmn; &radic;69)/6 (&approx; +0.884, &minus;1.884)</div>
+        <div>固有ベクトル: <strong><span class="math">w<sub>&plusmn;</sub> = (1, &lambda;<sub>&plusmn;</sub>)<sup>T</sup></span></strong>。分類: <strong>鞍点（不安定・白丸）</strong>。傾き約 +0.88 の直線は白丸から離れる矢印、傾き約 &minus;1.88 の直線は白丸へ近づく矢印を描き、4領域に双曲線状軌道を描く。</div>
+      </div>`
+  },
+  {
+    id: 4,
+    title: "問4（応用計算）: 減衰 β を変えたときの固定点分類の変化",
+    question: `問3と同じ <span class="math">&alpha; = 36/343</span>、固定点 <span class="math">z* = 1/7</span> において、減衰係数を <span class="math">&beta; = 2</span> に増やしたとき、固有値と固定点の分類はどう変わるか。また、このとき <span class="math">z* = 4/7</span> は依然として鞍点であるか答えよ。`,
+    hint: `J_21 は β に依存しません（-2/3 と 5/3 のまま）。τ = -β = -2 として τ^2 - 4Δ の符号を調べます。`,
+    answer: `
+      <div class="space-y-1.5">
+        <div><strong>z* = 1/7 (<span class="math">&beta;=2</span>)</strong>: <span class="math">&tau; = &minus;2, &Delta; = 2/3</span>。判別式 <span class="math">&tau;<sup>2</sup> &minus; 4&Delta; = 4 &minus; 8/3 = 4/3 &gt; 0</span>。</div>
+        <div>固有値: <span class="math">&lambda; = (&minus;2 &plusmn; &radic;(4/3))/2 = &minus;1 &plusmn; 1/&radic;3 &lt; 0</span>（異なる2つの負の実固有値）。</div>
+        <div>よって安定渦状点から <strong>安定結節点（振動せずに減衰収束）</strong> へ変わる。</div>
+        <div><strong>z* = 4/7</strong>: <span class="math">&Delta; = &minus;5/3 &lt; 0</span> は <span class="math">&beta;</span> に依らず負なので、<strong>依然として鞍点</strong>のまま。</div>
+      </div>`
+  },
+  {
+    id: 5,
+    title: "問5（シミュレーション解釈）: 線形化相図と非線形相図の比較・物理的理由",
+    question: `(a) 初期値 <span class="math">(0, 0.5)</span> は <span class="math">z* = 1/7</span> に収束し、<span class="math">(0, 0.8)</span> は電極に接触する理由を、相図の構造（線形化との違い）から説明せよ。(b) <span class="math">z* = 1/7</span> が安定で <span class="math">z* = 4/7</span> が不安定である物理的理由を説明せよ。`,
+    hint: `(a) 鞍点の安定多様体が境界（セパラトリクス）を作ります。(b) 固定点付近で少し z を増やしたとき、ばね力と静電力のどちらの増え方が大きいかを考えます。`,
+    answer: `
+      <div class="space-y-1.5">
+        <div><strong>(a) 非線形相図との違い</strong>: 固定点近傍では線形化と一致（渦状点・鞍点）するが、大域的には鞍点 <span class="math">(4/7, 0)</span> に入る安定多様体が「収束領域」と「引き込み領域」を分ける境界（セパラトリクス）となる。同じ <span class="math">z<sub>0</sub>=0</span> でも初速 <span class="math">v<sub>0</sub>=0.8</span> は境界を越えるため接触する。</div>
+        <div><strong>(b) 物理的理由</strong>: ばねの復元力 <span class="math">z</span> は線形に増えるが、静電力 <span class="math">&alpha;/(1&minus;z)<sup>2</sup></span> は <span class="math">z=1</span> に近づくほど急増する。<span class="math">z* = 1/7</span> 付近ではばねの増加率の方が大きいため変位がずれても元の位置へ押し戻される（安定）が、<span class="math">z* = 4/7</span> 付近では静電力の増加率が上回るため、少しでも近づくと静電力が勝って一気に引き込まれる（不安定）。</div>
+      </div>`
+  },
+  {
+    id: 6,
+    title: "問6（分岐）: サドルノード分岐の条件と分岐点での安定性判定",
+    question: `(a) <span class="math">0 &le; z &lt; 1</span> に固定点が2つ・1つ・0個となる <span class="math">&alpha; (&gt;0)</span> の範囲を求めよ。(b) 分岐点 <span class="math">&alpha; = 4/27</span> の固定点において、ヤコビアンの固有値だけで安定性を判定できない理由と、実際の挙動を答えよ。`,
+    hint: `g(z) = z(1-z)^2 の増減表を g'(z) = (1-z)(1-3z) で作ります。`,
+    answer: `
+      <div class="space-y-1.5">
+        <div><strong>(a)</strong> <span class="math">g(z)=z(1&minus;z)<sup>2</sup></span> を微分すると <span class="math">g'(z)=(1&minus;z)(1&minus;3z)</span>。<span class="math">0 &le; z &lt; 1</span> で <span class="math">z = 1/3</span> のとき極大値 <span class="math">g(1/3) = 4/27</span>。</div>
+        <div>よって固定点は <strong><span class="math">0 &lt; &alpha; &lt; 4/27</span> で2個</strong>、<strong><span class="math">&alpha; = 4/27</span> で1個 (<span class="math">z* = 1/3</span>)</strong>、<strong><span class="math">&alpha; &gt; 4/27</span> で0個</strong>（サドルノード分岐）。</div>
+        <div><strong>(b)</strong> <span class="math">&alpha; = 4/27, z* = 1/3</span> のとき <span class="math">J<sub>21</sub> = 0</span> となり、固有値は <strong><span class="math">&lambda; = 0, &minus;1</span></strong>。実部0の固有値を含む（非双曲型）ため、<strong>線形化だけでは安定性を判定できない</strong>。実際の非線形系では <span class="math">z<sub>0</sub> &lt; 1/3</span> からは近づくが <span class="math">z<sub>0</sub> &gt; 1/3</span> からは離れて接触するため <strong>不安定（半安定）</strong>。</div>
+      </div>`
+  },
+  {
+    id: 7,
+    title: "問7（プログラミング）: コード穴埋めとデバッグ問題",
+    question: `以下のRK4実装に含まれる誤りを1箇所指摘し、正しく直せ。また <span class="math">&alpha;(z, v) = max(0, &alpha;<sub>ff</sub> &minus; K<sub>p</sub>(z&minus;z<sub>ref</sub>) &minus; K<sub>d</sub>v)</span> でなぜ <span class="math">max(0, ...)</span> が必要か答えよ。<br><code class="text-xs font-mono">kz2 = func_dz(t[n]+dt/2, z[n]+dt*kz1/2, v[n]+dt*kv1/2, alpha, beta)<br>kv2 = func_dz(t[n]+dt/2, z[n]+dt*kz1/2, v[n]+dt*kv1/2, alpha, beta)</code>`,
+    hint: `kv2 は速度 v の傾き（dv/dt）を求める変数です。α の定義式も思い出しましょう。`,
+    answer: `
+      <div class="space-y-1.5">
+        <div><strong>(1) RK4バグ</strong>: 2行目の <code class="font-mono">kv2</code> が <code class="font-mono">func_dz</code> を呼んでいる。正しくは <strong><code class="font-mono">func_dv(...)</code></strong>。</div>
+        <div><strong>(2) 非負制約の理由</strong>: <span class="math">&alpha; = &epsilon;<sub>0</sub>AV<sup>2</sup>/(2kd<sup>3</sup>)</span> は電圧の2乗 <span class="math">V<sup>2</sup></span> に比例するため物理的に負にできない（静電力は常に引力であり斥力にはできない）。</div>
+      </div>`
+  }
+];
+
+const completedDrills = new Set();
+const drillContainer = document.getElementById("drill-container");
+
+function updateProgress() {
+  const n = completedDrills.size;
+  document.getElementById("progress-text").textContent = `${n} / ${drills.length} 完了`;
+  document.getElementById("progress-bar").style.width = `${(n / drills.length) * 100}%`;
+}
+
+drills.forEach(d => {
+  const card = document.createElement("div");
+  card.className = "bg-[var(--card)] border border-[var(--border)] rounded-lg p-4 space-y-2.5";
+  card.innerHTML = `
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <h3 class="text-sm font-bold">${d.title}</h3>
+      <label class="text-xs flex items-center gap-1.5 cursor-pointer select-none">
+        <input type="checkbox" class="drill-check accent-[var(--primary)]" data-id="${d.id}" />
+        <span>理解した</span>
+      </label>
+    </div>
+    <p class="text-xs leading-relaxed">${d.question}</p>
+    <div class="flex flex-wrap gap-2 text-xs">
+      <button class="toggle-hint px-2.5 py-1 rounded border border-[var(--border)] hover:opacity-80">ヒントを見る</button>
+      <button class="toggle-ans px-2.5 py-1 rounded bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90">解答・採点ポイントを表示</button>
+    </div>
+    <div class="hint-box hidden bg-[var(--background)] border border-[var(--card-border)] rounded p-2.5 text-xs text-[var(--muted-foreground)]">
+      <strong>[ヒント]</strong> ${d.hint}
+    </div>
+    <div class="ans-box hidden bg-[var(--background)] border border-[var(--border)] rounded p-3 text-xs leading-relaxed">
+      ${d.answer}
+    </div>
+  `;
+  card.querySelector(".toggle-hint").addEventListener("click", () => {
+    card.querySelector(".hint-box").classList.toggle("hidden");
+  });
+  card.querySelector(".toggle-ans").addEventListener("click", () => {
+    card.querySelector(".ans-box").classList.toggle("hidden");
+  });
+  card.querySelector(".drill-check").addEventListener("change", (e) => {
+    if (e.target.checked) completedDrills.add(d.id);
+    else completedDrills.delete(d.id);
+    updateProgress();
+  });
+  drillContainer.appendChild(card);
+});
+
+// ================= QUIZ (6 QUESTIONS) =================
+const quizzes = [
+  {
+    q: "Q1. ニュートン法で f(z) = α - z(1-z)^2 = 0 を解くとき、0 <= z <= 1 の範囲で接線の傾き f'(z) = 0 となり更新できなくなる点はどれか？",
+    opts: ["z = 0 と z = 1/2", "z = 1/3 と z = 1", "z = 1/7 と z = 4/7", "z = 4/27 と z = 1"],
+    ans: 1,
+    exp: "f'(z) = (1-z)(3z-1) = 0 より z = 1/3 と z = 1 で分母が 0 になります。"
+  },
+  {
+    q: "Q2. α = 36/343, β = 1 の固定点 (z*, 0) = (1/7, 0) におけるヤコビアンの固有値と相図の向きとして正しいものはどれか？",
+    opts: [
+      "正と負の実固有値・鞍点・白丸",
+      "実部負の複素固有値・反時計回りの渦状点・黒丸",
+      "実部負の複素固有値・時計回りの渦状点・黒丸",
+      "固有値 0 と -1・線形化のみでは判定不可"
+    ],
+    ans: 2,
+    exp: "τ = -1, Δ = 2/3, τ^2 - 4Δ = -5/3 < 0 より安定渦状点（黒丸）。上半分 v > 0 で dz/dt > 0（右向き）なので時計回りです。"
+  },
+  {
+    q: "Q3. 固定点 (4/7, 0) の固有値が λ1 ≈ +0.884, λ2 ≈ -1.884 であるとき、相図での固有ベクトル直線の傾きと矢印の向きはどうなるか？",
+    opts: [
+      "傾き +0.884 は外向き、傾き -1.884 は内向き",
+      "傾き +0.884 は内向き、傾き -1.884 は外向き",
+      "傾き 1/+0.884 は外向き、傾き 1/-1.884 は内向き",
+      "2本とも白丸へ向かう内向き"
+    ],
+    ans: 0,
+    exp: "J の1行目より -λ w1 + w2 = 0 なので傾き w2/w1 = λ。λ > 0 が不安定（外向き）、λ < 0 が安定（内向き）です。"
+  },
+  {
+    q: "Q4. α = 36/343 のまま減衰を β = 1 から β = 2 に増やすと、固定点 (1/7, 0) の分類はどうなるか？",
+    opts: [
+      "鞍点に変わる",
+      "安定渦状点のまま変わらない",
+      "安定結節点（振動せず収束）に変わる",
+      "固定点自体が消滅する"
+    ],
+    ans: 2,
+    exp: "τ = -2, Δ = 2/3 より τ^2 - 4Δ = 4 - 8/3 = +4/3 > 0 となり、異なる2つの負の実固有値を持つ安定結節点に変わります。"
+  },
+  {
+    q: "Q5. α = 4/27（分岐点）の固定点 z* = 1/3 について正しい記述はどれか？",
+    opts: [
+      "固有値が両方負なので線形化だけで漸近安定と判定できる",
+      "固有値に 0 を含むため線形化だけでは判定できず、非線形軌道では不安定（半安定）",
+      "固有値が複素数になるため安定渦状点である",
+      "固定点が2つに分裂している"
+    ],
+    ans: 1,
+    exp: "J = [[0, 1], [0, -1]] の固有値は 0 と -1。実部0を含むため線形化だけでは判定できず、z < 1/3 からは近づき z > 1/3 からは接触へ逃げるため不安定です。"
+  },
+  {
+    q: "Q6. α = 36/343, β = 1 で正しい4次ルンゲクッタ法 (dt = 0.01) を用いたとき、初期値 (z0, v0) = (0.0, 0.5) の軌道はどうなるか？",
+    opts: [
+      "接触判定 z >= 0.95 に達する",
+      "安定固定点 z* = 1/7 に収束する",
+      "鞍点 z* = 4/7 に収束して止まる",
+      "振動し続けて発散する"
+    ],
+    ans: 1,
+    exp: "(0.0, 0.5) はセパラトリクスの内側にあるため z* = 1/7 に収束します（kv2 を func_dz に誤記すると誤って接触してしまいます）。"
+  }
+];
+
+const quizContainer = document.getElementById("quiz-container");
+quizzes.forEach((item, qi) => {
+  const box = document.createElement("div");
+  box.className = "bg-[var(--card)] border border-[var(--border)] rounded-lg p-4 space-y-2";
+  box.innerHTML = `
+    <div class="text-xs font-bold">${item.q}</div>
+    <div class="grid sm:grid-cols-2 gap-1.5 text-xs">
+      ${item.opts.map((opt, oi) => `
+        <label class="flex items-center gap-2 p-2 rounded border border-[var(--card-border)] bg-[var(--background)] cursor-pointer hover:opacity-85">
+          <input type="radio" name="q${qi}" value="${oi}" class="accent-[var(--primary)]" />
+          <span>${opt}</span>
+        </label>
+      `).join("")}
+    </div>
+    <div id="q-feedback-${qi}" class="hidden text-xs p-2 rounded border"></div>
+  `;
+  quizContainer.appendChild(box);
+});
+
+document.getElementById("grade-btn").addEventListener("click", () => {
+  let score = 0;
+  quizzes.forEach((item, qi) => {
+    const sel = document.querySelector(`input[name="q${qi}"]:checked`);
+    const fb = document.getElementById(`q-feedback-${qi}`);
+    fb.classList.remove("hidden");
+    if (!sel) {
+      fb.className = "text-xs p-2 rounded border border-[var(--warning,#d97706)] text-[var(--foreground)]";
+      fb.textContent = `[未回答] 正解: ${item.opts[item.ans]} / ${item.exp}`;
+      return;
+    }
+    const ok = Number(sel.value) === item.ans;
+    if (ok) score++;
+    fb.className = ok
+      ? "text-xs p-2 rounded border border-[var(--success,#16a34a)] text-[var(--foreground)]"
+      : "text-xs p-2 rounded border border-[var(--error,#dc2626)] text-[var(--foreground)]";
+    fb.textContent = `${ok ? "[正解]" : "[不正解]"} 正解: ${item.opts[item.ans]} -- ${item.exp}`;
+  });
+  document.getElementById("quiz-score").textContent = `得点: ${score} / ${quizzes.length}`;
+});
+
+document.getElementById("reset-quiz-btn").addEventListener("click", () => {
+  quizzes.forEach((_, qi) => {
+    document.querySelectorAll(`input[name="q${qi}"]`).forEach(r => r.checked = false);
+    document.getElementById(`q-feedback-${qi}`).classList.add("hidden");
+  });
+  document.getElementById("quiz-score").textContent = "";
+});
+
+// ================= INTERACTIVE PHASE PORTRAIT SIMULATOR =================
+const canvas = document.getElementById("sim-canvas");
+const ctx = canvas.getContext("2d");
+const alphaSel = document.getElementById("sim-alpha");
+const betaSel = document.getElementById("sim-beta");
+const fpInfo = document.getElementById("sim-fp-info");
+const simLog = document.getElementById("sim-log");
+
+const Z_MIN = -0.05, Z_MAX = 1.0, V_MIN = -0.4, V_MAX = 1.0;
+let userTrajs = [];
+
+function cssVar(name, fallback) {
+  const val = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return val || fallback;
+}
+function mapX(z) { return ((z - Z_MIN) / (Z_MAX - Z_MIN)) * canvas.width; }
+function mapY(v) { return canvas.height - ((v - V_MIN) / (V_MAX - V_MIN)) * canvas.height; }
+function unmapX(px) { return Z_MIN + (px / canvas.width) * (Z_MAX - Z_MIN); }
+function unmapY(py) { return V_MIN + ((canvas.height - py) / canvas.height) * (V_MAX - V_MIN); }
+
+function rk4Sim(alpha, beta, z0, v0, dt = 0.01, T = null) {
+  if (T === null) T = Math.abs(alpha - 4 / 27) < 1e-6 ? 160.0 : 40.0;
+  const steps = Math.round(T / dt);
+  let z = z0, v = v0;
+  const pts = [[z, v]];
+  for (let i = 0; i < steps; i++) {
+    const fz = (zz, vv) => vv;
+    const fv = (zz, vv) => -beta * vv - zz + alpha / Math.pow(1 - zz, 2);
+    const k1z = fz(z, v), k1v = fv(z, v);
+    const k2z = fz(z + 0.5*dt*k1z, v + 0.5*dt*k1v), k2v = fv(z + 0.5*dt*k1z, v + 0.5*dt*k1v);
+    const k3z = fz(z + 0.5*dt*k2z, v + 0.5*dt*k2v), k3v = fv(z + 0.5*dt*k2z, v + 0.5*dt*k2v);
+    const k4z = fz(z + dt*k3z, v + dt*k3v), k4v = fv(z + dt*k3z, v + dt*k3v);
+    z += (dt / 6) * (k1z + 2*k2z + 2*k3z + k4z);
+    v += (dt / 6) * (k1v + 2*k2v + 2*k3v + k4v);
+    pts.push([z, v]);
+    if (z >= 0.95) return { pts, pullIn: true, tEnd: (i + 1) * dt, zEnd: z };
+    if (z < -0.5 || Math.abs(v) > 5) return { pts, pullIn: false, tEnd: (i + 1) * dt, zEnd: z };
+  }
+  return { pts, pullIn: false, tEnd: T, zEnd: z };
+}
+
+function findFixedPoints(alpha) {
+  // Scan [0, 1) and refine via Newton
+  const roots = [];
+  const f = z => alpha - z * Math.pow(1 - z, 2);
+  const df = z => -Math.pow(1 - z, 2) + 2 * z * (1 - z);
+  if (Math.abs(alpha - 4 / 27) < 1e-9) return [1 / 3];
+  if (alpha > 4 / 27) return [];
+  [0.05, 0.5].forEach(z0 => {
+    let z = z0;
+    for (let i = 0; i < 30; i++) {
+      const d = df(z);
+      if (Math.abs(d) < 1e-12) break;
+      z -= f(z) / d;
+    }
+    if (z >= 0 && z < 1 && Math.abs(f(z)) < 1e-8 && !roots.some(r => Math.abs(r - z) < 1e-5)) {
+      roots.push(z);
+    }
+  });
+  return roots.sort((a, b) => a - b);
+}
+
+function eigInfo(z, alpha, beta) {
+  const j21 = -1 + (2 * alpha) / Math.pow(1 - z, 3);
+  const tau = -beta;
+  const delta = -j21;
+  const disc = tau * tau - 4 * delta;
+  if (Math.abs(delta) < 1e-6) return { type: "分岐点(非双曲型)", stable: false, text: "λ = 0, -β" };
+  if (delta < 0) {
+    const l1 = (tau + Math.sqrt(disc)) / 2;
+    const l2 = (tau - Math.sqrt(disc)) / 2;
+    return { type: "鞍点", stable: false, text: `λ = ${l1.toFixed(3)}, ${l2.toFixed(3)}` };
+  }
+  if (disc < 0) {
+    const im = Math.sqrt(-disc) / 2;
+    const st = tau < 0 ? "安定渦状点" : (tau === 0 ? "中心点" : "不安定渦状点");
+    return { type: st, stable: tau < 0, text: `λ = ${(tau/2).toFixed(2)} ± ${im.toFixed(3)}i` };
+  }
+  const l1 = (tau + Math.sqrt(disc)) / 2;
+  const l2 = (tau - Math.sqrt(disc)) / 2;
+  return { type: tau < 0 ? "安定結節点" : "不安定結節点", stable: tau < 0, text: `λ = ${l1.toFixed(3)}, ${l2.toFixed(3)}` };
+}
+
+function drawSim() {
+  const alpha = parseFloat(alphaSel.value);
+  const beta = parseFloat(betaSel.value);
+  const fg = cssVar("--foreground", "#111827");
+  const muted = cssVar("--muted-foreground", "#6b7280");
+  const border = cssVar("--border", "#e5e7eb");
+  const card = cssVar("--card", "#ffffff");
+  const blue = cssVar("--chart-1", "#2563eb");
+  const red = cssVar("--chart-2", "#dc2626");
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Grid & axes
+  ctx.strokeStyle = border;
+  ctx.lineWidth = 1;
+  for (let z = 0; z <= 1.0; z += 0.2) {
+    const x = mapX(z);
+    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+  }
+  for (let v = -0.2; v <= 0.85; v += 0.2) {
+    const y = mapY(v);
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+  }
+
+  // v = 0 & contact z = 0.95
+  ctx.strokeStyle = muted;
+  ctx.setLineDash([5, 4]);
+  ctx.beginPath(); ctx.moveTo(0, mapY(0)); ctx.lineTo(canvas.width, mapY(0)); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(mapX(0.95), 0); ctx.lineTo(mapX(0.95), canvas.height); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Axis labels
+  ctx.fillStyle = muted;
+  ctx.font = "12px sans-serif";
+  ctx.fillText("z = x/d", canvas.width - 52, mapY(0) - 6);
+  ctx.fillText("v = dz/dt", mapX(0) + 6, 16);
+  ctx.fillText("contact (0.95)", mapX(0.95) - 82, 16);
+
+  // Trajectories
+  userTrajs.forEach(tr => {
+    const res = rk4Sim(alpha, beta, tr[0], tr[1]);
+    ctx.strokeStyle = res.pullIn ? red : blue;
+    ctx.lineWidth = 1.6;
+    if (res.pullIn) ctx.setLineDash([5, 3]);
+    else ctx.setLineDash([]);
+    ctx.beginPath();
+    res.pts.forEach((p, idx) => {
+      const px = mapX(p[0]), py = mapY(p[1]);
+      if (idx === 0) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = res.pullIn ? red : blue;
+    ctx.beginPath();
+    ctx.arc(mapX(tr[0]), mapY(tr[1]), 3.5, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Fixed points
+  const fps = findFixedPoints(alpha);
+  if (fps.length === 0) {
+    fpInfo.innerHTML = "<div>0 &le; z &lt; 1 に固定点なし（全領域で接触）</div>";
+  } else {
+    fpInfo.innerHTML = fps.map(zs => {
+      const info = eigInfo(zs, alpha, beta);
+      const px = mapX(zs), py = mapY(0);
+      ctx.beginPath();
+      ctx.arc(px, py, 6, 0, Math.PI * 2);
+      if (info.stable) {
+        ctx.fillStyle = fg;
+        ctx.fill();
+      } else {
+        ctx.fillStyle = card;
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = fg;
+        ctx.stroke();
+      }
+      return `<div>z*=${zs.toFixed(4)}: ${info.type}<br/>&nbsp;&nbsp;${info.text}</div>`;
+    }).join("");
+  }
+}
+
+function loadPreset() {
+  userTrajs = [
+    [0.0, 0.0], [0.0, 0.5], [0.0, 0.8], [0.3, 0.0], [0.6, 0.0],
+    [0.18, 0.0], [0.55, 0.0], [0.62, -0.15], [0.65, -0.25], [0.70, -0.25], [0.25, -0.25]
+  ];
+  simLog.textContent = "代表軌道 (11本) を表示中。追加クリック可。";
+  drawSim();
+}
+
+canvas.addEventListener("click", (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const px = (e.clientX - rect.left) * (canvas.width / rect.width);
+  const py = (e.clientY - rect.top) * (canvas.height / rect.height);
+  const z0 = unmapX(px), v0 = unmapY(py);
+  userTrajs.push([z0, v0]);
+  const res = rk4Sim(parseFloat(alphaSel.value), parseFloat(betaSel.value), z0, v0);
+  const line = document.createElement("div");
+  line.textContent = `(${z0.toFixed(2)}, ${v0.toFixed(2)}) -> ${res.pullIn ? `接触 t=${res.tEnd.toFixed(2)}` : `z=${res.zEnd.toFixed(3)}`}`;
+  if (simLog.textContent.includes("クリック") || simLog.textContent.includes("代表軌道")) simLog.innerHTML = "";
+  simLog.prepend(line);
+  drawSim();
+});
+
+alphaSel.addEventListener("change", drawSim);
+betaSel.addEventListener("change", drawSim);
+document.getElementById("sim-preset").addEventListener("click", loadPreset);
+document.getElementById("sim-clear").addEventListener("click", () => {
+  userTrajs = [];
+  simLog.textContent = "グラフ上をクリックしてください";
+  drawSim();
+});
+window.addEventListener("themechange", drawSim);
+loadPreset();
+</script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>シミュレーション工学 Google Colab 全TODO攻略ドリル（問題編）</title>
+<style>
+  @page { size: A4; margin: 15mm 14mm 16mm 14mm; }
+  :root { --ink:#1b1b1b; --navy:#1f4e79; --rust:#a8542a; --line:#c9ced4; --bg:#f5f7f9; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Yu Gothic", "YuGothic", "Meiryo", sans-serif;
+    color: var(--ink); font-size: 9.8pt; line-height: 1.62; margin: 0;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .page { max-width: 180mm; margin: 0 auto; padding: 3mm 0 6mm; }
+  header { border-bottom: 2.5px solid var(--navy); padding-bottom: 8px; margin-bottom: 8px; }
+  .kicker { font-size: 9pt; letter-spacing: .1em; color: var(--navy); }
+  h1 { font-size: 16.5pt; margin: 3px 0 2px; }
+  .sub { font-size: 9.2pt; color: #4a5560; }
+  .box { border: 1px solid var(--line); background: #fbfcfd; padding: 8px 12px; margin: 8px 0; font-size: 9.2pt; }
+  .box.navy { border-left: 4px solid var(--navy); }
+  .box h3 { margin: 0 0 4px; color: var(--navy); font-size: 10pt; }
+  .part { margin: 14px 0 6px; padding: 5px 10px; background: var(--navy); color: #fff;
+          font-size: 10.2pt; letter-spacing: .08em; break-after: avoid; }
+  .q { margin-top: 12px; break-inside: avoid; }
+  .qhead { display: flex; align-items: baseline; border-bottom: 1.4px solid var(--navy); padding-bottom: 2px; }
+  .qhead h2 { font-size: 10.8pt; margin: 0; }
+  .tag { margin-left: auto; font-size: 8.8pt; color: var(--navy); font-weight: 600; }
+  .lead { margin: 4px 0; font-size: 9.4pt; }
+  pre.code { font-family: Consolas, "Courier New", monospace; font-size: 8.6pt; line-height: 1.44;
+             background: var(--bg); border: 1px solid var(--line); padding: 6px 9px; white-space: pre-wrap; margin: 4px 0; }
+  .mono, code { font-family: Consolas, "Courier New", monospace; font-size: 9pt; }
+  .ans { border: 1px solid var(--line); margin: 4px 0 2px; padding: 2px 8px; }
+  .ans .ln { border-bottom: 1px dotted #aab2ba; height: 19px; }
+  .ans .ln:last-child { border-bottom: none; }
+  table.tbl { width: 100%; border-collapse: collapse; margin: 6px 0; font-size: 8.9pt; }
+  table.tbl th, table.tbl td { border: 1px solid var(--line); padding: 4px 6px; text-align: left; vertical-align: top; }
+  table.tbl th { background: #eef2f6; font-weight: 600; }
+  .pagebreak { break-before: page; }
+  footer { margin-top: 14px; border-top: 1px solid var(--line); padding-top: 5px;
+           font-size: 8.2pt; color: #777; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="kicker">2026年度 シミュレーション工学 / Google Colab 公式ノート全7本対応</div>
+  <h1>Google Colab 全TODO 攻略ドリル（問題編）</h1>
+  <div class="sub">全45箇所のTODOを重複統合した本質20課題 ― 「数式 → 更新式 → Pythonコード」を自力で書けるようになる練習帳</div>
+</header>
+
+<div class="box navy">
+  <h3>TODOを自力で解くための「5つの黄金パターン」</h3>
+  <table class="tbl">
+    <tr><th style="width:20%;">パターン</th><th>思考の型（コードを書く前に必ず頭の中で確認すること）</th></tr>
+    <tr><td><b>1. 誤差回避</b></td><td>大きい数＋小さい数は<b>情報落ち</b>（float32は有効桁約7桁）。近い数同士の引き算は<b>桁落ち</b>（解と係数の関係や有理化で和の形に変形する）。</td></tr>
+    <tr><td><b>2. 1階ODE更新</b></td><td>前進オイラー: <span class="mono">x[n]+dt*f</span> ／ 陰解法(dx/dt=kx): <span class="mono">x[n]/(1-k*dt)</span> ／ ホイン法: <span class="mono">k1=dt*f(t,x)</span>, <span class="mono">k2=dt*f(t+dt, x+k1)</span>, <span class="mono">x+(k1+k2)/2</span> ／ RK4: <span class="mono">t+dt/2</span> に注意し <span class="mono">(k1+2*k2+2*k3+k4)/6</span>。</td></tr>
+    <tr><td><b>3. 2階・多変数ODE</b></td><td><span class="mono">x'' = ...</span> を <span class="mono">dx/dt=v</span>, <span class="mono">dv/dt=...</span> に分解。RK4は<b>必ず全成分の k1 を求めてから</b>全成分を <span class="mono">k1/2</span> 進めて k2 を計算し、最後に同時更新する。</td></tr>
+    <tr><td><b>4. 制御・外力系</b></td><td>PD制御は <span class="mono">u = kp*(0 - phi) - kd*omega</span> を計算してから <span class="mono">domega</span> へ入れる。角加速度の分母（<span class="mono">m</span> や <span class="mono">m*l**2</span>）を落とさない。</td></tr>
+    <tr><td><b>5. ニュートン法・連立</b></td><td>1D: <span class="mono">x_new = x - fx / dfx</span> ／ 2D: <span class="mono">J @ delta = -f</span> を <span class="mono">np.linalg.solve(Jz, -fz)</span> で解く（逆行列を直接作らない）。</td></tr>
+  </table>
+</div>
+
+<div class="part">第2回（02_python_intro.ipynb）：基礎演算・繰り返し・数値計算誤差</div>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-01　数式と関数定義</h2><span class="tag">02_python_intro / Cell 7, 11</span></div>
+  <p class="lead">次の(1)数式 <span class="mono">y = x<sup>2</sup> + cos(x - 1) - √a</span>、(2)三角形の面積関数 <span class="mono">triangle_area(w, h)</span>、(3) <span class="mono">func1(x, a)</span> の空欄 [1]〜[4] を埋めよ。</p>
+  <pre class="code">import math
+a, x = 2, 2.1
+y = [   1   ]
+
+def triangle_area(w, h):
+    [   2   ]
+
+def func1(x, a):
+    [   3   ]
+
+print("f(2.1, 2) =", func1( [   4   ] ))</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-02　for文と公式による等比級数の和</h2><span class="tag">02_python_intro / Cell 15</span></div>
+  <p class="lead">初項 <span class="mono">a</span>、公比 <span class="mono">r</span>、項数 <span class="mono">n</span> の等比級数 <span class="mono">S<sub>n</sub> = a + ar + ... + ar<sup>n-1</sup></span> を求める2つの関数の空欄 [1], [2] を埋めよ。</p>
+  <pre class="code">def geometric_sum(a, r, n):
+    total = 0
+    for k in range(1, n + 1):
+        [   1   ]
+    return total
+
+def geometric_sum_formula(a, r, n):
+    if r == 1:
+        return a * n
+    else:
+        return [   2   ]</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-03　丸め誤差（0.1の加算）と無限級数の誤差評価</h2><span class="tag">02_python_intro / Cell 17, 19, 22, 24</span></div>
+  <p class="lead">無限級数 <span class="mono">Σ<sub>k=1..N</sub> (1 / k<sup>2</sup>)</span>（真値 <span class="mono">π<sup>2</sup>/6</span>）の部分和と真値との絶対誤差を求めるコードの空欄 [1]〜[3] を埋めよ。また、<span class="mono">total</span> を <span class="mono">np.float32(0.0)</span> にしたとき <span class="mono">N=10<sup>5</sup></span> 以降で誤差が減らなくなる理由を答えよ。</p>
+  <pre class="code">def partial_sum(N):
+    total = 0.0   # 単精度検証時は np.float32(0.0)
+    [   1   ]     # k=1 から N まで 1/k^2 を加算（単精度時は np.float32(1.0/(k**2)) 等）
+    return total
+
+true_value = [   2   ]
+for N in [10, 100, 1000, 10000, 100000, 1000000]:
+    err = [   3   ]</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-04　桁落ち回避（2次方程式・応用問題4.4）</h2><span class="tag">02_python_intro / Cell 30, 34, 36</span></div>
+  <p class="lead">(1) 2次方程式 <span class="mono">a x<sup>2</sup> + b x + c = 0</span>（<span class="mono">b &gt; 0</span>）で桁落ちを避ける [1] を埋めよ。(2) 応用課題 <span class="mono">y = 1/√(1-x) - 1/√(1+x)</span>（<span class="mono">x = 2.12345e-12</span>）について、分子を有理化して桁落ちしない式 [2] を書け。</p>
+  <pre class="code"># (1) x2_stable = (-b - sqrtD) / (2*a) が求まっているとき
+x1_stable = [   1   ]
+
+# (2) 桁落ちしない y の計算式（math.sqrt を使用）
+y = [   2   ]</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<div class="part">第3回（03_euler_intro.ipynb）：前進オイラー法・陰解法・非線形1階ODE</div>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-05　前進オイラー法（1変数線形 dx/dt = kx）</h2><span class="tag">03_euler_intro / Cell 3, 5, 8, 11</span></div>
+  <p class="lead"><span class="mono">dx/dt = k x</span> を前進オイラー法で更新する <span class="mono">for</span> ループ内の1行 [1] を書け。また、<span class="mono">k = -9</span> のとき <span class="mono">dt = 0.25</span> で発散する条件を式で示せ。</p>
+  <pre class="code">for n in range(n_steps):
+    x[n + 1] = [   1   ]</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-06　後退（陰解法）オイラー法（dx/dt = kx）</h2><span class="tag">03_euler_intro / Cell 14, 16, 19, 21</span></div>
+  <p class="lead">後退オイラー法 <span class="mono">(x<sub>n+1</sub> - x<sub>n</sub>) / Δt = k x<sub>n+1</sub></span> を <span class="mono">x<sub>n+1</sub></span> について解き、コード空欄 [1] を埋めよ。</p>
+  <pre class="code">for n in range(n_steps):
+    x[n + 1] = [   1   ]</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-07　非自律・非線形方程式 dx/dt = sin(t) - x<sup>3</sup> のオイラー法</h2><span class="tag">03_euler_intro / Cell 24, 26</span></div>
+  <p class="lead">右辺に時刻 <span class="mono">t</span> が含まれる <span class="mono">dx/dt = sin(t) - x<sup>3</sup></span> を前進オイラー法で計算するループを書け。</p>
+  <pre class="code">def euler_nonlinear(x0, dt, T):
+    n_steps = int(T / dt)
+    t = np.linspace(0.0, n_steps * dt, n_steps + 1)
+    x = np.zeros(n_steps + 1)
+    x[0] = x0
+    [   1: forループと更新式を記述   ]
+    return t, x</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<div class="part">第4回（04_runge_intro.ipynb）：ホイン法・RK4・非自律系RK4</div>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-08　ホイン法（2次のルンゲ・クッタ法）</h2><span class="tag">04_runge_intro / Cell 3, 5, 8, 10, 20</span></div>
+  <p class="lead"><span class="mono">func_dx(t, x, k)</span> を用いて、ホイン法（<span class="mono">k1, k2</span> と <span class="mono">x[n+1]</span>）のループ中身を書け。</p>
+  <pre class="code">for n in range(n_steps):
+    k1 = [   1   ]
+    k2 = [   2   ]
+    x[n + 1] = [   3   ]</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-09　4次のルンゲ・クッタ法（RK4：1変数線形）</h2><span class="tag">04_runge_intro / Cell 13, 16, 18, 20</span></div>
+  <p class="lead"><span class="mono">func_dx(t, x, k)</span> を用いて、RK4 の <span class="mono">k1〜k4</span> と <span class="mono">x[n+1]</span> を書け。また、<span class="mono">dt</span> を非常に小さくしたとき誤差が <span class="mono">10<sup>-17</sup></span> 付近で頭打ちになる理由を答えよ。</p>
+  <pre class="code">for n in range(n_steps):
+    [   1: k1, k2, k3, k4 と x[n+1] を記述   ]</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-10　非線形・非自律系 dx/dt = sin(t) - x<sup>3</sup> のRK4</h2><span class="tag">04_runge_intro / Cell 22</span></div>
+  <p class="lead"><span class="mono">func_nonlinear(t, x)</span> は時刻 <span class="mono">t</span> に陽に依存する。<span class="mono">k1〜k4</span> の第1引数（時刻）に注意してループ中身を書け。</p>
+  <pre class="code">for n in range(n_steps):
+    [   1: 時刻 t[n], t[n]+dt/2, t[n]+dt を正しく使った RK4 更新式   ]</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<div class="part">第5〜6回（05-06_2nd_order_simulation.ipynb）：2階・多変数システム</div>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-11　単振動のオイラー法（2成分同時更新）</h2><span class="tag">05-06 / Cell 5, 8, 11</span></div>
+  <p class="lead"><span class="mono">func_dx(t, x, v, m, k_spring)</span>, <span class="mono">func_dv(t, x, v, m, k_spring)</span> を用いて、前進オイラー法の2行を書け（なぜ <span class="mono">x[n+1]</span> を <span class="mono">v[n+1]</span> の計算に使ってはいけないかも確認）。</p>
+  <pre class="code">for n in range(n_steps):
+    x[n + 1] = [   1   ]
+    v[n + 1] = [   2   ]</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-12　単振動のRK4（2成分ペア計算）</h2><span class="tag">05-06 / Cell 8, 11, 14</span></div>
+  <p class="lead">位置 <span class="mono">x</span> と速度 <span class="mono">v</span> の両方をペアで進める RK4 の <span class="mono">k1x, k1v 〜 k4x, k4v</span> と最終更新式を書け。</p>
+  <pre class="code">for n in range(n_steps):
+    k1x = dt * func_dx(t[n], x[n], v[n], m, k_spring)
+    k1v = dt * func_dv(t[n], x[n], v[n], m, k_spring)
+    [   1: k2x, k2v 〜 k4x, k4v と x[n+1], v[n+1] を記述   ]</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-13　ローレンツモデル（3成分RK4）</h2><span class="tag">05-06 / Cell 19, 22</span></div>
+  <p class="lead">3変数 <span class="mono">(x, y, z)</span> に対する <span class="mono">func_dx, func_dy, func_dz(t, x, y, z, sigma, rho, beta)</span> の <span class="mono">k2x</span> と最終更新式 <span class="mono">z[n+1]</span> の形を書け。</p>
+  <pre class="code"># k1x, k1y, k1z が求まっているとき:
+k2x = [   1   ]
+...
+z[n + 1] = [   2   ]</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-14　ばねダンパ系の右辺関数</h2><span class="tag">05-06 / Cell 26</span></div>
+  <p class="lead">運動方程式 <span class="mono">m x'' + c x' + k x = u</span> について、<span class="mono">dv/dt</span> を返す関数 <span class="mono">func_dv</span> の中身を書け（変数名 <span class="mono">k_spring</span> に注意）。</p>
+  <pre class="code">def func_dv(t, x, v, m, c, k_spring, u):
+    return [   1   ]</pre>
+  <div class="ans"><div class="ln"></div></div>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-15　逆振り子（反り返り＆外力方向固定）の右辺関数</h2><span class="tag">05-06 / Cell 30, 33</span></div>
+  <p class="lead">(1) 反り返りモデル <span class="mono">m l<sup>2</sup> θ'' = l F − m g l cosθ − d θ'</span> の <span class="mono">func_domega</span>、(2) 外力方向固定モデル <span class="mono">m l<sup>2</sup> θ'' = l F cos(ψ+θ) − m g l cosθ − d θ'</span> の <span class="mono">func_domega</span> をそれぞれ書け。</p>
+  <pre class="code">def func_domega(t, theta, omega, m, l, g, d, F):
+    return [   1   ]
+
+def func_domega_fixed(t, theta, omega, m, l, g, d, F, psi):
+    return [   2   ]</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<div class="part">第7〜8回（07-08_exercise1_pendulum.ipynb）：演習1 単振り子</div>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-16　単振り子の運動方程式と右辺関数</h2><span class="tag">07-08 / Cell 3, 5</span></div>
+  <p class="lead">重力加速度 <span class="mono">g</span>、長さ <span class="mono">l</span> の単振り子 <span class="mono">θ'' = -(g/l) sinθ</span> の1階変換 <span class="mono">func_dtheta, func_domega</span> を書け。</p>
+  <pre class="code">def func_dtheta(t, theta, omega, g, l):
+    return [   1   ]
+
+def func_domega(t, theta, omega, g, l):
+    return [   2   ]</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-17　単振り子のオイラー法およびRK4更新式</h2><span class="tag">07-08 / Cell 3, 5</span></div>
+  <p class="lead">TODO-16 の関数を使い、(1) オイラー法での <span class="mono">theta[n+1], omega[n+1]</span>、(2) RK4 での <span class="mono">k1t, k1o, k2t, k2o</span> の書き方を書け。</p>
+  <pre class="code"># (1) オイラー法
+theta[n + 1] = [   1   ]
+omega[n + 1] = [   2   ]
+# (2) RK4 の k1, k2 部分
+[   3: k1t, k1o, k2t, k2o を記述   ]</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<div class="part">第11〜12回（11-12_inverted_pendulum_newton.ipynb）：PD制御・ニュートン法・連立方程式</div>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-18　逆振り子PD制御の微分方程式右辺</h2><span class="tag">11-12 / Cell 2</span></div>
+  <p class="lead">真上を <span class="mono">φ = 0</span> とする逆振り子 <span class="mono">φ'' = (g/l) sinφ + u</span> に、PD制御 <span class="mono">u = k<sub>p</sub>(0 - φ) - k<sub>d</sub> ω</span> を加えた <span class="mono">pendulum_pd</span> の空欄 [1], [2] を埋めよ。</p>
+  <pre class="code">def pendulum_pd(t, z, g, l, kp, kd):
+    phi, omega = z
+    u = [   1   ]
+    domega = [   2   ]
+    return [omega, domega]</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-19　1次元・2次元ニュートン法の更新式</h2><span class="tag">11-12 / Cell 5, 7, 9</span></div>
+  <p class="lead">(1) 1次元ニュートン法 <span class="mono">newton_1d</span> 内の <span class="mono">x_new</span> [1]、(2) 2次元ニュートン法 <span class="mono">newton_2d</span> 内で線形方程式 <span class="mono">J<sub>z</sub> δ = -f<sub>z</sub></span> を解く <span class="mono">delta</span> [2] をそれぞれ書け。</p>
+  <pre class="code"># (1) newton_1d (fx = f(x), dfx = df(x) 計算済み)
+x_new = [   1   ]
+
+# (2) newton_2d (fz = f(z), Jz = J(z) 計算済み、逆行列は自分で作らない)
+delta = [   2   ]</pre>
+  <div class="ans"><div class="ln"></div><div class="ln"></div></div>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>TODO-20　線形連立方程式 A x = b の求解</h2><span class="tag">11-12 / Cell 11</span></div>
+  <p class="lead">NumPy配列 <span class="mono">A</span>（3x3）と <span class="mono">b</span>（長さ3）に対し、<span class="mono">A x = b</span> の解ベクトル <span class="mono">x</span> を求める1行を書け（逆行列経由ではなく専用関数を用いる）。</p>
+  <pre class="code">x = [   1   ]
+print("A @ x =", A @ x)</pre>
+  <div class="ans"><div class="ln"></div></div>
+</section>
+
+<footer>
+  <span>シミュレーション工学 Google Colab 全TODO攻略ドリル（問題編）</span>
+  <span>全20課題 / 公式ノート7本完全対応</span>
+</footer>
+
+</div>
+</body>
+</html>

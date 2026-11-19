@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>シミュレーション工学 模擬期末試験 追加問題（解答）</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 18mm 15mm; }
+  :root { --ink:#1b1b1b; --navy:#1f4e79; --rust:#a8542a; --line:#c9ced4; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Yu Gothic", "YuGothic", "Meiryo", sans-serif;
+    color: var(--ink); font-size: 10.5pt; line-height: 1.8; margin: 0;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .page { max-width: 178mm; margin: 0 auto; padding: 6mm 0 10mm; }
+  header { border-bottom: 2.5px solid var(--navy); padding-bottom: 10px; margin-bottom: 6px; }
+  .kicker { font-size: 9.5pt; letter-spacing: .12em; color: var(--navy); }
+  h1 { font-size: 19pt; margin: 4px 0 2px; letter-spacing: .02em; }
+  .sub { font-size: 10pt; color: #4a5560; }
+  .part { margin: 22px 0 6px; padding: 6px 12px; background: var(--navy); color: #fff;
+          font-size: 11pt; letter-spacing: .16em; break-after: avoid; }
+  .q { margin-top: 18px; break-inside: avoid; }
+  .qhead { display: flex; align-items: baseline; border-bottom: 1.5px solid var(--navy); padding-bottom: 3px; }
+  .qhead h2 { font-size: 12pt; margin: 0; }
+  .pt { margin-left: auto; font-size: 10pt; color: var(--navy); font-weight: 600; }
+  h3 { font-size: 10.5pt; margin: 12px 0 4px; color: var(--navy); }
+  p { margin: 6px 0; }
+  .eq { text-align: center; margin: 10px 0; }
+  .frac { display: inline-block; vertical-align: -0.55em; text-align: center; line-height: 1.15; font-size: .95em; }
+  .frac > span { display: block; padding: 0 .28em; }
+  .frac > .d { border-top: 1px solid #333; }
+  table.mat { display: inline-table; vertical-align: middle; border-collapse: collapse; margin: 0 3px; }
+  table.mat td { padding: 1px 9px; text-align: center; border: none; }
+  .bracket { display: inline-block; border-left: 1.4px solid #333; border-right: 1.4px solid #333;
+             padding: 2px 3px; vertical-align: middle; }
+  table.t { width: 100%; border-collapse: collapse; font-size: 9.5pt; margin: 10px 0; }
+  table.t th, table.t td { border: 1px solid var(--line); padding: 5px 8px; text-align: left; vertical-align: top; }
+  table.t th { background: #f2f4f6; font-weight: 600; }
+  table.t td.c { text-align: center; }
+  .mono { font-family: Consolas, "Courier New", monospace; font-size: 9.5pt; }
+  .note { font-size: 9pt; color: #555; }
+  .box { border: 1px solid var(--line); border-left: 3px solid var(--rust); padding: 8px 14px; margin: 12px 0; font-size: 9.5pt; }
+  .box b { color: var(--rust); }
+  .ans-mark { font-weight: 700; color: var(--navy); }
+  .fig { text-align: center; margin: 10px 0; }
+  .fig svg { max-width: 100%; height: auto; }
+  .cap { font-size: 9pt; color: #444; text-align: center; margin-top: 2px; }
+  .keep { break-inside: avoid; }
+  .pagebreak { break-before: page; }
+  footer { margin-top: 26px; border-top: 1px solid var(--line); padding-top: 6px;
+           font-size: 8.5pt; color: #777; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="kicker">2026年度 シミュレーション工学 / 模擬試験 追加問題</div>
+  <h1>追加問題　解答と採点の目安</h1>
+  <div class="sub">第10問〜第12問　／　60点満点</div>
+</header>
+
+<div class="box">
+<b>この追加問題の位置づけ</b><br>
+本試験（第1問〜第9問）は、オイラー法・ルンゲ・クッタ法・高階ODE・モデル化・振り子・線形系の安定性・PD制御・ニュートン法を扱った。一方、第5回〜第6回の中心である「1次元系の相図と固定点の分類」「刻み幅と精度の関係」「2次系（バネダンパ系）のステップ応答」は出題していなかった。追加問題はこの3つを補うものである。本試験と合わせて、第1回〜第12回の範囲をひととおり覆う。
+</div>
+
+<div class="part">第10問　1次元系の相図と固定点（20点）</div>
+
+<section class="q">
+  <div class="qhead"><h2>(1) 固定点</h2><span class="pt">4点</span></div>
+  <p><i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup>(1 − <i>x</i>) = 0 を解く。<i>x</i><sup>2</sup> = 0 または 1 − <i>x</i> = 0 であるから</p>
+  <div class="eq"><span class="ans-mark"><i>x</i> = 0,　<i>x</i> = 1</span></div>
+  <p class="note"><i>x</i> = 0 は重解（2重根）である。このことが次の(2)で効いてくる。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>(2) 線形化と符号による判定</h2><span class="pt">8点</span></div>
+  <p><i>f</i>′(<i>x</i>) = 2<i>x</i> − 3<i>x</i><sup>2</sup> である。</p>
+  <h3><i>x</i> = 1 について</h3>
+  <div class="eq"><i>f</i>′(1) = 2 − 3 = −1 &lt; 0</div>
+  <p>したがって <span class="ans-mark"><i>x</i> = 1 は安定な固定点（アトラクター）</span>である。</p>
+  <h3><i>x</i> = 0 について</h3>
+  <div class="eq"><i>f</i>′(0) = 0</div>
+  <p>1次近似の係数が 0 になるため、線形化では判定できない（<i>f</i>′(<i>x</i>*) = 0 のときは高次の項が支配する）。そこで <i>f</i> の符号を調べる。</p>
+  <div class="eq-left">
+    <i>x</i> &lt; 0：<i>x</i><sup>2</sup> &gt; 0、1 − <i>x</i> &gt; 0 より <i>f</i> &gt; 0（右向き、0 に近づく）<br>
+    0 &lt; <i>x</i> &lt; 1：<i>x</i><sup>2</sup> &gt; 0、1 − <i>x</i> &gt; 0 より <i>f</i> &gt; 0（右向き、0 から離れる）
+  </div>
+  <p>左側からは引き寄せ、右側からは押し返すので、<span class="ans-mark"><i>x</i> = 0 は半安定な固定点</span>である。</p>
+  <p class="note">配点の内訳：<i>f</i>′ の計算 2点、<i>x</i> = 1 の判定 2点、<i>f</i>′(0) = 0 で判定不能と述べたこと 2点、符号による半安定の結論 2点。「不安定」とだけ書いた答案は、左側からの吸引を見落としているので 4点。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>(3) 相図</h2><span class="pt">4点</span></div>
+  <p><i>f</i>(<i>x</i>) = <i>x</i><sup>2</sup> − <i>x</i><sup>3</sup> の概形は、<i>x</i> = 0 と <i>x</i> = 1 で 0 になり、<i>f</i>′(<i>x</i>) = 2<i>x</i> − 3<i>x</i><sup>2</sup> = 0 より <i>x</i> = 2/3 で極大値 4/27 ≈ 0.148 をとる。<i>x</i> &lt; 0 では正、<i>x</i> &gt; 1 では負である。</p>
+
+  <div class="fig">
+  <svg viewBox="0 0 520 220" width="470" xmlns="http://www.w3.org/2000/svg">
+    <line x1="60" y1="150" x2="480" y2="150" stroke="#333" stroke-width="1.2"/>
+    <line x1="180" y1="200" x2="180" y2="40" stroke="#333" stroke-width="1.2"/>
+    <text x="486" y="154" font-size="12" fill="#333">x</text>
+    <text x="166" y="36" font-size="12" fill="#333">f(x)</text>
+    <path d="M 80 110 C 120 150, 160 150, 180 150 C 205 150, 220 60, 240 60 C 265 60, 290 150, 320 150 C 370 150, 430 200, 470 210"
+          fill="none" stroke="#1f4e79" stroke-width="2"/>
+    <circle cx="180" cy="150" r="4" fill="#a8542a"/>
+    <circle cx="320" cy="150" r="4" fill="#a8542a"/>
+    <text x="172" y="172" font-size="11" fill="#a8542a">0</text>
+    <text x="312" y="172" font-size="11" fill="#a8542a">1</text>
+    <text x="228" y="52" font-size="10" fill="#555">2/3</text>
+
+    <line x1="80" y1="190" x2="470" y2="190" stroke="#999" stroke-width="1"/>
+    <line x1="180" y1="186" x2="180" y2="194" stroke="#999"/>
+    <line x1="320" y1="186" x2="320" y2="194" stroke="#999"/>
+    <path d="M 110 190 L 150 190" stroke="#1f4e79" stroke-width="2" marker-end="url(#ar)"/>
+    <path d="M 205 190 L 250 190" stroke="#1f4e79" stroke-width="2" marker-end="url(#ar)"/>
+    <path d="M 400 190 L 355 190" stroke="#1f4e79" stroke-width="2" marker-end="url(#ar)"/>
+    <defs>
+      <marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+        <path d="M0,0 L6,3 L0,6 z" fill="#1f4e79"/>
+      </marker>
+    </defs>
+    <text x="100" y="212" font-size="10" fill="#555">x &lt; 0</text>
+    <text x="210" y="212" font-size="10" fill="#555">0 &lt; x &lt; 1</text>
+    <text x="390" y="212" font-size="10" fill="#555">x &gt; 1</text>
+  </svg>
+  <div class="cap">図：f(x) = x²(1 − x) のグラフと、x 軸上の解の流れ（下段の矢印）</div>
+  </div>
+
+  <p>矢印は、<i>x</i> &lt; 0 では右向き（0 へ）、0 &lt; <i>x</i> &lt; 1 では右向き（1 へ）、<i>x</i> &gt; 1 では左向き（1 へ）となる。</p>
+  <p class="note">配点の内訳：グラフの概形（0 と 1 で 0 を通る）2点、矢印の向き 2点。極大値まで書く必要はないが、<i>x</i> &gt; 1 で負になることを示していない答案は 1点減。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>(4) 初期値ごとの長時間挙動</h2><span class="pt">4点</span></div>
+  <table class="t">
+    <tr><th style="width:22%">初期値</th><th style="width:26%">t → ∞ の行き先</th><th>理由</th></tr>
+    <tr><td class="c"><i>x</i><sub>0</sub> = −0.5</td><td class="c"><span class="ans-mark"><i>x</i> → 0</span></td><td>0 の左側では <i>f</i> &gt; 0 で右へ流れ、0 に吸い込まれる。</td></tr>
+    <tr><td class="c"><i>x</i><sub>0</sub> = 0.5</td><td class="c"><span class="ans-mark"><i>x</i> → 1</span></td><td>0 と 1 の間では <i>f</i> &gt; 0 で右へ流れ、1 に吸い込まれる。</td></tr>
+    <tr><td class="c"><i>x</i><sub>0</sub> = 2</td><td class="c"><span class="ans-mark"><i>x</i> → 1</span></td><td>1 の右側では <i>f</i> &lt; 0 で左へ流れ、1 に吸い込まれる。</td></tr>
+  </table>
+  <p class="note">配点の内訳：3つとも正しく答えて4点。1つ誤りで2点。0 と 1 の間の初期値が 0 に戻るとした答案は、半安定の理解が逆になっているので0点。</p>
+</section>
+
+<div class="part pagebreak">第11問　刻み幅と精度（20点）</div>
+
+<section class="q">
+  <div class="qhead"><h2>(1) 次数</h2><span class="pt">4点</span></div>
+  <table class="t">
+    <tr><th>手法</th><th style="width:34%">1ステップあたりの誤差</th><th style="width:30%">一定時間後の積算誤差</th></tr>
+    <tr><td>前進オイラー法</td><td class="c">O(Δ<i>t</i><sup>2</sup>)</td><td class="c">O(Δ<i>t</i>)（1次精度）</td></tr>
+    <tr><td>ホイン法（2次RK）</td><td class="c">O(Δ<i>t</i><sup>3</sup>)</td><td class="c">O(Δ<i>t</i><sup>2</sup>)（2次精度）</td></tr>
+    <tr><td>RK4</td><td class="c">O(Δ<i>t</i><sup>5</sup>)</td><td class="c">O(Δ<i>t</i><sup>4</sup>)（4次精度）</td></tr>
+  </table>
+  <p>積算誤差の次数は、1ステップの誤差をステップ数 1/Δ<i>t</i> 倍したものだから、1つ低い次数になる。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>(2) Δt を 1/2 にしたときの誤差の比</h2><span class="pt">8点</span></div>
+  <table class="t">
+    <tr><th>手法</th><th style="width:26%">0.100 → 0.050 の比</th><th style="width:22%">推定した次数</th><th>理論値 2<sup>n</sup></th></tr>
+    <tr><td>前進オイラー法</td><td class="c">1.553×10<sup>−1</sup> ÷ 7.379×10<sup>−2</sup> = 2.10</td><td class="c">1次</td><td class="c">2</td></tr>
+    <tr><td>ホイン法</td><td class="c">8.973×10<sup>−2</sup> ÷ 1.458×10<sup>−2</sup> = 6.15</td><td class="c">2次</td><td class="c">4</td></tr>
+    <tr><td>RK4</td><td class="c">3.489×10<sup>−3</sup> ÷ 1.483×10<sup>−4</sup> = 23.5</td><td class="c">4次</td><td class="c">16</td></tr>
+  </table>
+  <p>比は 2<sup><i>n</i></sup> の形で増えるので、両対数グラフの傾き、または log<sub>2</sub>(比) から次数 <i>n</i> を読み取れる。log<sub>2</sub> 2.10 ≈ 1.1、log<sub>2</sub> 6.15 ≈ 2.6、log<sub>2</sub> 23.5 ≈ 4.6 となる。</p>
+  <p>実測の比が理論値（2、4、16）より大きいのは、Δ<i>t</i> がまだ十分小さくなく、打ち切り誤差の高次の項が効いているためである。表の下の行（0.025 → 0.0125）では 2.05、4.38、17.6 となり、理論値に近づいていく。この「Δ<i>t</i> を小さくすると比が理論値に収束する」ことが、次数の確認になっている。</p>
+  <p class="note">配点の内訳：3つの比の計算 3点、次数の推定 3点、理論値とのずれの説明 2点。比を計算せずに「オイラーは1次」と暗記で書いただけの答案は 3点。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>(3) RK4 が実用上よく使われる理由</h2><span class="pt">4点</span></div>
+  <p>1ステップあたりに <i>f</i> を評価する回数は、前進オイラー法が1回、ホイン法が2回、RK4 が4回である。RK4 は1ステップのコストが4倍かかるが、4次精度なので刻み幅を大きく取れる。</p>
+  <p>表から、RK4 は Δ<i>t</i> = 0.05 で誤差 1.5×10<sup>−4</sup> を得ている。同じ誤差を前進オイラー法で得るには、誤差が O(Δ<i>t</i>) で 7.4×10<sup>−2</sup>（Δ<i>t</i> = 0.05）だから、Δ<i>t</i> を約 1/500 の 1×10<sup>−4</sup> まで小さくする必要がある。このとき <i>t</i> = 0.2 までのステップ数は約 2000 で、<i>f</i> の評価は 2000 回。RK4 は 4ステップ × 4回 = 16 回で済む。したがって、精度あたりの計算コストは RK4 が圧倒的に小さい。</p>
+  <p class="note">配点の内訳：1ステップの評価回数（1、2、4）2点、精度あたりのコスト比較 2点。「RK4 は精度が良い」だけでは理由になっていないので 1点。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>(4) 安定条件の確認</h2><span class="pt">4点</span></div>
+  <p><i>k</i> = −9、Δ<i>t</i> = 0.1 のとき、前進オイラー法の増幅率は</p>
+  <div class="eq">1 + <i>k</i>Δ<i>t</i> = 1 − 0.9 = 0.1</div>
+  <p>|0.1| &lt; 1 なので安定である。安定条件は |1 + <i>k</i>Δ<i>t</i>| ≤ 1 より Δ<i>t</i> ≤ 2/|<i>k</i>| = 2/9 ≈ 0.222 であり、Δ<i>t</i> = 0.1 はこれを満たす。</p>
+  <p>ただし、安定であることと精度が良いことは別である。表のとおり、この刻み幅でのオイラー法の誤差は 1.55×10<sup>−1</sup> で、真値 0.165 に対してほぼ 100 % の誤差がある。</p>
+  <p class="note">配点の内訳：増幅率の値 2点、Δ<i>t</i> ≤ 2/9 の導出 1点、安定と精度は別という指摘 1点。</p>
+</section>
+
+<div class="part pagebreak">第12問　2次系のステップ応答（20点）</div>
+
+<section class="q">
+  <div class="qhead"><h2>(1) 1階連立への変形</h2><span class="pt">4点</span></div>
+  <p><i>v</i> = d<i>x</i>/d<i>t</i> とおくと、d<sup>2</sup><i>x</i>/d<i>t</i><sup>2</sup> = d<i>v</i>/d<i>t</i> であるから</p>
+  <div class="eq"><span class="frac"><span>d<i>x</i></span><span class="d">d<i>t</i></span></span> = <i>v</i>　,　
+    <span class="frac"><span>d<i>v</i></span><span class="d">d<i>t</i></span></span> = 1 − 2<i>v</i> − <i>x</i></div>
+  <p>ベクトル表記では d/d<i>t</i> [<i>x</i>, <i>v</i>]<sup>T</sup> = [<i>v</i>, 1 − <i>x</i> − 2<i>v</i>]<sup>T</sup> となる。</p>
+  <p class="note">配点の内訳：状態変数の定義 2点、2式の完成 2点。符号（−2<i>v</i> − <i>x</i>）を落とした答案は 2点。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>(2) 固定点</h2><span class="pt">3点</span></div>
+  <p>d<i>x</i>/d<i>t</i> = 0 より <i>v</i> = 0。d<i>v</i>/d<i>t</i> = 0 より 1 − <i>x</i> = 0、すなわち <i>x</i> = 1。</p>
+  <div class="eq"><span class="ans-mark">(<i>x</i>, <i>v</i>) = (1, 0)</span></div>
+  <p>これはステップ応答の収束先（最終値 1）に対応する。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>(3) ヤコビアンと固有値</h2><span class="pt">6点</span></div>
+  <p><i>f</i><sub>1</sub> = <i>v</i>、<i>f</i><sub>2</sub> = 1 − <i>x</i> − 2<i>v</i> とおくと</p>
+  <div class="eq"><i>J</i> =
+    <span class="bracket"><table class="mat">
+      <tr><td>∂<i>f</i><sub>1</sub>/∂<i>x</i></td><td>∂<i>f</i><sub>1</sub>/∂<i>v</i></td></tr>
+      <tr><td>∂<i>f</i><sub>2</sub>/∂<i>x</i></td><td>∂<i>f</i><sub>2</sub>/∂<i>v</i></td></tr>
+    </table></span> =
+    <span class="bracket"><table class="mat"><tr><td>0</td><td>1</td></tr><tr><td>−1</td><td>−2</td></tr></table></span></div>
+  <p>この系は線形なので、ヤコビアンは固定点によらず一定である。特性方程式は</p>
+  <div class="eq">det(<i>J</i> − <i>λE</i>) = <i>λ</i>(<i>λ</i> + 2) + 1 = <i>λ</i><sup>2</sup> + 2<i>λ</i> + 1 = (<i>λ</i> + 1)<sup>2</sup> = 0</div>
+  <div class="eq"><span class="ans-mark"><i>λ</i> = −1（重解）</span></div>
+  <p>トレース <i>τ</i> = −2、行列式 Δ = 1 であるから、<i>τ</i> &lt; 0、Δ &gt; 0、<i>τ</i><sup>2</sup> − 4Δ = 0 より<span class="ans-mark">漸近安定な結節点（臨界減衰）</span>である。</p>
+  <p class="note">配点の内訳：ヤコビアン 3点、特性方程式と固有値 2点、τ-Δ による判定と減衰の種類 1点。固有値を −1 と −1 と書けても、減衰の種類を答えていない答案は 5点。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>(4) ステップ応答の概形</h2><span class="pt">4点</span></div>
+  <p>臨界減衰のときの解は <i>x</i>(<i>t</i>) = 1 − (1 + <i>t</i>)<i>e</i><sup>−<i>t</i></sup> である。確認すると、<i>x</i>(0) = 1 − 1 = 0、d<i>x</i>/d<i>t</i> = <i>t e</i><sup>−<i>t</i></sup> より <i>t</i> = 0 で傾き 0、<i>t</i> → ∞ で <i>x</i> → 1。d<i>x</i>/d<i>t</i> = <i>t e</i><sup>−<i>t</i></sup> ≥ 0（<i>t</i> ≥ 0）なので単調増加で、オーバーシュートはない。</p>
+
+  <div class="fig">
+  <svg viewBox="0 0 520 240" width="470" xmlns="http://www.w3.org/2000/svg">
+    <line x1="60" y1="200" x2="480" y2="200" stroke="#333" stroke-width="1.2"/>
+    <line x1="60" y1="200" x2="60" y2="30" stroke="#333" stroke-width="1.2"/>
+    <text x="486" y="204" font-size="12" fill="#333">t</text>
+    <text x="46" y="26" font-size="12" fill="#333">x</text>
+    <line x1="60" y1="60" x2="480" y2="60" stroke="#bbb" stroke-dasharray="5 4"/>
+    <text x="466" y="54" font-size="10" fill="#777">1</text>
+    <text x="52" y="204" font-size="10" fill="#777">0</text>
+    <path d="M 60 200 C 120 200, 150 120, 200 95 C 250 75, 320 63, 420 60 L 470 60"
+          fill="none" stroke="#1f4e79" stroke-width="2.2"/>
+    <text x="250" y="120" font-size="10" fill="#555">x(t) = 1 − (1+t)e^(−t)</text>
+  </svg>
+  <div class="cap">図：臨界減衰のステップ応答。初期傾き 0、単調増加、最終値 1、オーバーシュートなし</div>
+  </div>
+
+  <p class="note">配点の内訳：最終値 1 と初期傾き 0 の明記 2点、単調増加（オーバーシュートなし）1点、グラフの概形 1点。</p>
+</section>
+
+<section class="q">
+  <div class="qhead"><h2>(5) 減衰係数を変えたとき</h2><span class="pt">3点</span></div>
+  <table class="t">
+    <tr><th style="width:24%">条件</th><th style="width:24%">減衰の種類</th><th>応答の変化</th></tr>
+    <tr><td><i>c</i> &gt; 2（<i>ζ</i> &gt; 1）</td><td class="c">過減衰</td><td>振動せずにゆっくり収束する。速く収束させるには、臨界減衰より大きな <i>c</i> が必要になり、整定は遅くなる。</td></tr>
+    <tr><td><i>c</i> = 2（<i>ζ</i> = 1）</td><td class="c">臨界減衰</td><td>オーバーシュートせず、最も速く収束する。</td></tr>
+    <tr><td><i>c</i> &lt; 2（<i>ζ</i> &lt; 1）</td><td class="c">不足減衰</td><td>振動しながら収束する。オーバーシュートが生じ、<i>c</i> が小さいほど振動が長く続く。</td></tr>
+  </table>
+  <p class="note">配点の内訳：2つの場合の名前と挙動 2点、臨界減衰が最速であることの言及 1点。</p>
+</section>
+
+<div class="part pagebreak">追加問題のまとめ</div>
+
+<div class="box">
+<b>本試験（第1問〜第9問）との対応</b><br>
+追加問題の3問は、本試験で扱わなかった第5回〜第6回の内容を補うものである。本試験の第1問〜第9問と追加問題の第10問〜第12問を合わせると、第1回〜第12回の範囲をひととおり覆う。本番までの残り期間では、次の順で確認するとよい。
+<ol style="margin:6px 0 0 0; padding-left:1.4em;">
+  <li>本試験の第1問〜第9問を90分で解く。</li>
+  <li>追加問題の第10問〜第12問を90分で解く。</li>
+  <li>誤答した単元の講義回に戻る。とくに、固定点の分類（第9回〜第11回）と、2次系の減衰の分類（第5回〜第6回）は、用語の定義を正確に書けるようにする。</li>
+</ol>
+</div>
+
+<table class="t">
+  <tr><th style="width:26%">単元</th><th style="width:24%">該当する回</th><th>本番での出題されやすさ</th></tr>
+  <tr><td>1次元系の相図・固定点</td><td>第5回〜第6回</td><td>高い。記述式で安定性の理由を書かせる形式が定番。</td></tr>
+  <tr><td>刻み幅と精度</td><td>第3回〜第5回</td><td>高い。表や数値から次数を読み取る形式。</td></tr>
+  <tr><td>2次系のステップ応答</td><td>第5回〜第6回</td><td>中程度。固定点と固有値の計算とセットで出る。</td></tr>
+</table>
+
+<footer>
+  <span>シミュレーション工学 模擬期末試験 追加問題（解答）</span>
+  <span>全3問 / 60点 / 90分</span>
+</footer>
+
+</div>
+</body>
+</html>

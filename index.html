@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>シミュレーション工学 期末対策</title>
+<style>
+  :root { --fg:#1b1b1f; --muted:#5f6470; --line:#e2e4ea; --accent:#2b5cd9; --bg:#fbfbfd; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg);
+         font-family:-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP",sans-serif;
+         line-height:1.6; -webkit-text-size-adjust:100%; }
+  main { max-width:680px; margin:0 auto; padding:20px 16px 64px; }
+  h1 { font-size:1.35rem; margin:0 0 4px; letter-spacing:.01em; }
+  .meta { color:var(--muted); font-size:.85rem; margin:0 0 24px; }
+  h2 { font-size:.78rem; font-weight:700; letter-spacing:.12em; color:var(--muted);
+       text-transform:uppercase; margin:32px 0 10px; padding-bottom:6px; border-bottom:1px solid var(--line); }
+  .set { border:1px solid var(--line); border-radius:12px; background:#fff; padding:14px 16px; margin-bottom:12px; }
+  .set p { margin:0 0 10px; font-size:.9rem; color:var(--muted); }
+  .set strong { display:block; font-size:1rem; margin-bottom:4px; color:var(--fg); }
+  .row { display:flex; gap:8px; flex-wrap:wrap; }
+  a.btn { flex:1 1 0; min-width:120px; text-align:center; text-decoration:none;
+          padding:12px 10px; border-radius:9px; font-size:.92rem; font-weight:600;
+          border:1px solid var(--accent); color:var(--accent); background:#fff; }
+  a.btn.solid { background:var(--accent); color:#fff; }
+  a.btn:active { opacity:.6; }
+  .note { font-size:.82rem; color:var(--muted); background:#f2f3f7; border-radius:10px;
+          padding:12px 14px; margin-top:28px; }
+  .note b { color:var(--fg); }
+  footer { text-align:center; font-size:.75rem; color:var(--muted); margin-top:32px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>シミュレーション工学 期末対策</h1>
+  <p class="meta">2026/11/25（水）10:30–12:00 ／ 107講義室 ／ 90分 ／ 持ち込み不可</p>
+
+  <h2>1. 模擬試験（まずこれ）</h2>
+
+  <div class="set">
+    <strong>模擬期末試験（9問 / 60点）</strong>
+    <p>本番に一番近い形。範囲は第1回〜第12回＋演習1。</p>
+    <div class="row">
+      <a class="btn solid" href="mock/main_q.html">問題</a>
+      <a class="btn" href="mock/main_q.pdf">PDF</a>
+      <a class="btn" href="mock/main_a.html">解答</a>
+      <a class="btn" href="mock/main_a.pdf">解答PDF</a>
+    </div>
+  </div>
+
+  <div class="set">
+    <strong>Colab・後半強化（7問 / 70点）</strong>
+    <p>第9〜12回とコード記述の抜け漏れ用。2周目に。</p>
+    <div class="row">
+      <a class="btn solid" href="mock/colab_q.html">問題</a>
+      <a class="btn" href="mock/colab_q.pdf">PDF</a>
+      <a class="btn" href="mock/colab_a.html">解答</a>
+      <a class="btn" href="mock/colab_a.pdf">解答PDF</a>
+    </div>
+  </div>
+
+  <div class="set">
+    <strong>追加問題（3問 / 60点）</strong>
+    <p>相図・刻み幅・2次系の応答。第5〜6回の穴を埋める。</p>
+    <div class="row">
+      <a class="btn solid" href="mock/extra_q.html">問題</a>
+      <a class="btn" href="mock/extra_q.pdf">PDF</a>
+      <a class="btn" href="mock/extra_a.html">解答</a>
+      <a class="btn" href="mock/extra_a.pdf">解答PDF</a>
+    </div>
+  </div>
+
+  <h2>2. コードを書く練習</h2>
+
+  <div class="set">
+    <strong>Colab 全TODO 攻略ドリル（20課題）</strong>
+    <p>「数式 → 更新式 → Pythonコード」の反復。更新式を書く問題の対策。</p>
+    <div class="row">
+      <a class="btn solid" href="mock/drill_q.html">問題</a>
+      <a class="btn" href="mock/drill_q.pdf">PDF</a>
+      <a class="btn" href="mock/drill_a.html">解答解説</a>
+      <a class="btn" href="mock/drill_a.pdf">解答PDF</a>
+    </div>
+  </div>
+
+  <h2>3. 暗記と手書き</h2>
+
+  <div class="set">
+    <strong>固定点分類 暗記トレーニング</strong>
+    <p>1日5分。ヤコビアン → 固有値 → 分類の反射神経。</p>
+    <div class="row">
+      <a class="btn solid" href="tool/fixedpoint_quiz.html">トレーニング開始</a>
+    </div>
+  </div>
+
+  <div class="set">
+    <strong>固定点分類 暗記シート</strong>
+    <p>分類条件の早見表。トレーニングで間違えたときに見る。</p>
+    <div class="row">
+      <a class="btn" href="tool/fixedpoint_sheet.html">シート</a>
+      <a class="btn" href="tool/fixedpoint_sheet.pdf">PDF</a>
+    </div>
+  </div>
+
+  <div class="set">
+    <strong>人間が紙に書くことリスト</strong>
+    <p>試験中に実際に手を動かす手順の一覧。</p>
+    <div class="row">
+      <a class="btn" href="tool/paper_list.html">リスト</a>
+      <a class="btn" href="tool/paper_list.pdf">PDF</a>
+    </div>
+  </div>
+
+  <div class="set">
+    <strong>演習2 対策まとめ ／ 対話型</strong>
+    <p>第13〜14回の内容。今回の範囲外の可能性あり（掲示で要確認）。</p>
+    <div class="row">
+      <a class="btn" href="tool/ex2_summary.html">まとめ</a>
+      <a class="btn" href="tool/ex2_summary.pdf">PDF</a>
+      <a class="btn" href="tool/ex2_chat.html">対話型</a>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>使い方</b><br>
+    ① 問題を解く → ② 解答で採点 → ③ 間違えた所だけ講義資料（手元のPDF）に戻る。<br><br>
+    <b>このサイトに入れていないもの</b><br>
+    教員配布の講義スライド（再配布になるため）と、氏名・学籍番号を含むレポートPDF。手元のフォルダから見てください。
+  </div>
+
+  <footer>自作の学習用まとめです。</footer>
+</main>
+</body>
+</html>

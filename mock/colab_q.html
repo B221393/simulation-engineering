@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>シミュレーション工学 模擬期末試験 Colab・後半強化編（問題）</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 18mm 15mm; }
+  :root { --ink:#1b1b1b; --navy:#1f4e79; --rust:#a8542a; --line:#c9ced4; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Yu Gothic", "YuGothic", "Meiryo", sans-serif;
+    color: var(--ink); font-size: 10pt; line-height: 1.65; margin: 0;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .page { max-width: 178mm; margin: 0 auto; padding: 4mm 0 6mm; }
+  header { border-bottom: 2.5px solid var(--navy); padding-bottom: 8px; margin-bottom: 4px; }
+  .kicker { font-size: 9.2pt; letter-spacing: .12em; color: var(--navy); }
+  h1 { font-size: 17pt; margin: 3px 0 2px; letter-spacing: .02em; }
+  .sub { font-size: 9.5pt; color: #4a5560; }
+  .meta { width: 100%; border-collapse: collapse; margin: 8px 0 10px; font-size: 9.2pt; }
+  .meta th, .meta td { border: 1px solid var(--line); padding: 4px 8px; text-align: left; }
+  .meta th { background: #f2f4f6; width: 22%; font-weight: 600; }
+  .notice { border: 1px solid var(--line); padding: 6px 12px 6px 28px; font-size: 9.2pt; margin-bottom: 10px; }
+  .notice li { margin: 1px 0; }
+  .part { margin: 14px 0 4px; padding: 5px 12px; background: var(--navy); color: #fff;
+          font-size: 10.5pt; letter-spacing: .12em; break-after: avoid; }
+  .q { margin-top: 14px; break-inside: avoid; }
+  .qhead { display: flex; align-items: baseline; border-bottom: 1.5px solid var(--navy); padding-bottom: 3px; }
+  .qhead h2 { font-size: 11.5pt; margin: 0; }
+  .pt { margin-left: auto; font-size: 9.8pt; color: var(--navy); font-weight: 600; }
+  .lead { font-size: 9.8pt; color: #333; margin: 6px 0 4px; }
+  ol.body { padding-left: 1.6em; margin: 5px 0; }
+  ol.body > li { margin: 4px 0; }
+  .ans { border: 1px solid var(--line); margin: 5px 0 2px; padding: 3px 10px; }
+  .ans .ln { border-bottom: 1px dotted #aab2ba; height: 19px; }
+  .ans .ln:last-child { border-bottom: none; }
+  .ans.blank { background: #fbfbfc; }
+  .eq { text-align: center; margin: 8px 0; }
+  .eq-left { margin: 6px 0 6px 1.2em; }
+  .frac { display: inline-block; vertical-align: -0.55em; text-align: center; line-height: 1.15; font-size: .95em; }
+  .frac > span { display: block; padding: 0 .28em; }
+  .frac > .d { border-top: 1px solid #333; }
+  table.mat { display: inline-table; vertical-align: middle; border-collapse: collapse; margin: 0 3px; }
+  table.mat td { padding: 1px 8px; text-align: center; border: none; }
+  .bracket { display: inline-block; border-left: 1.4px solid #333; border-right: 1.4px solid #333;
+             padding: 2px 3px; vertical-align: middle; }
+  code, .mono { font-family: Consolas, "Courier New", monospace; font-size: 9.3pt; }
+  pre.code { font-family: Consolas, "Courier New", monospace; font-size: 8.8pt; line-height: 1.48;
+             background: #f6f7f9; border: 1px solid var(--line); padding: 8px 10px; white-space: pre-wrap; margin: 6px 0; }
+  .note { font-size: 9pt; color: #555; }
+  .pagebreak { break-before: page; }
+  footer { margin-top: 22px; border-top: 1px solid var(--line); padding-top: 6px;
+           font-size: 8.5pt; color: #777; display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<header>
+  <div class="kicker">2026年度 シミュレーション工学 / 模擬試験 第3弾（Colab・第9-12回後半強化編）</div>
+  <h1>模擬期末試験　― Google Colab演習・安定解析・線形数値計算</h1>
+  <div class="sub">出題範囲：Google Colab公式ノート7本（第2回〜第12回）および結合講義資料（穴埋め解除済み）の未出題重要テーマ</div>
+</header>
+
+<table class="meta">
+  <tr><th>試験時間</th><td>90分</td><th>配点</th><td>70点満点（全7問・各10点）</td></tr>
+  <tr><th>本番</th><td>2026年11月25日(水) 10:30-12:00 / 107講義室</td><th>持ち込み</th><td>不可（筆記具のみ）</td></tr>
+</table>
+
+<ol class="notice">
+  <li>既存の模擬試験（第1問〜第9問）および追加問題（第10問〜第12問）と合わせて、全範囲の抜け漏れをなくすための強化セットです。</li>
+  <li>電卓・PCの持ち込みは不可。Pythonコードは文法の細かい暗記ではなく、計算手順・更新式・バグの指摘が正しく書けていればよい。</li>
+  <li>計算過程も採点の対象とする。分数または有効数字3桁程度で記入すること。</li>
+  <li>図を描く問題では、軸の量、固定点、固有ベクトルの方向、軌道の矢印の向きを明記すること。</li>
+</ol>
+
+<div class="part">第1部　Google Colab実装・誤差・妥当性評価（第2回〜第8回）</div>
+
+<!-- ============================================================ Q13 -->
+<section class="q">
+  <div class="qhead"><h2>第13問　Colab演習：浮動小数点誤差とNumPy演算（第2回）</h2><span class="pt">10点</span></div>
+  <p class="lead">第2回Colabノートブック（<span class="mono">02_python_intro.ipynb</span>）の数値計算誤差と行列演算に関する設問に答えよ。</p>
+
+  <ol class="body">
+    <li>無限級数 <span class="mono">S<sub>N</sub> = Σ<sub>k=1..N</sub> (1 / k<sup>2</sup>)</span>（真値 <span class="mono">π<sup>2</sup>/6</span>）を、単精度（<span class="mono">np.float32</span>）の変数 <span class="mono">total</span> に <span class="mono">k = 1</span> から順に加算すると、<span class="mono">N</span> を <span class="mono">10<sup>4</sup></span> から <span class="mono">10<sup>6</sup></span> へ増やしても真値との誤差がほとんど減らなくなる。この現象を引き起こしている誤差の名称を答え、発生理由を単精度の有効桁数（約7桁）に触れて説明せよ。<span class="note">（4点）</span></li>
+    <li>2次方程式 <span class="mono">a x<sup>2</sup> + b x + c = 0</span>（<span class="mono">a = 1, b = 10<sup>5</sup>, c = 1</span>）の2解のうち絶対値が小さい方 <span class="mono">x<sub>1</sub></span> を求める次のコードにおいて、<span class="mono">x1_naive</span> は残差が大きくなるのに対し、<span class="mono">x1_stable</span> は高精度となる。その理由を説明し、空欄 <span class="mono">[ A ]</span> に入る式を書け。<span class="note">（4点）</span>
+      <pre class="code">D = b**2 - 4*a*c
+sqrtD = np.sqrt(D)
+x1_naive  = (-b + sqrtD) / (2*a)
+x2_stable = (-b - sqrtD) / (2*a)
+x1_stable = [   A   ]   # x1 * x2 = c / a を利用して桁落ちを回避</pre>
+    </li>
+    <li><span class="mono">A = [[1, 2], [3, 4]]</span>, <span class="mono">B = [[2, 0], [1, 2]]</span> に対して、NumPy配列の演算 <span class="mono">A + B</span> と <span class="mono">A @ B</span> の結果をそれぞれ行列で書け。<span class="note">（2点）</span></li>
+  </ol>
+
+  <div class="ans">
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div>
+  </div>
+</section>
+
+<!-- ============================================================ Q14 -->
+<section class="q pagebreak">
+  <div class="qhead"><h2>第14問　Colab演習：RK4の実装バグと妥当性検証（第3回〜第8回）</h2><span class="pt">10点</span></div>
+  <p class="lead">第3〜8回Colabノートブック（<span class="mono">03_euler_intro</span>, <span class="mono">04_runge_intro</span>, <span class="mono">05-06_2nd_order</span>, <span class="mono">07-08_exercise1</span>）を題材とする。</p>
+
+  <ol class="body">
+    <li>下のコードは、単振動 <span class="mono">dx/dt = f<sub>x</sub>(t, x, v), dv/dt = f<sub>v</sub>(t, x, v)</span> を4次のルンゲ・クッタ法（RK4）で解くつもりで書いたものだが、<b>数値計算法として誤った実装が2箇所</b>含まれている。誤っている行番号と理由を指摘し、正しいコードに直せ。<span class="note">（4点）</span>
+      <pre class="code">01: for n in range(n_steps):
+02:     k1x = dt * func_dx(t[n], x[n], v[n], m, k_spring)
+03:     k1v = dt * func_dv(t[n], x[n], v[n], m, k_spring)
+04:     k2x = dt * func_dx(t[n] + dt/2, x[n] + k1x/2, v[n], m, k_spring)
+05:     k2v = dt * func_dv(t[n] + dt/2, x[n] + k1x/2, v[n], m, k_spring)
+06:     k3x = dt * func_dx(t[n] + dt/2, x[n] + k2x/2, v[n] + k2v/2, m, k_spring)
+07:     k3v = dt * func_dv(t[n] + dt/2, x[n] + k2x/2, v[n] + k2v/2, m, k_spring)
+08:     k4x = dt * func_dx(t[n] + dt,   x[n] + k3x,   v[n] + k3v,   m, k_spring)
+09:     k4v = dt * func_dv(t[n] + dt,   x[n] + k3x,   v[n] + k3v,   m, k_spring)
+10:     x[n+1] = x[n] + (k1x + 2*k2x + 2*k3x + k4x) / 6
+11:     v[n+1] = v[n] + (k1v + 2*k2v + 2*k3v + k4v) / 6
+12:     # 参考：もし 04-05 が正しくても、次のように非自律系 dx/dt = sin(t) - x^3 の RK4 で
+13:     # k2 = dt * func(t[n], x[n] + k1/2) と時刻を t[n] のままにする誤りもよくある</pre>
+      <span class="note">※ 誤り2箇所は (a) 04〜05行目にある変数の扱い と (b) 13行目に記された非自律系での時刻引数の扱い である。それぞれ具体的に説明せよ。</span>
+    </li>
+    <li>次の2つのシミュレーションについて、プログラムにバグがないか・計算結果が妥当かを検証する方法を1つずつ挙げよ。<span class="note">（4点）</span>
+      <br>(a) 第3回Colabの非線形方程式 <span class="mono">dx/dt = sin(t) − x<sup>3</sup></span> のように解析解が簡単に書けない場合
+      <br>(b) 第7〜8回演習1の単振り子（減衰なし）のシミュレーションの場合（保存量を用いる方法など）
+    </li>
+    <li>単振動（<span class="mono">m x'' + k x = 0</span>）を前進オイラー法で解き相図 <span class="mono">(x, v)</span> を描くと、真の閉じた円ではなく外側へ広がる渦巻きになる。その理由を1〜2文で説明せよ。<span class="note">（2点）</span></li>
+  </ol>
+
+  <div class="ans">
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div>
+  </div>
+</section>
+
+<!-- ============================================================ Q15 -->
+<section class="q">
+  <div class="qhead"><h2>第15問　Colab演習：逆振り子の反り返りと外力固定（第5〜6回応用）</h2><span class="pt">10点</span></div>
+  <p class="lead">第5〜6回Colab（<span class="mono">05-06_2nd_order_simulation.ipynb</span> 第5章）の「空飛ぶ消火ホース」モデルを考える。長さ <span class="mono">l</span> の棒の先端に質量 <span class="mono">m</span> の質点があり、<span class="mono">θ</span> は水平方向から測った棒の角度である。</p>
+
+  <ol class="body">
+    <li>外力が棒に垂直にかかる場合、運動方程式は <span class="mono">m l<sup>2</sup> θ'' = l F − m g l cosθ − d θ'</span>（<span class="mono">F ≥ 0</span>）で表される。
+      <br>(a) 状態変数 <span class="mono">(θ, ω) = (θ, θ')</span> による1階の連立微分方程式を書け（分母に注意すること）。
+      <br>(b) <span class="mono">m = 1 kg, g = 9.8 m/s<sup>2</sup>, F = 15 N</span> のとき、固定点が存在せず棒が回り続ける（反り返る）理由を固定点条件から示せ。<span class="note">（4点）</span></li>
+    <li>外力の向きを鉛直方向から角度 <span class="mono">ψ</span>（<span class="mono">0 &lt; ψ &lt; π/2</span>）に固定すると、運動方程式は次式になる。
+      <div class="eq"><span class="mono">m l<sup>2</sup> θ'' = l F cos(ψ + θ) − m g l cosθ − d θ'</span></div>
+      固定点 <span class="mono">θ*</span> が <span class="mono">tanθ* = (F cosψ − m g) / (F sinψ)</span> を満たすことを導出し、<span class="mono">F</span> を十分大きくしていくと <span class="mono">θ*</span> はどの角度に近づくか答えよ。<span class="note">（4点）</span></li>
+    <li>角度 <span class="mono">ψ</span> を <span class="mono">0°</span> に近づけると何が起きるか、また初期角度 <span class="mono">θ(0)</span> を非常に大きく（例：<span class="mono">2.5 rad</span>）すると固定点に戻らない場合がある理由を簡潔に述べよ。<span class="note">（2点）</span></li>
+  </ol>
+
+  <div class="ans">
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div>
+  </div>
+</section>
+
+<div class="part pagebreak">第2部　安定解析・線形システム・数値線形代数（第9回〜第12回）</div>
+
+<!-- ============================================================ Q16 -->
+<section class="q">
+  <div class="qhead"><h2>第16問　Colab・講義補完：減衰単振り子・境界固定点・ロミオとジュリエット（第9〜10回）</h2><span class="pt">10点</span></div>
+
+  <ol class="body">
+    <li>減衰のある単振り子 <span class="mono">dθ/dt = ω, dω/dt = −(g/l) sinθ − b ω</span>（<span class="mono">b &gt; 0, θ ∈ (−π, π]</span>）について、すべての固定点を求め、各固定点でのヤコビアン行列・トレース <span class="mono">τ</span>・行列式 <span class="mono">Δ</span> を計算して安定性と相図の分類（<span class="mono">b<sup>2</sup> − 4g/l</span> の符号による場合分けを含む）を答えよ。<span class="note">（5点）</span></li>
+    <li>次の2つの2次元線形系について、<span class="mono">τ, Δ</span>、固有値、固定点の種類と安定性を答え、相図の概形を下の枠内に描け。<span class="note">（3点）</span>
+      <br>(a) <span class="mono">dx<sub>1</sub>/dt = −x<sub>1</sub> + x<sub>2</sub>, dx<sub>2</sub>/dt = −x<sub>2</sub></span>（<span class="mono">τ<sup>2</sup> − 4Δ = 0</span> の境界例）
+      <br>(b) ロミオとジュリエット系 <span class="mono">dR/dt = a J, dJ/dt = −b R</span>（<span class="mono">a, b &gt; 0</span>）
+    </li>
+    <li>2次元線形系 <span class="mono">dx/dt = A x</span> において、トレース <span class="mono">τ = tr(A)</span> が相空間上の領域の面積の時間変化にどう対応するか（<span class="mono">τ &lt; 0, τ = 0, τ &gt; 0</span> の意味）を1文で説明せよ。<span class="note">（2点）</span></li>
+  </ol>
+
+  <div style="display:flex; gap:10px; align-items:stretch; margin-top:6px;">
+    <div class="ans" style="flex:1;">
+      <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+      <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    </div>
+    <div class="ans blank" style="width:62mm; display:flex; align-items:center; justify-content:center; color:#9aa2aa; font-size:8.8pt; text-align:center;">
+      (2) (a)(b) の相図スケッチ<br>（軸・矢印を明記）
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ Q17 -->
+<section class="q">
+  <div class="qhead"><h2>第17問　Colab演習・講義：2元連立ニュートン法と収束しない初期値（第11〜12回）</h2><span class="pt">10点</span></div>
+  <p class="lead">第12回講義およびColab（<span class="mono">11-12_inverted_pendulum_newton.ipynb</span> 第2章）のニュートン法について答えよ。</p>
+
+  <ol class="body">
+    <li>2元連立非線形方程式
+      <div class="eq">
+        <span class="mono"><b>f</b>(x, y) = </span>
+        <span class="bracket"><table class="mat"><tr><td><i>x</i><sup>2</sup> + <i>y</i> − 1</td></tr><tr><td><i>x</i> + <i>y</i><sup>2</sup> − 1</td></tr></table></span>
+        <span class="mono"> = <b>0</b></span>
+      </div>
+      に対して、ヤコビ行列 <span class="mono">J(x, y)</span> を求めよ。<span class="note">（2点）</span></li>
+    <li>初期値 <span class="mono">(x<sub>0</sub>, y<sub>0</sub>) = (0.8, 0.2)</span> からニュートン法を1ステップ実行し、更新量 <span class="mono">(δx<sub>0</sub>, δy<sub>0</sub>)</span>（連立1次方程式 <span class="mono">J(x<sub>0</sub>, y<sub>0</sub>) δ<b>z</b> = −<b>f</b>(x<sub>0</sub>, y<sub>0</sub>)</span> の解）と、更新後の値 <span class="mono">(x<sub>1</sub>, y<sub>1</sub>)</span> を分数または小数第3位までで求めよ。<span class="note">（4点）</span></li>
+    <li>初期値を <span class="mono">(0.5, 0.5)</span> にすると、1ステップ目すら計算できず停止する。その理由をヤコビ行列の値を用いて説明せよ。また、Pythonコードで更新量 <span class="mono">delta</span> を求める次の穴埋め <span class="mono">[ B ]</span> を書け：<span class="mono">delta = np.linalg.solve( [ B ] )</span><span class="note">（2点）</span></li>
+    <li>1変数方程式 <span class="mono">f(x) = x<sup>3</sup> − 2x + 2 = 0</span> を初期値 <span class="mono">x<sub>0</sub> = 0</span> でニュートン法にかけると、<span class="mono">x<sub>1</sub>, x<sub>2</sub>, x<sub>3</sub></span> はいくつになるか計算し、根に収束しない理由を述べよ。<span class="note">（2点）</span></li>
+  </ol>
+
+  <div class="ans">
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+  </div>
+</section>
+
+<!-- ============================================================ Q18 -->
+<section class="q pagebreak">
+  <div class="qhead"><h2>第18問　講義後半（穴埋め解除）：ピボット選択付きGaussの消去法（第12回）</h2><span class="pt">10点</span></div>
+  <p class="lead">次の連立1次方程式 <span class="mono">A <b>x</b> = <b>b</b></span> を、部分ピボット選択付き Gauss の消去法で解く。</p>
+  <div class="eq">
+    <i>A</i> = <span class="bracket"><table class="mat"><tr><td>2</td><td>2</td><td>1</td></tr><tr><td>1</td><td>1</td><td>3</td></tr><tr><td>1</td><td>−1</td><td>2</td></tr></table></span>
+    ,　<b><i>b</i></b> = <span class="bracket"><table class="mat"><tr><td>3</td></tr><tr><td>4</td></tr><tr><td>5</td></tr></table></span>
+  </div>
+
+  <ol class="body">
+    <li>前進消去において「部分ピボット選択（各列の絶対値最大要素を持つ行を上と入れ替える操作）」を行う理由を2つ挙げよ。<span class="note">（2点）</span></li>
+    <li>上の <span class="mono">A, <b>b</b></span> に対して部分ピボット選択付きの前進消去を実行し、途中の行列の変形と行入れ替えを明記して、上三角行列 <span class="mono">U</span> と変換後の右辺ベクトル <span class="mono"><b>b</b>*</span> を求めよ。<span class="note">（4点）</span></li>
+    <li>得られた <span class="mono">U <b>x</b> = <b>b</b>*</span> に対して後退代入を行い、解 <span class="mono"><b>x</b> = (x<sub>1</sub>, x<sub>2</sub>, x<sub>3</sub>)<sup>T</sup></span> を求めよ。<span class="note">（2点）</span></li>
+    <li>数値計算で <span class="mono">A <b>x</b> = <b>b</b></span> を1回だけ解くとき、逆行列 <span class="mono">A<sup>−1</sup></span> を求めてから <span class="mono"><b>x</b> = A<sup>−1</sup> <b>b</b></span> を計算するより、直接 <span class="mono">np.linalg.solve(A, b)</span>（Gauss消去法・LU分解）を使うべき理由を述べよ。<span class="note">（2点）</span></li>
+  </ol>
+
+  <div class="ans">
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+  </div>
+</section>
+
+<!-- ============================================================ Q19 -->
+<section class="q">
+  <div class="qhead"><h2>第19問　講義後半（穴埋め解除）：LU分解とべき乗法・逆べき乗法（第12回）</h2><span class="pt">10点</span></div>
+
+  <ol class="body">
+    <li>行列 <span class="mono">A</span> を下三角行列 <span class="mono">L</span>（対角成分はすべて1）と上三角行列 <span class="mono">U</span> の積 <span class="mono">A = L U</span> に分解して <span class="mono">A <b>x</b> = <b>b</b></span> を解く手順（前進代入・後退代入の順）を式で説明せよ。また、同じ係数行列 <span class="mono">A</span> に対して右辺ベクトル <span class="mono"><b>b</b></span> だけを何度も変えて解くとき、Gaussの消去法よりLU分解が有利になる理由を述べよ。<span class="note">（3点）</span></li>
+    <li>行列 <span class="mono">A = [[4, 1], [2, 3]]</span>（Colab第2回の練習行列 <span class="mono">A<sub>2</sub></span>）をピボット選択なしで <span class="mono">A = L U</span>（<span class="mono">l<sub>11</sub> = l<sub>22</sub> = 1</span>）に分解し、<span class="mono">L</span> と <span class="mono">U</span> を求めよ。<span class="note">（2点）</span></li>
+    <li>同じ行列 <span class="mono">A = [[4, 1], [2, 3]]</span> に対し、初期ベクトル <span class="mono"><b>x</b><sup>(0)</sup> = [1, 0]<sup>T</sup></span> からべき乗法を2ステップ（<span class="mono"><b>y</b><sup>(k)</sup> = A <b>x</b><sup>(k)</sup></span>、正規化 <span class="mono"><b>x</b><sup>(k+1)</sup> = <b>y</b><sup>(k)</sup> / ||<b>y</b><sup>(k)</sup>||</span>）実行せよ。<span class="mono">k = 0</span> と <span class="mono">k = 1</span> における <span class="mono"><b>y</b><sup>(k)</sup></span> と、最大固有値の近似値（内積 <span class="mono"><b>y</b><sup>(k)</sup> · <b>x</b><sup>(k)</sup></span> および成分比 <span class="mono">y<sub>1</sub><sup>(k)</sup> / x<sub>1</sub><sup>(k)</sup></span>）を求めよ。<span class="note">（3点）</span></li>
+    <li>正則行列 <span class="mono">A</span> の絶対値<b>最小</b>の固有値を反復で求めたい場合に用いる手法の名称と、更新の核となるベクトル計算式（<span class="mono"><b>y</b><sup>(k)</sup> = ...</span> および固有値との関係式）を書け。<span class="note">（2点）</span></li>
+  </ol>
+
+  <div class="ans">
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+    <div class="ln"></div><div class="ln"></div>
+  </div>
+</section>
+
+<footer>
+  <span>シミュレーション工学 模擬期末試験（Colab・後半強化編 問題）</span>
+  <span>全7問 / 70点 / 90分</span>
+</footer>
+
+</div>
+</body>
+</html>
