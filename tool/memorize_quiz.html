@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>シミュレーション工学 期末試験 選択式クイズ（35問）</title>
+<style>
+  :root {
+    --fg: #1b1b1f;
+    --muted: #5f6470;
+    --line: #dfe2ea;
+    --accent: #2b5cd9;
+    --accent-bg: #eef3ff;
+    --bg: #f8f9fc;
+    --card: #ffffff;
+    --ok: #137333;
+    --ok-bg: #e6f4ea;
+    --ok-line: #a8dab5;
+    --ng: #b3261e;
+    --ng-bg: #fce8e6;
+    --ng-line: #f2b8b5;
+    --warn: #8a5300;
+    --warn-bg: #fef7e0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, "Segoe UI", "Yu Gothic", "Hiragino Sans", "Noto Sans JP", sans-serif;
+    line-height: 1.65;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 16px 14px 64px; }
+
+  .top-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .kicker { font-size: 0.72rem; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+  h1 { font-size: 1.24rem; margin: 4px 0 6px; line-height: 1.35; }
+  .sub { font-size: 0.84rem; color: var(--muted); margin: 0; }
+  .sub a { color: var(--accent); }
+
+  .hud {
+    position: sticky; top: 8px; z-index: 20;
+    background: rgba(255,255,255,0.96);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin: 14px 0;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+  }
+  .hud-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 0.82rem; }
+  .hud-count { font-weight: 700; font-variant-numeric: tabular-nums; }
+  .hud-sub { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .hud-btns { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+  .progress-track { height: 6px; background: #edf0f6; border-radius: 4px; margin-top: 8px; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0; background: var(--accent); transition: width 0.25s; }
+
+  button {
+    font: inherit; font-size: 0.82rem; cursor: pointer;
+    border: 1px solid var(--line); background: #fff; color: var(--fg);
+    border-radius: 8px; padding: 6px 11px;
+  }
+  button:hover { background: #f4f6fb; }
+  button:focus-visible { outline: 3px solid #b9c9f5; outline-offset: 2px; }
+  button.on { background: var(--accent-bg); border-color: #b9c9f5; color: var(--accent); font-weight: 700; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 16px; }
+  .unit-tag { display: inline-block; font-size: 0.72rem; font-weight: 700; color: var(--accent); background: var(--accent-bg); border-radius: 999px; padding: 2px 9px; }
+  .q-num { float: right; font-size: 0.78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .q-text { font-size: 1.02rem; font-weight: 700; margin: 10px 0 12px; }
+  .fig { margin: 0 0 14px; background: #fbfcff; border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
+  .fig svg { display: block; width: 100%; height: auto; max-height: 250px; }
+  .fig figcaption { font-size: 0.74rem; color: var(--muted); text-align: center; margin-top: 4px; }
+
+  .options { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .opt {
+    width: 100%; text-align: left; display: flex; gap: 10px; align-items: flex-start;
+    padding: 11px 13px; border-radius: 9px; font-size: 0.93rem; line-height: 1.5;
+  }
+  .opt .key {
+    flex: 0 0 auto; width: 1.5em; height: 1.5em; border-radius: 50%;
+    border: 1px solid var(--line); display: grid; place-items: center;
+    font-size: 0.76rem; font-weight: 700; color: var(--muted); background: #fff;
+  }
+  .opt:disabled { cursor: default; }
+  .opt.answered:hover { background: #fff; }
+  .opt.is-ok { background: var(--ok-bg); border-color: var(--ok-line); }
+  .opt.is-ok .key { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .opt.is-ng { background: var(--ng-bg); border-color: var(--ng-line); }
+  .opt.is-ng .key { background: var(--ng); border-color: var(--ng); color: #fff; }
+  .opt.is-dim { opacity: 0.55; }
+
+  .feedback { margin-top: 14px; border-radius: 10px; padding: 12px 14px; display: none; }
+  .feedback.show { display: block; }
+  .feedback.ok { background: var(--ok-bg); border: 1px solid var(--ok-line); }
+  .feedback.ng { background: var(--ng-bg); border: 1px solid var(--ng-line); }
+  .fb-title { font-weight: 700; font-size: 0.95rem; }
+  .feedback.ok .fb-title { color: var(--ok); }
+  .feedback.ng .fb-title { color: var(--ng); }
+  .fb-answer { font-size: 0.88rem; margin: 6px 0 4px; }
+  .fb-answer b { color: var(--fg); }
+  .fb-why { font-size: 0.86rem; color: #3c414b; }
+  .fb-why .math { font-family: "Cambria Math", "Times New Roman", Georgia, serif; }
+
+  .actions { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .actions .next { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; padding: 8px 16px; }
+  .actions .next:hover { background: #2450c4; }
+
+  .result { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 16px; }
+  .result h2 { margin: 0 0 6px; font-size: 1.1rem; }
+  .score-big { font-size: 1.7rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .miss-list { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; }
+  .miss-list li { border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; font-size: 0.84rem; }
+  .miss-list .miss-q { display: block; color: var(--muted); font-size: 0.78rem; margin-top: 2px; }
+
+  footer { text-align: center; font-size: 0.75rem; color: var(--muted); margin-top: 24px; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top-card">
+    <div class="kicker">SIMULATION ENGINEERING // 4-CHOICE DRILL</div>
+    <h1>期末試験 覚えるべきことリスト 選択式クイズ（35問）</h1>
+    <p class="sub">
+      範囲: 第1回〜第12回 ＋ 演習1。1問1答の選択式で、選んだ瞬間に <b>[正解] / [不正解]</b> と理由が出ます。<br>
+      入力式の一覧は <a href="memorize_list.html">覚えるべきことリスト（入力チェック）</a> にあります。
+    </p>
+  </header>
+
+  <div class="hud">
+    <div class="hud-row">
+      <span class="hud-count" id="hud-count">1 / 35</span>
+      <span class="hud-sub" id="hud-score">正解 0 / 不正解 0</span>
+      <div class="hud-btns">
+        <button type="button" id="btn-shuffle">シャッフル</button>
+        <button type="button" id="btn-weak">苦手・未解答だけ</button>
+        <button type="button" id="btn-reset">記録リセット</button>
+      </div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+
+  <main id="app"></main>
+
+  <footer>シミュレーション工学 期末試験 選択式クイズ（全35問・8単元）</footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const STORE_KEY = "sim_eng_memorize_quiz_v1";
+
+  /* ---------- 図 (SVG) ---------- */
+  const FIGS = {
+    loglog: `
+      <svg viewBox="0 0 360 210" role="img" aria-label="刻み幅と誤差の両対数グラフ。オイラー法の傾き1、ホイン法の傾き2、RK4の傾き4">
+        <line x1="46" y1="16" x2="46" y2="176" stroke="#b9bfd0"/>
+        <line x1="46" y1="176" x2="336" y2="176" stroke="#b9bfd0"/>
+        <text x="12" y="20" font-size="11" fill="#5f6470">誤差</text>
+        <text x="300" y="196" font-size="11" fill="#5f6470">刻み幅 Δt</text>
+        <line x1="70" y1="40" x2="320" y2="160" stroke="#2b5cd9" stroke-width="2"/>
+        <line x1="70" y1="40" x2="200" y2="160" stroke="#137333" stroke-width="2"/>
+        <line x1="70" y1="40" x2="122" y2="160" stroke="#b3261e" stroke-width="2"/>
+        <text x="250" y="142" font-size="11" fill="#2b5cd9">傾き1: オイラー</text>
+        <text x="150" y="132" font-size="11" fill="#137333">傾き2: ホイン</text>
+        <text x="96" y="72" font-size="11" fill="#b3261e">傾き4: RK4</text>
+      </svg>`,
+    phaseline: `
+      <svg viewBox="0 0 360 120" role="img" aria-label="1次元相図。x=0 は半安定、x=1 は安定">
+        <line x1="30" y1="70" x2="330" y2="70" stroke="#b9bfd0" stroke-width="1.5"/>
+        <polygon points="330,70 320,65 320,75" fill="#b9bfd0"/>
+        <circle cx="120" cy="70" r="5" fill="#fff" stroke="#1b1b1f" stroke-width="2"/>
+        <circle cx="240" cy="70" r="5" fill="#1b1b1f"/>
+        <text x="110" y="96" font-size="12" fill="#1b1b1f">x* = 0</text>
+        <text x="232" y="96" font-size="12" fill="#1b1b1f">x* = 1</text>
+        <text x="40" y="52" font-size="11" fill="#5f6470">→ 右向き</text>
+        <text x="146" y="52" font-size="11" fill="#5f6470">→ 右向き</text>
+        <text x="262" y="52" font-size="11" fill="#5f6470">← 左向き</text>
+      </svg>`,
+    phase: `
+      <svg viewBox="0 0 360 220" role="img" aria-label="z-v 相平面の中心点。軌道は反時計回りの円ではなく、v が正の上半分で右へ進むため時計回り">
+        <line x1="30" y1="110" x2="320" y2="110" stroke="#b9bfd0"/>
+        <line x1="180" y1="18" x2="180" y2="200" stroke="#b9bfd0"/>
+        <text x="306" y="104" font-size="11" fill="#5f6470">z</text>
+        <text x="188" y="22" font-size="11" fill="#5f6470">v</text>
+        <circle cx="180" cy="110" r="58" fill="none" stroke="#2b5cd9" stroke-width="2"/>
+        <polygon points="180,52 172,62 188,62" fill="#2b5cd9"/>
+        <polygon points="238,110 228,102 228,118" fill="#2b5cd9"/>
+        <polygon points="180,168 172,158 188,158" fill="#2b5cd9"/>
+        <polygon points="122,110 132,102 132,118" fill="#2b5cd9"/>
+        <circle cx="180" cy="110" r="4" fill="#2b5cd9"/>
+        <text x="196" y="82" font-size="11" fill="#2b5cd9">v &gt; 0 では右へ</text>
+        <text x="40" y="130" font-size="11" fill="#2b5cd9">v &lt; 0 では左へ</text>
+      </svg>`,
+    cart: `
+      <svg viewBox="0 0 360 170" role="img" aria-label="壁・ばね・減衰器・質量からなる1自由度の台車モデル。入力 u が右向きに加わる">
+        <line x1="30" y1="30" x2="30" y2="150" stroke="#1b1b1f" stroke-width="3"/>
+        <line x1="30" y1="140" x2="330" y2="140" stroke="#b9bfd0" stroke-width="2"/>
+        <polyline points="30,62 42,62 48,50 58,74 68,50 78,74 88,62 100,62" fill="none" stroke="#2b5cd9" stroke-width="2"/>
+        <text x="44" y="40" font-size="11" fill="#2b5cd9">k (ばね)</text>
+        <rect x="100" y="48" width="90" height="46" fill="#eef3ff" stroke="#2b5cd9" stroke-width="2"/>
+        <text x="132" y="76" font-size="13" fill="#1b1b1f">m</text>
+        <line x1="190" y1="90" x2="190" y2="140" stroke="#1b1b1f" stroke-width="2"/>
+        <line x1="240" y1="90" x2="240" y2="140" stroke="#1b1b1f" stroke-width="2"/>
+        <rect x="190" y="90" width="50" height="20" fill="none" stroke="#8a5300" stroke-width="2"/>
+        <text x="192" y="128" font-size="11" fill="#8a5300">c (ダンパ)</text>
+        <line x1="100" y1="120" x2="40" y2="120" stroke="#5f6470" stroke-dasharray="4 3"/>
+        <text x="46" y="115" font-size="11" fill="#5f6470">x</text>
+        <line x1="190" y1="70" x2="250" y2="70" stroke="#b3261e" stroke-width="2"/>
+        <polygon points="250,70 240,65 240,75" fill="#b3261e"/>
+        <text x="252" y="74" font-size="12" fill="#b3261e">u</text>
+      </svg>`
+  };
+
+  /* ---------- 問題データ ---------- */
+  const QUESTIONS = [
+    { u: "1. 誤差と浮動小数点", q: "0.1 + 0.2 が 0.30000000000000004 になるのは、数を有限桁の2進小数で表すために生じる誤差である。この誤差の名称は？",
+      c: ["丸め誤差", "打ち切り誤差", "桁落ち", "情報落ち"], a: 0,
+      why: "有限桁で表現した時点で生じるのが丸め誤差。無限級数や微分を有限回で切るのが打ち切り誤差、近い値の引き算が桁落ち、大きい数に小さい数を足して消えるのが情報落ち。" },
+
+    { u: "1. 誤差と浮動小数点", q: "単精度（float32）と倍精度（float64）で表現できる10進の有効桁数はおよそいくつか？",
+      c: ["7桁 / 16桁", "16桁 / 32桁", "3桁 / 6桁", "24桁 / 53桁"], a: 0,
+      why: "float32 は約7桁、float64 は約16桁（マシンイプシロン約2.2e-16）。24と53は2進の仮数部ビット数であり、10進の有効桁数ではない点に注意。" },
+
+    { u: "1. 誤差と浮動小数点", q: "近い値同士を引き算すると有効数字が失われ、相対誤差が急に拡大する現象を何というか？",
+      c: ["桁落ち", "情報落ち", "丸め誤差", "打ち切り誤差"], a: 0,
+      why: "例: 2次方程式の解の公式で -b + √(b²-4ac) をそのまま計算すると桁落ちする。回避策は解と係数の関係 x1 = c/(a·x2) を使うか、共役式で有理化すること。" },
+
+    { u: "1. 誤差と浮動小数点", q: "Python で x の2乗を計算する演算子はどれか？",
+      c: ["x ** 2", "x ^ 2", "x // 2", "x % 2"], a: 0,
+      why: "Python の ^ はビット単位の排他的論理和（XOR）であってべき乗ではない。べき乗は **、切り捨て除算は //、剰余は %。" },
+
+    { u: "1. 誤差と浮動小数点", q: "ax²+bx+c=0（b>0）で、大きい側の解 x2 から小さい側の解 x1 を桁落ちなく求める式はどれか？",
+      c: ["x1 = c / (a * x2)", "x1 = (-b + sqrt(b*b - 4*a*c)) / (2*a)", "x1 = (-b - sqrt(b*b - 4*a*c)) / (2*a)", "x1 = -b / a"], a: 0,
+      why: "解と係数の関係 x1·x2 = c/a より x1 = c/(a·x2)。-b+√(...) は b>0 でほぼ0同士の引き算になり桁落ちする。-b-√(...) は桁落ちしないが、それは大きい側の解 x2 の式。" },
+
+    { u: "2. オイラー法・ホイン法・RK4", q: "dx/dt = f(t,x) に対する前進オイラー法の更新式はどれか？",
+      c: ["x[n+1] = x[n] + dt * f(t[n], x[n])", "x[n+1] = x[n] + dt * f(t[n+1], x[n+1])", "x[n+1] = x[n] + 0.5 * dt * (f(t[n],x[n]) + f(t[n+1],x[n+1]))", "x[n+1] = x[n] + (dt/2) * f(t[n], x[n])"], a: 0,
+      why: "微分の定義 (x(t+dt)-x(t))/dt ≈ f(t,x) をそのまま変形したもの。右辺がすべて既知量なので陽解法。f(t[n+1], x[n+1]) を使うのが後退（陰）オイラー法。" },
+
+    { u: "2. オイラー法・ホイン法・RK4", q: "dx/dt = kx（k = -9）に前進オイラー法を適用する。発散しない最大の刻み幅 dt は？",
+      c: ["dt = 2/9 ≒ 0.222", "dt = 9/2 = 4.5", "dt = 1/9 ≒ 0.111", "dt はいくら大きくてもよい"], a: 0,
+      why: "安定条件 |1 + k·dt| ≤ 1 に k = -9 を入れると -1 ≤ 1 - 9dt ≤ 1、すなわち dt ≤ 2/9。dt = 0.25 では増幅率が -1.25 となり、符号を反転しながら発散する。" },
+
+    { u: "2. オイラー法・ホイン法・RK4", q: "dx/dt = kx（k < 0）に後退オイラー法を適用したときの安定性は？",
+      c: ["任意の dt > 0 で絶対安定", "dt ≤ 2/|k| のときだけ安定", "常に発散する", "dt が小さいほど不安定になる"], a: 0,
+      why: "x[n+1] = x[n]/(1 - k·dt) で、k<0・dt>0 なら分母は常に1より大きい。よって増幅率は0より大きく1未満に収まり、刻み幅を大きくしても発散しない（絶対安定＝A安定）。" },
+
+    { u: "2. オイラー法・ホイン法・RK4", q: "RK4 の更新式 x[n+1] = x[n] + (k1 + ?·k2 + ?·k3 + k4) / ? の係数はどれか？",
+      c: ["(k1 + 2k2 + 2k3 + k4)/6", "(k1 + 3k2 + 3k3 + k4)/8", "(k1 + k2 + k3 + k4)/4", "(k1 + 4k2 + k3)/6"], a: 0,
+      why: "シンプソン則と同じ重みで、両端1・中間2・分母6。k2, k3 は t[n]+dt/2、k4 は t[n]+dt と時刻を進めるのを忘れないこと。" },
+
+    { u: "2. オイラー法・ホイン法・RK4", q: "刻み幅 dt を 1/10 にしたとき、一定時間後の積算誤差が RK4（4次精度）で何倍になるか？",
+      c: ["1/10000 倍", "1/10 倍", "1/100 倍", "1/4 倍"], a: 0,
+      why: "積算誤差は O(dt^p)。1/10 にすると 10^-p 倍になるので、1次=1/10、2次=1/100、4次=1/10000。両対数グラフの傾きがそのまま次数になる。" },
+
+    { u: "3. 連立化とモデル化", q: "m·x'' + c·x' + k·x = u を x1 = x、x2 = x' で1階連立化したとき、dx2/dt はどれか？", fig: "cart",
+      c: ["(u - c*x2 - k*x1) / m", "(u - c*x2 - k*x1) * m", "u - c*x2 - k*x1", "(u + c*x2 + k*x1) / m"], a: 0,
+      why: "まず最高階の x'' について解き、m で割る。x'' = (u - c·x' - k·x)/m。m で割り忘れるのが最頻出のミス。" },
+
+    { u: "3. 連立化とモデル化", q: "2変数 (x, v) を RK4 で解くとき、各段階で守るべき鉄則はどれか？",
+      c: ["全成分を同じ段階（k1/2 など）で揃えてから次の段階へ進む", "x を先に更新し、その新しい x を v の計算に使う", "v だけ k1〜k4 を計算すればよい", "段階ごとに刻み幅を変えてよい"], a: 0,
+      why: "段階が混ざると次数が崩れ、4次精度にならない。x[n+1] を先に更新して v[n+1] に使うのは半陰解法（シンプレクティック・オイラー）で、RK4 とは別物。" },
+
+    { u: "3. 連立化とモデル化", q: "単振り子 m·l²·θ'' = -m·g·l·sinθ を ω' = f(θ) の形にした右辺と、質量 m の影響は？",
+      c: ["-(g/l)·sinθ で、m は約分されて依存しない", "-(g/l)·sinθ で、m に比例して速くなる", "-(g·m/l)·sinθ で、m に比例する", "-(l/g)·sinθ で、質量に反比例する"], a: 0,
+      why: "両辺を m·l² で割ると m は完全に約分される。振り子の周期が質量によらないのは自由落下と同じ理由。-(l/g) は角振動数の2乗の逆数であって右辺ではない。" },
+
+    { u: "3. 連立化とモデル化", q: "回転運動方程式 m·l²·θ'' = l·F - m·g·l·cosθ - d·ω の右辺をそのままコードにするとき、割る分母（慣性モーメント）は？",
+      c: ["m * l**2", "m * l", "l**2", "m + l"], a: 0,
+      why: "慣性モーメントは I = m·l²。質量と長さを1乗ずつにすると次元も値も合わない。シミュレーションでは目的に必要な要素だけを残し、不要な要素は削ることがモデル化の原則。" },
+
+    { u: "4. 1次元相図と2次系", q: "dx/dt = f(x) の固定点 x* で f'(x*) = 0 のとき、線形化による安定性判定はどうなるか？",
+      c: ["判定できない（高次項や符号を直接調べる必要がある）", "必ず安定", "必ず不安定", "必ず周期的に振動する"], a: 0,
+      why: "1次近似 Δx' ≈ f'(x*)Δx が0になり、高次項が支配する。f'(x*)<0 なら安定、>0 なら不安定、=0 だけは線形化では決められない。" },
+
+    { u: "4. 1次元相図と2次系", q: "dx/dt = x²(1-x) の固定点 x = 0 の分類は？", fig: "phaseline",
+      c: ["半安定（片側から近づき、反対側へは離れる）", "漸近安定", "不安定（両側へ離れる）", "中心点"], a: 0,
+      why: "x<0 でも 0<x<1 でも f(x) = x²(1-x) > 0 で右向き。よって左からは近づき、右からは離れる半安定。x = 1 は両側から集まる漸近安定。" },
+
+    { u: "4. 1次元相図と2次系", q: "x'' + c·x' + x = 1（m=1, k=1）で、オーバーシュートせず最も速く収束する減衰と、そのときの c は？",
+      c: ["臨界減衰 / c = 2", "不足減衰 / c = 0.5", "過減衰 / c = 4", "臨界減衰 / c = 1"], a: 0,
+      why: "特性方程式 λ² + cλ + 1 = 0 の判別式 c² - 4 = 0 より c = 2。c > 2 は過減衰（遅い）、0 < c < 2 は不足減衰（振動してオーバーシュート）。" },
+
+    { u: "4. 1次元相図と2次系", q: "解析解が書けない減衰なし単振り子のシミュレータが正しいか確かめる方法として最も適切なのは？",
+      c: ["dt を小さくして収束を確認し、エネルギー保存誤差の両対数傾きが次数（1や4）に一致するか見る", "文法エラーがなければ正しいとみなす", "初期値を固定点に置いて0のままを確認する", "1回だけ実行して目視でグラフを眺める"], a: 0,
+      why: "保存則（力学的エネルギー一定）と次数検証（誤差がオイラーで O(dt)、RK4 で O(dt⁴)）の組合せが最強のバグ検出法。固定点に置くと何も動かないので検証にならない。" },
+
+    { u: "5. ヤコビアンと固定点分類", q: "単振り子 f1 = ω, f2 = -(g/l)sinθ の最下点 θ* = 0 の分類は？",
+      c: ["中心点（中立安定）", "安定渦状点", "鞍点", "安定結節点"], a: 0,
+      why: "J = [[0,1],[-g/l,0]]、固有値 λ = ±i√(g/l) の純虚数なので中心点。ただし非線形項があるため、漸近安定ではなく中立安定（リアプノフ安定）と書く。" },
+
+    { u: "5. ヤコビアンと固定点分類", q: "θ = π と θ = -π は相図上でどう扱うか？",
+      c: ["角度は 2π 周期なので同一の1つの固定点（真上）", "座標が違うので別々の2つの固定点", "どちらも固定点ではない", "片方だけが固定点になる"], a: 0,
+      why: "θ ∈ (-π, π] と定義すれば π と -π は同じ地点。真上の逆振り子の姿勢は1つしかないので、固定点も1つとして数える。" },
+
+    { u: "5. ヤコビアンと固定点分類", q: "A = [[1,1],[4,-2]] のトレース τ、行列式 Δ、固有値、固定点の分類の組合せで正しいものは？",
+      c: ["τ = -1, Δ = -6, λ = -3, 2, 鞍点", "τ = -1, Δ = 6, λ = -3, 2, 安定結節点", "τ = 3, Δ = -6, λ = -2, 3, 鞍点", "τ = -1, Δ = -6, λ = -1, -6, 安定渦状点"], a: 0,
+      why: "τ = 1 + (-2) = -1、Δ = 1·(-2) - 1·4 = -6。λ² + λ - 6 = (λ+3)(λ-2)。Δ < 0 なら τ によらず鞍点。" },
+
+    { u: "5. ヤコビアンと固定点分類", q: "τ = 0 の線形系では、相空間の面積は時間とともにどうなるか？（面積は e^(τt) に比例）",
+      c: ["一定に保たれる", "指数関数的に収縮する", "指数関数的に拡大する", "振動しながら増減する"], a: 0,
+      why: "面積の伸縮率は e^(τt)。τ < 0 で収縮（安定）、τ > 0 で拡大（不安定）、τ = 0 で面積保存（中心点）。" },
+
+    { u: "5. ヤコビアンと固定点分類", q: "横軸 z、縦軸 v（= dz/dt）の相平面で、中心点・渦状点の軌道はどちら回りか？", fig: "phase",
+      c: ["時計回り", "反時計回り", "向きは決まらない", "τ の符号で反転する"], a: 0,
+      why: "上半分は v > 0 なので dz/dt > 0、必ず右へ進む。下半分は左へ進む。よって上→右→下→左の時計回り。反時計回りと書くと減点。" },
+
+    { u: "6. 逆振り子のPD制御", q: "φ = 0 を真上とする逆振り子で、重力項の符号は？（真下基準の -(g/l)sinθ との違い）",
+      c: ["+（傾くほど倒れる向きに働く）", "-（傾くと戻る向きに働く）", "0（重力は無関係）", "φ の2乗に比例する"], a: 0,
+      why: "真上は不安定つり合いなので、少し傾くとさらに倒れる向きにトルクが働く。よって dω/dt = +(g/l)sinφ + u。真下基準の単振り子とは符号が逆。" },
+
+    { u: "6. 逆振り子のPD制御", q: "目標 φ_ref = 0 への PD 制御入力 u はどれか？",
+      c: ["u = -kp*phi - kd*omega", "u = kp*phi + kd*omega", "u = kp*phi - kd*omega", "u = -kp*omega - kd*phi"], a: 0,
+      why: "偏差 (0 - φ) に比例する項と、角速度を止める項の和。kp*(0-phi) - kd*omega と同じ。符号を逆にすると倒れる向きに押してしまう。" },
+
+    { u: "6. 逆振り子のPD制御", q: "sinφ ≈ φ と線形化した φ'' + kd·φ' + (kp - g/l)φ = 0 が漸近安定になる条件は？",
+      c: ["kd > 0 かつ kp > g/l", "kd > 0 かつ kp > 0", "kd < 0 かつ kp > g/l", "kd > g/l かつ kp > 0"], a: 0,
+      why: "τ = -kd < 0（減衰）と Δ = kp - g/l > 0（復元力が重力に勝つ）の両方が必要。kp が g/l 以下だと重力に負けて倒れたままになる。" },
+
+    { u: "6. 逆振り子のPD制御", q: "g/l = 9.8、kd = 6 のとき、臨界減衰（τ² = 4Δ）となる kp は？",
+      c: ["18.8", "9.8", "14.8", "36"], a: 0,
+      why: "kd² = 4(kp - g/l) より kp = g/l + kd²/4 = 9.8 + 36/4 = 18.8。離散時間でゲインを上げすぎると1ステップの変化が過大になり数値発散する。" },
+
+    { u: "7. ニュートン法", q: "f(x) = 0 を解く1次元ニュートン法の更新式はどれか？",
+      c: ["x[k+1] = x[k] - f(x[k]) / f'(x[k])", "x[k+1] = x[k] + f(x[k]) / f'(x[k])", "x[k+1] = x[k] - f'(x[k]) / f(x[k])", "x[k+1] = x[k] - f(x[k]) * f'(x[k])"], a: 0,
+      why: "テイラー1次近似 f(x+δ) ≈ f(x) + f'(x)δ = 0 より δ = -f/f'。図形的には接線と x 軸の交点。分母と分子を入れ替えるのが典型的なミス。" },
+
+    { u: "7. ニュートン法", q: "f(x) = x³ - 13 = 0 を x0 = 2 から1ステップ進めた x1 は？",
+      c: ["29/12 ≒ 2.417", "13/4 = 3.25", "2.5", "17/12 ≒ 1.417"], a: 0,
+      why: "f'(x) = 3x² より x1 = 2 - (8-13)/(3·4) = 2 + 5/12 = 29/12 ≒ 2.4167。真値 13^(1/3) ≒ 2.351 に1歩でかなり近づく。" },
+
+    { u: "7. ニュートン法", q: "f(x) = x³ - 2x + 2 に初期値 x0 = 0 を与えるとどうなるか？",
+      c: ["0 と 1 を永久に往復し、収束しない", "x = 1 に直ちに収束する", "無限大へ発散する", "x = 0 が解なのでそのまま止まる"], a: 0,
+      why: "x1 = 0 - 2/(-2) = 1、x2 = 1 - 1/1 = 0 で 0 と 1 の2周期に落ちる。f'(x) = 0 の点では接線が水平になりゼロ除算で止まる。初期値選びが重要。" },
+
+    { u: "7. ニュートン法", q: "連立非線形方程式に対する2次元ニュートン法で、各反復に解く線形方程式は？",
+      c: ["J(x[k]) δ = -f(x[k])", "J(x[k]) δ = f(x[k])", "J(x[k])ᵀ δ = f(x[k])", "δ = -J(x[k]) f(x[k])"], a: 0,
+      why: "np.linalg.solve(Jz, -fz) の形。右辺のマイナスを落とすのが最頻出のバグ。det J = 0 になる初期値では解けずに停止する。" },
+
+    { u: "8. 線形連立方程式と固有値", q: "ガウスの消去法で部分ピボット選択（絶対値最大の行を対角に持ってくる）を行う理由は？",
+      c: ["ゼロ除算の回避と、微小値で割ることによる丸め誤差の拡大防止", "行列を対称行列に変換するため", "計算量を O(n) に減らすため", "逆行列を必ず求められるようにするため"], a: 0,
+      why: "a_kk = 0 だとそのままでは割れない。また非常に小さい数で割ると丸め誤差が急拡大する。どちらも数値的安定性のための工夫で、計算量は O(n³) のまま。" },
+
+    { u: "8. 線形連立方程式と固有値", q: "LU分解で A = LU とし、同じ A で右辺 b だけを変えて何度も解くとき、2回目以降の代入計算の計算量は？",
+      c: ["O(n²)（前進代入と後退代入だけ）", "O(n³)（毎回分解し直す）", "O(n)", "O(1)"], a: 0,
+      why: "分解は O(n³) だが1回だけ。以降は L·y = b を前進代入、U·x = y を後退代入で O(n²)。これが LU 分解の最大の利点。" },
+
+    { u: "8. 線形連立方程式と固有値", q: "最小固有値を反復で求める方法と、np.linalg.inv(A) @ b が solve に比べて何倍の計算量か、の組合せで正しいものは？",
+      c: ["逆べき乗法 / 約3倍", "べき乗法 / 約3倍", "逆べき乗法 / 約1/3倍", "べき乗法 / 約9倍"], a: 0,
+      why: "A⁻¹ の最大固有値は 1/λ_min なので、逆べき乗法で最小固有値が得られる。逆行列の直接計算は solve の約3倍の演算量で丸め誤差も増えるため、連立方程式は solve で解く。" },
+
+    { u: "2. オイラー法・ホイン法・RK4", q: "刻み幅 dt を 1/2 にしたとき、誤差が 1/16 になる手法はどれか？（両対数グラフの傾きが4）", fig: "loglog",
+      c: ["RK4（4次精度）", "ホイン法（2次精度）", "前進オイラー法（1次精度）", "後退オイラー法（1次精度）"], a: 0,
+      why: "誤差比は 2^p。1次なら1/2、2次なら1/4、4次なら1/16。傾きが大きいほど少ない計算で高精度になる。" }
+  ];
+
+  /* ---------- 状態 ---------- */
+  let state = {
+    answers: {},    // { index: chosen }
+    order: null,    // 出題順（null = 番号順）
+    weakOnly: false,
+    cursor: 0
+  };
+
+  const app = document.getElementById("app");
+  const hudCount = document.getElementById("hud-count");
+  const hudScore = document.getElementById("hud-score");
+  const fill = document.getElementById("progress-fill");
+  const btnShuffle = document.getElementById("btn-shuffle");
+  const btnWeak = document.getElementById("btn-weak");
+  const btnReset = document.getElementById("btn-reset");
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return;
+      const p = JSON.parse(raw);
+      state.answers = p.answers || {};
+    } catch (e) {}
+  }
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ answers: state.answers })); } catch (e) {}
+  }
+
+  function queue() {
+    let idx = QUESTIONS.map(function (q, i) { return i; });
+    if (state.weakOnly) {
+      const weak = idx.filter(function (i) { return state.answers[i] !== QUESTIONS[i].a; });
+      if (weak.length) idx = weak;
+    }
+    if (state.order) {
+      const pos = {};
+      state.order.forEach(function (i, k) { pos[i] = k; });
+      idx.sort(function (a, b) { return pos[a] - pos[b]; });
+    }
+    return idx;
+  }
+
+  function stats() {
+    let ok = 0, ng = 0;
+    Object.keys(state.answers).forEach(function (k) {
+      const q = QUESTIONS[k];
+      if (!q) return;
+      if (state.answers[k] === q.a) ok++; else ng++;
+    });
+    return { ok: ok, ng: ng };
+  }
+
+  function updateHud(q, label) {
+    const s = stats();
+    hudCount.textContent = label;
+    hudScore.textContent = "正解 " + s.ok + " / 不正解 " + s.ng;
+    fill.style.width = Math.round((s.ok + s.ng) / QUESTIONS.length * 100) + "%";
+    btnShuffle.classList.toggle("on", !!state.order);
+    btnWeak.classList.toggle("on", state.weakOnly);
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function renderQuestion() {
+    const qs = queue();
+    if (state.cursor >= qs.length) { renderResult(); return; }
+    const qi = qs[state.cursor];
+    const q = QUESTIONS[qi];
+    const chosen = state.answers[qi];
+    const answered = chosen !== undefined;
+
+    app.innerHTML =
+      '<section class="card">' +
+        '<span class="q-num">' + (state.cursor + 1) + " / " + qs.length + '</span>' +
+        '<span class="unit-tag">' + esc(q.u) + '</span>' +
+        '<p class="q-text">' + esc(q.q) + '</p>' +
+        (q.fig ? '<figure class="fig">' + FIGS[q.fig] + '<figcaption>図: この問題の判断材料</figcaption></figure>' : '') +
+        '<ul class="options" id="options">' +
+          q.c.map(function (text, k) {
+            return '<li><button type="button" class="opt' + (answered ? ' answered' : '') + '" data-k="' + k + '">' +
+              '<span class="key">' + "ABCD"[k] + '</span><span>' + esc(text) + '</span></button></li>';
+          }).join('') +
+        '</ul>' +
+        '<div class="feedback" id="fb"></div>' +
+        '<div class="actions" id="actions"></div>' +
+      '</section>';
+
+    const opts = Array.prototype.slice.call(document.querySelectorAll(".opt"));
+    opts.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        choose(qi, Number(btn.dataset.k), opts);
+      });
+      if (answered) btn.disabled = true;
+    });
+
+    if (answered) paint(qi, opts, false);
+    updateHud(q, (state.cursor + 1) + " / " + qs.length);
+    window.scrollTo(0, 0);
+  }
+
+  function choose(qi, k, opts) {
+    if (state.answers[qi] !== undefined) return;
+    state.answers[qi] = k;
+    save();
+    paint(qi, opts, true);
+    updateHud(QUESTIONS[qi], (state.cursor + 1) + " / " + queue().length);
+  }
+
+  function paint(qi, opts, animate) {
+    const q = QUESTIONS[qi];
+    const chosen = state.answers[qi];
+    const ok = chosen === q.a;
+
+    opts.forEach(function (btn, k) {
+      btn.disabled = true;
+      btn.classList.add("answered");
+      btn.classList.remove("is-ok", "is-ng", "is-dim");
+      if (k === q.a) btn.classList.add("is-ok");
+      else if (k === chosen) btn.classList.add("is-ng");
+      else btn.classList.add("is-dim");
+    });
+
+    renderFeedback(q, chosen, ok);
+    renderNextButton();
+  }
+
+  function renderFeedback(q, chosen, ok) {
+    const fb = document.getElementById("fb");
+    fb.className = "feedback show " + (ok ? "ok" : "ng");
+    fb.setAttribute("role", "status");
+    fb.innerHTML =
+      '<div class="fb-title">' + (ok ? "[正解]" : "[不正解]") + "</div>" +
+      (ok ? "" : '<div class="fb-answer">選んだ答え: <b>' + esc(q.c[chosen]) + "</b></div>") +
+      (ok ? "" : '<div class="fb-answer">正しい答え: <b>' + esc(q.c[q.a]) + "</b></div>") +
+      '<div class="fb-why">' + esc(q.why) + "</div>";
+  }
+
+  function renderNextButton() {
+    const qs = queue();
+    const last = state.cursor >= qs.length - 1;
+    const actions = document.getElementById("actions");
+    actions.innerHTML = '<button type="button" class="next" id="btn-next">' +
+      (last ? "結果を見る →" : "次の問題 →") + "</button>";
+    document.getElementById("btn-next").addEventListener("click", next);
+  }
+
+  function next() {
+    state.cursor++;
+    if (state.cursor >= queue().length) { renderResult(); return; }
+    renderQuestion();
+  }
+
+  function renderResult() {
+    const s = stats();
+    const missed = [];
+    QUESTIONS.forEach(function (q, i) {
+      const a = state.answers[i];
+      if (a !== q.a) missed.push({ i: i, q: q, a: a });
+    });
+    updateHud(null, "結果");
+    app.innerHTML =
+      '<section class="result">' +
+        '<h2>結果</h2>' +
+        '<p class="score-big">' + s.ok + " / " + (s.ok + s.ng) + " 問正解（正解率 " +
+          (s.ok + s.ng ? Math.round(s.ok / (s.ok + s.ng) * 100) : 0) + "%）</p>" +
+        '<p class="sub">全35問のうち、まだ解いていない問題は ' + (QUESTIONS.length - s.ok - s.ng) + " 問です。</p>" +
+        (missed.length
+          ? '<h2 style="margin-top:16px;font-size:0.98rem;">復習リスト（不正解・未解答）</h2>' +
+            '<ul class="miss-list">' +
+            missed.map(function (m) {
+              return '<li>' + esc(m.q.c[m.q.a]) +
+                '<span class="miss-q">' + esc(m.q.u) + "｜" + (m.a === undefined ? "未解答" : "誤答") + "</span></li>";
+            }).join('') +
+            "</ul>"
+          : '<p class="sub" style="margin-top:10px;">全問正解です。入力式の一覧で手書きの再現も確認しておくと安心です。</p>') +
+        '<div class="actions">' +
+          '<button type="button" class="next" id="btn-retry-weak">不正解・未解答だけやり直す</button>' +
+          '<button type="button" id="btn-restart">最初から</button>' +
+        "</div>" +
+      "</section>";
+
+    document.getElementById("btn-retry-weak").addEventListener("click", function () {
+      state.weakOnly = true;
+      state.cursor = 0;
+      renderQuestion();
+    });
+    document.getElementById("btn-restart").addEventListener("click", function () {
+      state.weakOnly = false;
+      state.order = null;
+      state.cursor = 0;
+      renderQuestion();
+    });
+  }
+
+  /* ---------- 操作 ---------- */
+  btnShuffle.addEventListener("click", function () {
+    if (state.order) {
+      state.order = null;
+    } else {
+      const arr = QUESTIONS.map(function (q, i) { return i; });
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+      }
+      state.order = arr;
+    }
+    state.cursor = 0;
+    renderQuestion();
+  });
+
+  btnWeak.addEventListener("click", function () {
+    state.weakOnly = !state.weakOnly;
+    state.cursor = 0;
+    renderQuestion();
+  });
+
+  btnReset.addEventListener("click", function () {
+    if (!window.confirm("解答の記録をすべて消します。よろしいですか？")) return;
+    state.answers = {};
+    state.order = null;
+    state.weakOnly = false;
+    state.cursor = 0;
+    save();
+    renderQuestion();
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    const qs = queue();
+    const qi = qs[state.cursor];
+    if (qi === undefined) return;
+
+    if (/^[1-4]$/.test(e.key)) {
+      const opts = Array.prototype.slice.call(document.querySelectorAll(".opt"));
+      const btn = opts[Number(e.key) - 1];
+      if (btn && !btn.disabled) btn.click();
+      e.preventDefault();
+    } else if (e.key === "Enter" || e.key === " ") {
+      const nb = document.getElementById("btn-next");
+      if (nb) { nb.click(); e.preventDefault(); }
+    }
+  });
+
+  load();
+  if (Object.keys(state.answers).length === QUESTIONS.length) {
+    state.cursor = 0;
+  }
+  renderQuestion();
+})();
+</script>
+</body>
+</html>

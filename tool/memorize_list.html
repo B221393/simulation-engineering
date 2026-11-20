@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>シミュレーション工学 期末試験 覚えるべきことリスト（入力チェック付き）</title>
+<style>
+  :root {
+    --fg: #1b1b1f;
+    --muted: #5f6470;
+    --line: #dfe2ea;
+    --accent: #2b5cd9;
+    --accent-bg: #eef3ff;
+    --bg: #f8f9fc;
+    --card: #ffffff;
+    --ok: #137333;
+    --ok-bg: #e6f4ea;
+    --ok-line: #a8dab5;
+    --ng: #b3261e;
+    --ng-bg: #fce8e6;
+    --ng-line: #f2b8b5;
+    --warn: #8a5300;
+    --warn-bg: #fef7e0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, "Segoe UI", "Yu Gothic", "Hiragino Sans", "Noto Sans JP", sans-serif;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 16px 14px 72px; }
+
+  /* Header & Dashboard */
+  .top-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .kicker { font-size: 0.75rem; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+  h1 { font-size: 1.28rem; margin: 4px 0 4px; line-height: 1.35; }
+  .sub { font-size: 0.84rem; color: var(--muted); margin: 0; }
+
+  .sticky-bar {
+    position: sticky;
+    top: 8px;
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  }
+  .stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .score-box { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .score-main { font-size: 1.15rem; font-weight: 800; color: var(--fg); font-variant-numeric: tabular-nums; }
+  .score-sub { font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .progress-track {
+    width: 100%;
+    height: 8px;
+    background: #ebedf3;
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 8px 0 10px;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.25s ease;
+  }
+  .controls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--fg);
+    padding: 7px 11px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+  }
+  button:hover { border-color: #b9bfd0; background: #f4f6fb; }
+  button.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  button.primary:hover { opacity: 0.92; background: var(--accent); }
+  button.active-filter {
+    background: var(--accent-bg);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  button.danger { color: var(--ng); border-color: var(--ng-line); }
+  button.danger:hover { background: var(--ng-bg); }
+
+  /* Unit Navigation */
+  .unit-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .unit-chip {
+    font-size: 0.78rem;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--fg);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .unit-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .unit-chip.done { background: var(--ok-bg); border-color: var(--ok-line); color: var(--ok); }
+
+  /* Unit Section */
+  .unit-section { margin-bottom: 22px; }
+  .unit-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+  .unit-title { font-size: 1.02rem; font-weight: 800; margin: 0; }
+  .unit-meta { font-size: 0.78rem; color: var(--muted); }
+
+  /* Question Card */
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 10px;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .q-card.is-ok { border-color: var(--ok-line); background: #fbfefc; }
+  .q-card.is-ng { border-color: var(--ng-line); background: #fffbfa; }
+  .q-card.hidden-by-filter { display: none; }
+
+  .q-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .q-id-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .q-num {
+    font-size: 0.74rem;
+    font-weight: 800;
+    background: #eef1f7;
+    color: var(--fg);
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+  .q-topic { font-size: 0.88rem; font-weight: 700; color: var(--fg); }
+  .q-badge {
+    font-size: 0.76rem;
+    font-weight: 800;
+    padding: 2px 9px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    background: #f5f6fa;
+  }
+  .q-badge.ok { background: var(--ok-bg); border-color: var(--ok-line); color: var(--ok); }
+  .q-badge.ng { background: var(--ng-bg); border-color: var(--ng-line); color: var(--ng); }
+
+  .q-prompt { font-size: 0.92rem; margin: 0 0 10px; }
+  .code-block {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.85rem;
+    background: #f4f6fa;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin: 6px 0 10px;
+    white-space: pre-wrap;
+    overflow-x: auto;
+  }
+  .math { font-family: "Cambria Math", "Times New Roman", Georgia, serif; }
+  .mono { font-family: Consolas, "Courier New", monospace; font-size: 0.88em; background: #f1f3f8; padding: 1px 4px; border-radius: 4px; }
+  .frac {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    margin: 0 2px;
+    font-size: 0.88em;
+    line-height: 1.15;
+  }
+  .frac > span:first-child { border-bottom: 1px solid currentColor; padding: 0 4px 1px; }
+  .frac > span:last-child { padding: 1px 4px 0; }
+  .mat {
+    display: inline-grid;
+    grid-template-columns: auto auto;
+    gap: 2px 10px;
+    vertical-align: middle;
+    border-left: 1.5px solid currentColor;
+    border-right: 1.5px solid currentColor;
+    border-radius: 4px;
+    padding: 2px 7px;
+    margin: 0 3px;
+    text-align: center;
+    font-size: 0.9em;
+  }
+
+  /* Input Grid */
+  .input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 0.78rem; font-weight: 700; color: var(--muted); }
+  .field input, .field select {
+    width: 100%;
+    padding: 9px 10px;
+    font-size: 16px;
+    font-family: inherit;
+    border: 1px solid #c9cedb;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--fg);
+  }
+  .field input:focus, .field select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(43, 92, 217, 0.14);
+  }
+  .field input.field-ok, .field select.field-ok { border-color: var(--ok); background: #f6fbf7; }
+  .field input.field-ng, .field select.field-ng { border-color: var(--ng); background: #fff7f6; }
+  .field-hint { font-size: 0.74rem; color: var(--muted); }
+
+  .q-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+  .feedback {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.86rem;
+    border: 1px solid var(--line);
+    background: #f5f7fb;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: var(--ok-bg); border-color: var(--ok-line); }
+  .feedback.ng { background: var(--ng-bg); border-color: var(--ng-line); }
+  .feedback-title { font-weight: 800; margin-bottom: 4px; }
+  .feedback.ok .feedback-title { color: var(--ok); }
+  .feedback.ng .feedback-title { color: var(--ng); }
+  .answer-line { margin: 4px 0; font-weight: 700; color: var(--fg); }
+  .explain-line { margin: 4px 0 0; color: #2b2f38; }
+
+  .note-box {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--warn);
+    border-radius: 10px;
+    padding: 14px;
+    margin-top: 20px;
+    font-size: 0.86rem;
+  }
+  .note-box h2 { font-size: 0.96rem; margin: 0 0 6px; color: var(--warn); }
+  .back-link {
+    display: inline-block;
+    margin-bottom: 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .back-link:hover { text-decoration: underline; }
+  footer { text-align: center; font-size: 0.76rem; color: var(--muted); margin-top: 28px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back-link" id="back-link" href="../index.html" style="display:none;">[一覧ページへ戻る]</a>
+
+  <header class="top-card">
+    <div class="kicker">SIMULATION ENGINEERING // EXAM CHECKLIST &amp; INTERACTIVE DRILL</div>
+    <h1>シミュレーション工学 期末試験 覚えるべきことリスト（動的チェック付き）</h1>
+    <p class="sub">
+      範囲: 第1回〜第12回 ＋ 演習1（模擬試験・追加問題・後半強化・Colab全TODO対応）。<br>
+      空欄に入力（または選択）して「判定」を押すと、その場で <b>[正解] / [不正解]</b> と試験用の模範解答が表示されます。
+    </p>
+  </header>
+
+  <div class="sticky-bar">
+    <div class="stats-row">
+      <div class="score-box">
+        <span class="score-main" id="score-main">正解: 0 / 32 問</span>
+        <span class="score-sub" id="score-sub">未解答: 32 / 不正解: 0 / 連続正解: 0</span>
+      </div>
+      <div class="controls">
+        <button id="btn-check-all" class="primary">入力済みをまとめて判定</button>
+        <button id="btn-toggle-study">すべて模範解答を表示</button>
+        <button id="btn-filter-ng">苦手・未解答のみ</button>
+        <button id="btn-reset" class="danger">記録をリセット</button>
+      </div>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div class="controls" style="font-size:0.76rem; color:var(--muted);">
+      操作ヒント: 入力欄で Enter キーを押してもその場で判定できます。解答状況はブラウザに自動保存されます。
+    </div>
+  </div>
+
+  <nav class="unit-nav" id="unit-nav"></nav>
+
+  <main id="quiz-root"></main>
+
+  <section class="note-box">
+    <h2>補足: 演習2（静電アクチュエータ）が範囲に含まれる場合の確認事項</h2>
+    <div>
+      第13〜14回（演習2）が試験範囲に含まれる場合は、既存の「固定点分類 暗記トレーニング」「演習2 対策まとめ」とあわせて以下を確認してください。<br>
+      - 1階変換と固定点条件: <span class="mono">z' = v</span>, <span class="mono">v' = -beta*v - z + alpha/(1-z)^2</span> より <span class="mono">alpha = z(1-z)^2</span><br>
+      - ニュートン法の停止点: <span class="mono">f'(z) = (1-z)(3z-1) = 0</span> の <span class="mono">z = 1/3, 1</span>（最大 <span class="mono">alpha = 4/27</span>）<br>
+      - サドルノード分岐点 <span class="mono">alpha = 4/27, z = 1/3</span> では固有値 0 を含むため線形化だけでは判定不可（半安定）。
+    </div>
+  </section>
+
+  <footer>シミュレーション工学 期末試験 覚えるべきことリスト（全8単元・32問）</footer>
+</div>
+
+<script>
+(function() {
+  "use strict";
+
+  const STORAGE_KEY = "sim_eng_memorize_list_v1";
+
+  // --- Normalization & Validators ---
+  function normText(s) {
+    return String(s || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[！-～]/g, function(ch) {
+        return String.fromCharCode(ch.charCodeAt(0) - 0xFEE0);
+      })
+      .replace(/　/g, " ")
+      .replace(/\s+/g, "")
+      .replace(/[。、．，・\(\)\[\]「」『』]/g, "");
+  }
+
+  function normCode(s) {
+    return String(s || "")
+      .trim()
+      .replace(/[！-～]/g, function(ch) {
+        return String.fromCharCode(ch.charCodeAt(0) - 0xFEE0);
+      })
+      .replace(/　/g, " ")
+      .replace(/\s+/g, "")
+      .toLowerCase();
+  }
+
+  function parseNumOrFrac(s) {
+    const t = normCode(s).replace(/≈/g, "").replace(/約/g, "");
+    if (!t) return NaN;
+    if (/^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/.test(t)) {
+      return Number(t);
+    }
+    const m = t.match(/^([+-]?\d+(?:\.\d+)?)\/([+-]?\d+(?:\.\d+)?)$/);
+    if (m) {
+      const den = Number(m[2]);
+      if (den === 0) return NaN;
+      return Number(m[1]) / den;
+    }
+    return NaN;
+  }
+
+  function checkNum(expected, tol) {
+    const t = tol == null ? 1e-4 : tol;
+    return function(raw) {
+      const v = parseNumOrFrac(raw);
+      return Number.isFinite(v) && Math.abs(v - expected) <= t;
+    };
+  }
+
+  function checkExactList(list) {
+    const normSet = list.map(normText);
+    return function(raw) {
+      const v = normText(raw);
+      if (!v) return false;
+      return normSet.some(function(target) {
+        return v === target;
+      });
+    };
+  }
+
+  function checkCodeList(list) {
+    const normSet = list.map(normCode);
+    return function(raw) {
+      const v = normCode(raw);
+      if (!v) return false;
+      return normSet.some(function(target) {
+        return v === target;
+      });
+    };
+  }
+
+  function checkKeywords(requiredGroups) {
+    return function(raw) {
+      const v = normText(raw);
+      if (!v) return false;
+      return requiredGroups.every(function(group) {
+        return group.some(function(kw) {
+          return v.indexOf(normText(kw)) !== -1;
+        });
+      });
+    };
+  }
+
+  // Safe algebraic evaluator for linear expressions (e.g. "(u - c*v - k*x)/m")
+  function evalSafeExpr(expr, vars) {
+    let s = String(expr || "")
+      .trim()
+      .replace(/[！-～]/g, function(ch) {
+        return String.fromCharCode(ch.charCodeAt(0) - 0xFEE0);
+      })
+      .replace(/−/g, "-")
+      .replace(/×/g, "*")
+      .replace(/÷/g, "/")
+      .replace(/\^/g, "**")
+      .replace(/\s+/g, "");
+    if (!s) return NaN;
+    // Allow only alphanumeric, underscore, math operators, dots, parens
+    if (!/^[a-zA-Z0-9_+\-*/().]+$/.test(s)) return NaN;
+    // Reject dangerous identifiers
+    if (/(window|document|eval|function|return|this|global|process|constructor|prototype)/i.test(s)) {
+      return NaN;
+    }
+    // Insert implicit multiplication like 2x -> 2*x, )x -> )*x (keep scientific notation 1e-4)
+    s = s.replace(/(\d)(?![eE][+-]?\d)([a-zA-Z(])/g, "$1*$2").replace(/(\))([a-zA-Z0-9(])/g, "$1*$2");
+    try {
+      const keys = Object.keys(vars);
+      const vals = keys.map(function(k) { return vars[k]; });
+      const fn = new Function(keys.join(","), "return (" + s + ");");
+      const out = fn.apply(null, vals);
+      return typeof out === "number" && Number.isFinite(out) ? out : NaN;
+    } catch (e) {
+      return NaN;
+    }
+  }
+
+  function checkExprEquiv(refFn, varSets) {
+    return function(raw) {
+      if (!String(raw || "").trim()) return false;
+      for (let i = 0; i < varSets.length; i++) {
+        const v = evalSafeExpr(raw, varSets[i]);
+        const r = refFn(varSets[i]);
+        if (!Number.isFinite(v) || Math.abs(v - r) > 1e-6) return false;
+      }
+      return true;
+    };
+  }
+
+  // --- Units & 32 Questions ---
+  const UNITS = [
+    {
+      id: "u1",
+      title: "1. 数値計算の誤差と浮動小数点（第1〜2回）",
+      desc: "4種類の誤差の区別・有効桁数・桁落ち回避コード",
+      questions: [
+        {
+          id: "u1_q1",
+          topic: "有限桁表現による誤差",
+          prompt: "コンピュータが数を有限の桁数でしか表現できないために必ず生じる誤差（例: Pythonで 0.1 + 0.2 が 0.30000000000000004 になる）を何というか？",
+          inputs: [
+            { id: "a", label: "誤差の名称", kind: "text", placeholder: "例: ○○誤差", answerText: "丸め誤差", check: checkExactList(["丸め誤差", "まるめ誤差"]) }
+          ],
+          explain: "丸め誤差は有限桁（2進浮動小数点）で数を表す際に必ず生じる。無限の級数や微分を有限回で切る「打ち切り誤差」と区別すること。"
+        },
+        {
+          id: "u1_q2",
+          topic: "単精度・倍精度の有効桁数",
+          prompt: "単精度（float32）と倍精度（float64）で表現できる10進の有効桁数はそれぞれ約何桁か？（半角数字のみ）",
+          inputs: [
+            { id: "f32", label: "単精度 (float32)", kind: "number", placeholder: "桁数", answerText: "約7桁 (7)", check: checkNum(7, 0.1) },
+            { id: "f64", label: "倍精度 (float64)", kind: "number", placeholder: "桁数", answerText: "約16桁 (16)", check: checkNum(16, 0.1) }
+          ],
+          explain: "float32 は約7桁（1e-7 付近で情報落ちが顕著）、float64 は約16桁（マシンイプシロン 約 2.2e-16）。なお Δt を極端に小さくすると丸め誤差の蓄積が打ち切り誤差を上回り、誤差が頭打ちになる。"
+        },
+        {
+          id: "u1_q3",
+          topic: "情報落ちと桁落ちの区別",
+          prompt: "大きい値と小さい値を足したとき小さい値の情報が失われる現象を [A]、近い値同士を引き算したとき有効数字が失われて相対誤差が拡大する現象を [B] という。",
+          inputs: [
+            { id: "a", label: "[A] 大きい数 + 小さい数", kind: "text", placeholder: "○○落ち", answerText: "情報落ち", check: checkExactList(["情報落ち", "じょうほうおち"]) },
+            { id: "b", label: "[B] 近い値の引き算", kind: "text", placeholder: "○○落ち", answerText: "桁落ち", check: checkExactList(["桁落ち", "けたおち"]) }
+          ],
+          explain: "級数 sum(1/k^2) で float32 の和が途中から増えなくなるのは「情報落ち」。2次方程式の解の公式で -b + sqrt(b^2 - 4ac) をそのまま計算して精度が落ちるのは「桁落ち」。"
+        },
+        {
+          id: "u1_q4",
+          topic: "桁落ち回避コードとPython演算子",
+          prompt: "2次方程式 ax^2+bx+c=0（b>0）で大きい側の安定解 x2_stable から小さい側の解 x1_stable を桁落ちなく求めるPython式（[A]）と、Pythonのべき乗演算子（[B]）を入力せよ。",
+          code: "x1_stable = [A]   # 解と係数の関係 x1*x2 = c/a を利用\ny = x [B] 2       # xの2乗",
+          inputs: [
+            { id: "a", label: "[A] x1_stable =", kind: "expr", placeholder: "c / (a * x2_stable)", answerText: "c / (a * x2_stable)", check: checkExprEquiv(function(v){ return v.c / (v.a * v.x2_stable); }, [{a:2,c:3,x2_stable:5}, {a:1,c:1,x2_stable:-100000}]) },
+            { id: "b", label: "[B] べき乗演算子", kind: "text", placeholder: "記号2文字", answerText: "**", check: checkCodeList(["**"]) }
+          ],
+          explain: "Pythonの ^ は排他的論理和 (XOR) なのでべき乗には必ず ** を使う。√(1+x)-√(1-x) の桁落ち回避には共役式 √(1+x)+√(1-x) を分母分子に掛ける有理化を用いる。"
+        }
+      ]
+    },
+    {
+      id: "u2",
+      title: "2. オイラー法・ホイン法・RK4と精度次数（第3〜4回）",
+      desc: "更新式・安定条件・陰解法・打ち切り誤差の次数",
+      questions: [
+        {
+          id: "u2_q1",
+          topic: "前進オイラー法の更新式",
+          prompt: "dx/dt = f(t, x) に対する前進オイラー法のPython更新式を埋めよ（配列 t, x と刻み幅 dt、関数 f を使用）。",
+          code: "x[n + 1] = x[n] + [A]",
+          inputs: [
+            { id: "a", label: "[A] 更新の増分", kind: "text", placeholder: "dt * f(t[n], x[n])", answerText: "dt * f(t[n], x[n])", check: checkCodeList(["dt*f(t[n],x[n])", "f(t[n],x[n])*dt", "dt*f(t_n,x_n)", "f(t_n,x_n)*dt"]) }
+          ],
+          explain: "微分の定義 (x(t+Δt) - x(t))/Δt ≈ f(t, x) から即座に x_{n+1} = x_n + Δt f(t_n, x_n) が導ける。右辺がすべて時刻 t_n の既知量なので「陽解法」と呼ばれる。"
+        },
+        {
+          id: "u2_q2",
+          topic: "前進オイラー法の安定条件",
+          prompt: "dx/dt = kx に前進オイラー法を適用すると x_{n+1} = (1 + k Δt) x_n となり、安定条件は |1 + k Δt| <= 1 である。k = -9 のとき発散しない最大の Δt は？（分数または小数で入力）",
+          inputs: [
+            { id: "a", label: "最大の Δt (<= ?)", kind: "number", placeholder: "例: 2/9 または 0.222", answerText: "2/9 (約 0.222)", check: checkNum(2/9, 0.002) }
+          ],
+          explain: "|1 - 9 Δt| <= 1 より -1 <= 1 - 9 Δt <= 1、よって Δt <= 2/9 ≈ 0.222。例えば Δt = 0.25 のときは増幅率 1 + (-9)(0.25) = -1.25 となり、符号を反転しながら振動発散する。"
+        },
+        {
+          id: "u2_q3",
+          topic: "後退（陰解法）オイラー法",
+          prompt: "dx/dt = kx に後退オイラー法 x_{n+1} = x_n + Δt (k x_{n+1}) を適用して x_{n+1} について解くと x_{n+1} = x_n / ([A]) となる。また k < 0 のとき任意の Δt > 0 で安定か？",
+          inputs: [
+            { id: "a", label: "[A] 分母の式", kind: "expr", placeholder: "1 - k * dt", answerText: "1 - k * dt", check: checkExprEquiv(function(v){ return 1 - v.k * v.dt; }, [{k:-9, dt:0.25}, {k:-2, dt:0.1}]) },
+            { id: "b", label: "k < 0 の安定性", kind: "select", options: ["", "任意の dt > 0 で絶対安定（発散しない）", "Δt <= 2/|k| のときのみ安定", "常に発散する"], answerText: "任意の dt > 0 で絶対安定（発散しない）", check: checkExactList(["任意の dt > 0 で絶対安定（発散しない）"]) }
+          ],
+          explain: "k < 0, Δt > 0 なら常に 1 - k Δt > 1 なので増幅率 0 < 1/(1 - k Δt) < 1 となり、刻み幅を大きくしても発散しない（絶対安定）。"
+        },
+        {
+          id: "u2_q4",
+          topic: "ホイン法と4次ルンゲ・クッタ法 (RK4)",
+          prompt: "dx/dt = f(t, x) の RK4 更新式の空欄 [A]〜[E] を埋めよ（刻み幅は dt、k1 = dt * f(t[n], x[n]) とする）。",
+          code: "k2 = dt * f(t[n] + [A], x[n] + [B])\nk3 = dt * f(t[n] + dt/2, x[n] + k2/2)\nk4 = dt * f(t[n] + dt,   x[n] + k3)\nx[n+1] = x[n] + (k1 + [C]*k2 + [D]*k3 + k4) / [E]",
+          inputs: [
+            { id: "a", label: "[A] 時刻の増分", kind: "text", placeholder: "dt/2", answerText: "dt/2", check: checkCodeList(["dt/2", "0.5*dt", "dt*0.5"]) },
+            { id: "b", label: "[B] 状態の増分", kind: "text", placeholder: "k1/2", answerText: "k1/2", check: checkCodeList(["k1/2", "0.5*k1", "k1*0.5"]) },
+            { id: "c", label: "[C] k2の重み", kind: "number", placeholder: "数字", answerText: "2", check: checkNum(2, 1e-6) },
+            { id: "d", label: "[D] k3の重み", kind: "number", placeholder: "数字", answerText: "2", check: checkNum(2, 1e-6) },
+            { id: "e", label: "[E] 全体の分母", kind: "number", placeholder: "数字", answerText: "6", check: checkNum(6, 1e-6) }
+          ],
+          explain: "ホイン法（2次RK）は k2 = dt*f(t[n]+dt, x[n]+k1), x[n+1] = x[n] + 0.5*(k1+k2)。非自律系（sin(t) など t を含む式）では k2, k3 の時刻引数 t[n]+dt/2 と k4 の t[n]+dt を絶対に忘れないこと。"
+        },
+        {
+          id: "u2_q5",
+          topic: "誤差次数と刻み幅 1/10 の倍率",
+          prompt: "刻み幅 Δt を 1/10 にしたとき、一定時間 T 後の「積算誤差」は前進オイラー法・ホイン法・RK4 でそれぞれ何倍になるか？（分数または小数で入力）",
+          inputs: [
+            { id: "euler", label: "前進オイラー法 (1次精度)", kind: "number", placeholder: "例: 1/10", answerText: "1/10 倍 (1ステップ O(Δt^2), 積算 O(Δt))", check: checkNum(0.1, 1e-6) },
+            { id: "heun", label: "ホイン法 (2次精度)", kind: "number", placeholder: "例: 1/100", answerText: "1/100 倍 (1ステップ O(Δt^3), 積算 O(Δt^2))", check: checkNum(0.01, 1e-6) },
+            { id: "rk4", label: "RK4 (4次精度)", kind: "number", placeholder: "例: 1/10000", answerText: "1/10000 倍 (1ステップ O(Δt^5), 積算 O(Δt^4))", check: checkNum(0.0001, 1e-7) }
+          ],
+          explain: "1ステップ誤差 O(Δt^{p+1}) にステップ数 T/Δt を掛けると積算誤差は O(Δt^p) になる。Δt を 1/2 にすると誤差比は 2^p（2, 4, 16）、両対数グラフの傾きは 1, 2, 4 になる。RK4 は1ステップ4回評価だが精度あたりのコストが圧倒的に小さい。"
+        }
+      ]
+    },
+    {
+      id: "u3",
+      title: "3. 高階微分方程式・1階連立化・モデル化（第4〜6回）",
+      desc: "状態変数変換・多変数RK4の鉄則・振り子とモデル化の考え方",
+      questions: [
+        {
+          id: "u3_q1",
+          topic: "2階微分方程式の1階連立化",
+          prompt: "ばねダンパ系 m x'' + c x' + k x = u を状態変数 x1 = x, x2 = x' で1階連立化すると dx1/dt = x2 となる。dx2/dt の右辺を入力せよ（変数 u, c, x1, x2, k, m を使用、x1=x, x2=v でも可）。",
+          inputs: [
+            { id: "a", label: "dx2/dt =", kind: "expr", placeholder: "(u - c*x2 - k*x1) / m", answerText: "(u - c*x2 - k*x1) / m", check: checkExprEquiv(function(p){ return (p.u - p.c * p.x2 - p.k * p.x1) / p.m; }, [{u:1.5, c:0.8, x1:0.3, x2:-0.4, k:2.5, m:1.2, x:0.3, v:-0.4}, {u:-2.0, c:1.1, x1:-0.7, x2:0.9, k:3.0, m:0.5, x:-0.7, v:0.9}]) }
+          ],
+          explain: "最高階微分 x'' について解くことが基本。m で割り忘れないようにする。Colab TODO-14 では引数名が k_spring である点にも注意。"
+        },
+        {
+          id: "u3_q2",
+          topic: "多変数系でのオイラー法・RK4の鉄則",
+          prompt: "2変数 (x, v) のRK4で k2x = dt * f_dx(t[n]+dt/2, x[n]+k1x/2, v[n]+k1v/2) を計算するとき、よくある実装ミスとその影響はどれか？",
+          inputs: [
+            { id: "a", label: "正しい鉄則を選択", kind: "select", options: ["", "全成分を同じ段階(k1/2等)で揃えて評価しないと段階が混ざり精度が崩れる", "x[n+1] を先に計算してから v[n+1] に使うのが陽的オイラー法である", "RK4では速度成分 v だけ k1〜k4 を計算すればよい"], answerText: "全成分を同じ段階(k1/2等)で揃えて評価しないと段階が混ざり精度が崩れる", check: checkExactList(["全成分を同じ段階(k1/2等)で揃えて評価しないと段階が混ざり精度が崩れる"]) }
+          ],
+          explain: "各段階 (k1 -> k2 -> k3 -> k4) で全成分を計算し終えてから次の段階へ進む。オイラー法で x[n+1] を先に更新してそれを v[n+1] に使うと別の手法（半陰解法／シンプレクティックオイラー法）になる。"
+        },
+        {
+          id: "u3_q3",
+          topic: "単振り子の運動方程式",
+          prompt: "単振り子 m l^2 θ'' = -m g l sinθ を θ'' = f(θ) の形に整理した右辺 [A] と、質量 m への依存性 [B] を答えよ。",
+          inputs: [
+            { id: "a", label: "[A] dω/dt =", kind: "text", placeholder: "-(g/l)*sin(theta)", answerText: "-(g/l) * sin(theta)", check: checkCodeList(["-(g/l)*sin(theta)", "-g/l*sin(theta)", "-(g/l)*np.sin(theta)", "-g/l*np.sin(theta)", "-g*sin(theta)/l", "-(g*sin(theta))/l"]) },
+            { id: "b", label: "[B] 質量 m の影響", kind: "select", options: ["", "m が約分されるため質量に依存しない", "m に比例して速く振れる", "1/m に反比例する"], answerText: "m が約分されるため質量に依存しない", check: checkExactList(["m が約分されるため質量に依存しない"]) }
+          ],
+          explain: "両辺を m l^2 で割ると m と l が1つずつ約分され、dω/dt = -(g/l) sinθ となる。これは自由落下と同じく質量に依存しない。"
+        },
+        {
+          id: "u3_q4",
+          topic: "逆振り子(外力あり)の分母とモデル化の方針",
+          prompt: "回転運動方程式 m l^2 θ'' = l F - m g l cosθ - d ω のPython右辺関数の分母 [A] と、シミュレーションにおけるモデル化の原則 [B] を答えよ。",
+          code: "return (l * F - m * g * l * np.cos(theta) - d * omega) / ([A])",
+          inputs: [
+            { id: "a", label: "[A] 分母 (慣性モーメント)", kind: "expr", placeholder: "m * l**2", answerText: "m * l**2", check: checkExprEquiv(function(p){ return p.m * p.l * p.l; }, [{m:1.5, l:0.7}, {m:2.0, l:1.3}]) },
+            { id: "b", label: "[B] モデル化の基本方針", kind: "select", options: ["", "目的に応じて必要な要素だけを選び、不要な要素は削ぎ落とす", "現実のあらゆる要素をすべて式に入れるほど常に良いモデルになる", "計算時間が増えても必ず剛体・空気抵抗・摩擦を全部入れる"], answerText: "目的に応じて必要な要素だけを選び、不要な要素は削ぎ落とす", check: checkExactList(["目的に応じて必要な要素だけを選び、不要な要素は削ぎ落とす"]) }
+          ],
+          explain: "慣性モーメント I = m l^2 で割るため分母は m*l**2（m*l ではない）。また外力方向固定時は cos(psi + theta) となる。モデルを不必要に複雑化すると計算コスト増・パラメータ増・原因特定困難・制御設計困難を招く。"
+        }
+      ]
+    },
+    {
+      id: "u4",
+      title: "4. 1次元相図・2次系ステップ応答・妥当性検証（第5〜6回・追加）",
+      desc: "固定点の線形安定性・半安定・減衰の種類・検証法",
+      questions: [
+        {
+          id: "u4_q1",
+          topic: "1次元系の固定点と安定性判定",
+          prompt: "dx/dt = f(x) の固定点 x* (f(x*)=0) において、f'(x*) < 0 なら [A]、f'(x*) > 0 なら [B]、f'(x*) = 0 なら線形化だけでは [C]。",
+          inputs: [
+            { id: "a", label: "[A] f'(x*) < 0", kind: "text", placeholder: "安定 / 不安定", answerText: "安定（アトラクター）", check: checkExactList(["安定", "漸近安定", "アトラクター"]) },
+            { id: "b", label: "[B] f'(x*) > 0", kind: "text", placeholder: "安定 / 不安定", answerText: "不安定（リペラー）", check: checkExactList(["不安定", "リペラー"]) },
+            { id: "c", label: "[C] f'(x*) = 0", kind: "text", placeholder: "○○不可", answerText: "判定不可（高次項や符号確認が必要）", check: checkExactList(["判定不可", "判定できない", "判別不可", "判別できない", "判断不可", "判断できない"]) }
+          ],
+          explain: "1次近似 Δx' ≈ f'(x*) Δx の傾きが負なら戻り（安定）、正なら離れる（不安定）。傾き 0 のときは高次項が支配するため、f(x) の符号を左右で直接調べる。"
+        },
+        {
+          id: "u4_q2",
+          topic: "半安定固定点と長時間挙動",
+          prompt: "dx/dt = x^2(1 - x) の固定点は x = 0, 1 である。x = 0 の分類 [A] と、初期値 x0 = 0.5 を与えたとき t -> ∞ で収束する値 [B] を答えよ。",
+          inputs: [
+            { id: "a", label: "[A] x = 0 の分類", kind: "select", options: ["", "半安定", "漸近安定", "不安定（両側から離れる）"], answerText: "半安定", check: checkExactList(["半安定"]) },
+            { id: "b", label: "[B] x0 = 0.5 の収束先", kind: "number", placeholder: "数値", answerText: "1", check: checkNum(1, 1e-6) }
+          ],
+          explain: "x < 0 でも 0 < x < 1 でも f(x) = x^2(1-x) > 0（右向き矢印）。よって x = 0 は左からは近づき右からは離れる「半安定」。x0 = 0.5 は右へ流れて x = 1 へ収束する。"
+        },
+        {
+          id: "u4_q3",
+          topic: "2次系の減衰分類と臨界減衰",
+          prompt: "x'' + c x' + x = 1（m=1, k=1）で「オーバーシュートせず最も速く 1 へ収束する」減衰の種類 [A]、このときの τ^2 - 4Δ の値 [B]、および c の値 [C] を答えよ。",
+          inputs: [
+            { id: "a", label: "[A] 減衰の種類", kind: "text", placeholder: "○○減衰", answerText: "臨界減衰", check: checkExactList(["臨界減衰", "りんかいげんすい"]) },
+            { id: "b", label: "[B] τ^2 - 4Δ の値", kind: "number", placeholder: "数値", answerText: "0", check: checkNum(0, 1e-6) },
+            { id: "c", label: "[C] c の値", kind: "number", placeholder: "数値", answerText: "2", check: checkNum(2, 1e-6) }
+          ],
+          explain: "特性方程式 λ^2 + c λ + 1 = 0 の判別式 c^2 - 4 = 0 より c = 2 が臨界減衰。c > 2 が過減衰（振動せず遅い）、0 < c < 2 が不足減衰（振動してオーバーシュートあり）。"
+        },
+        {
+          id: "u4_q4",
+          topic: "シミュレータの妥当性検証法",
+          prompt: "解析解が書けない非線形系や減衰なし単振り子で、プログラムが正しいか妥当性検証する方法として最も適切な組合せは？",
+          inputs: [
+            { id: "a", label: "妥当性検証の方法", kind: "select", options: ["", "Δt を小さくして収束確認 + 単振り子ではエネルギー保存誤差の両対数傾きが次数(1や4)に一致するか確認", "コードを目視して文法エラーがなければ正しいとみなす", "初期値を固定点(0,0)に置いて値が0のままであることだけ確認する"], answerText: "Δt を小さくして収束確認 + 単振り子ではエネルギー保存誤差の両対数傾きが次数(1や4)に一致するか確認", check: checkExactList(["Δt を小さくして収束確認 + 単振り子ではエネルギー保存誤差の両対数傾きが次数(1や4)に一致するか確認"]) }
+          ],
+          explain: "保存則（力学的エネルギー一定）と刻み幅の次数検証（|E(t)-E(0)| がオイラー法で O(Δt)、RK4 で O(Δt^4)）を組み合わせるのが最も強力なバグ検出・妥当性検証法である。"
+        }
+      ]
+    },
+    {
+      id: "u5",
+      title: "5. 2次元線形系・ヤコビアン・固定点分類（第7〜10回・演習1）",
+      desc: "ヤコビ行列・τとΔの判定ルール・相図の矢印・単振り子の解釈",
+      questions: [
+        {
+          id: "u5_q1",
+          topic: "ヤコビアンと単振り子の最下点",
+          prompt: "単振り子 f1 = ω, f2 = -(g/l)sinθ のヤコビ行列 J(θ*, ω*) = [[a, b], [-(g/l)cosθ*, d]] の成分 a, b, d と、最下点 θ* = 0 の分類を答えよ。",
+          inputs: [
+            { id: "a", label: "成分 a (∂f1/∂θ)", kind: "number", placeholder: "数値", answerText: "0", check: checkNum(0, 1e-6) },
+            { id: "b", label: "成分 b (∂f1/∂ω)", kind: "number", placeholder: "数値", answerText: "1", check: checkNum(1, 1e-6) },
+            { id: "d", label: "成分 d (∂f2/∂ω)", kind: "number", placeholder: "数値", answerText: "0", check: checkNum(0, 1e-6) },
+            { id: "cls", label: "θ* = 0 の分類", kind: "select", options: ["", "中心点（センター・中立安定）", "安定渦状点", "鞍点（サドル）"], answerText: "中心点（センター・中立安定）", check: checkExactList(["中心点（センター・中立安定）"]) }
+          ],
+          explain: "θ*=0 で J=[[0,1],[-g/l,0]]、固有値 λ = ±i√(g/l)（純虚数）より中心点。θ*=π では J=[[0,1],[g/l,0]]、λ = ±√(g/l) より鞍点（不安定）。なお非線形項があるため厳密には減衰なしセンターの判定には保存則の確認を伴う。"
+        },
+        {
+          id: "u5_q2",
+          topic: "中心点の用語と周期変数の罠",
+          prompt: "減衰なし単振り子でよくある2つの減点ポイントを確認しよう。(A) 中心点（センター）は「漸近安定」ではなく何と書くべきか？ (B) θ = π と θ = -π は何個の固定点か？",
+          inputs: [
+            { id: "a", label: "[A] 中心点の安定性", kind: "select", options: ["", "中立安定（リアプノフ安定だが吸引的／漸近安定ではない）", "漸近安定", "常に不安定"], answerText: "中立安定（リアプノフ安定だが吸引的／漸近安定ではない）", check: checkExactList(["中立安定（リアプノフ安定だが吸引的／漸近安定ではない）"]) },
+            { id: "b", label: "[B] θ = ±π の扱い", kind: "select", options: ["", "周期変数なので同一の1つの固定点（真上）", "座標が違うので別の2つの固定点"], answerText: "周期変数なので同一の1つの固定点（真上）", check: checkExactList(["周期変数なので同一の1つの固定点（真上）"]) }
+          ],
+          explain: "センターの軌道は固定点の周りを回り続けるだけで近づかないため「中立安定（リアプノフ安定だが漸近安定ではない）」。また θ ∈ (-π, π] で角度は 2π 周期なので π と -π は同一地点。"
+        },
+        {
+          id: "u5_q3",
+          topic: "固有値・トレース・行列式の計算",
+          prompt: "行列 A = [[1, 1], [4, -2]] について、トレース τ、行列式 Δ、2つの固有値 λ1 < λ2、および固定点の分類を求めよ。",
+          inputs: [
+            { id: "tau", label: "トレース τ = tr(A)", kind: "number", placeholder: "数値", answerText: "-1", check: checkNum(-1, 1e-6) },
+            { id: "det", label: "行列式 Δ = det(A)", kind: "number", placeholder: "数値", answerText: "-6", check: checkNum(-6, 1e-6) },
+            { id: "l1", label: "小さい方の固有値 λ1", kind: "number", placeholder: "数値", answerText: "-3", check: checkNum(-3, 1e-6) },
+            { id: "l2", label: "大きい方の固有値 λ2", kind: "number", placeholder: "数値", answerText: "2", check: checkNum(2, 1e-6) },
+            { id: "cls", label: "固定点の分類", kind: "text", placeholder: "○○点", answerText: "鞍点（サドル）", check: checkExactList(["鞍点", "サドル", "サドル点", "不安定な鞍点"]) }
+          ],
+          explain: "τ = 1 + (-2) = -1, Δ = 1*(-2) - 1*4 = -6。特性方程式 λ^2 - τλ + Δ = λ^2 + λ - 6 = (λ+3)(λ-2) = 0 より λ = -3, 2。固有ベクトルは λ=2 -> (1, 1)^T、λ=-3 -> (1, -4)^T。"
+        },
+        {
+          id: "u5_q4",
+          topic: "τ-Δ 平面での分類と面積変化",
+          prompt: "次の3つの判定を即答せよ。(A) Δ < 0 のときの分類、(B) τ < 0, Δ > 0, τ^2 - 4Δ < 0 の分類、(C) τ = 0 のとき相空間の面積はどう変化するか（面積は e^(τt) に比例）。",
+          inputs: [
+            { id: "a", label: "[A] Δ < 0", kind: "text", placeholder: "分類名", answerText: "鞍点（不安定・白丸）", check: checkExactList(["鞍点", "サドル", "サドル点"]) },
+            { id: "b", label: "[B] τ<0, Δ>0, τ^2-4Δ<0", kind: "text", placeholder: "分類名", answerText: "安定渦状点（安定焦点・黒丸）", check: checkExactList(["安定渦状点", "安定な渦状点", "安定焦点", "安定スパイラル"]) },
+            { id: "c", label: "[C] τ = 0 の面積変化", kind: "select", options: ["", "保存される（一定）", "指数関数的に収縮する", "指数関数的に拡大する"], answerText: "保存される（一定）", check: checkExactList(["保存される（一定）"]) }
+          ],
+          explain: "Step1: Δ < 0 なら即「鞍点」、Δ = 0 なら「線形化だけでは判定不可」。Step2: Δ > 0 なら τ < 0 で安定、τ > 0 で不安定、τ = 0 で中心点。Step3: τ^2 - 4Δ < 0 なら渦状点、> 0 なら結節点、= 0 なら退化ノード。"
+        },
+        {
+          id: "u5_q5",
+          topic: "相図の手描きルール（向きと矢印）",
+          prompt: "横軸が位置 z、縦軸が速度 v (= dz/dt) の相図において、(A) 渦状点・中心点の回転向きは？ (B) 鞍点の固有ベクトル上の矢印は λ > 0 のとき固定点に対して内向きか外向きか？",
+          inputs: [
+            { id: "a", label: "[A] 回転の向き", kind: "select", options: ["", "時計回り", "反時計回り"], answerText: "時計回り", check: checkExactList(["時計回り"]) },
+            { id: "b", label: "[B] λ > 0 方向の矢印", kind: "select", options: ["", "外向き（固定点から離れる）", "内向き（固定点へ近づく）"], answerText: "外向き（固定点から離れる）", check: checkExactList(["外向き（固定点から離れる）"]) }
+          ],
+          explain: "上半分 (v > 0) では dz/dt > 0 なので必ず右へ進み、下半分 (v < 0) では左へ進むため時計回り。また J の1行目が [0, 1] なら固有ベクトルは w = (1, λ)^T なので傾きがそのまま λ、λ > 0 で外向き、λ < 0 で内向き。"
+        }
+      ]
+    },
+    {
+      id: "u6",
+      title: "6. 逆振り子のPD制御（第11回）",
+      desc: "倒立座標系の符号・漸近安定条件・臨界減衰ゲイン計算",
+      questions: [
+        {
+          id: "u6_q1",
+          topic: "倒立座標の符号とPD制御則",
+          prompt: "φ = 0 を真上（倒立）とする逆振り子で、重力項の符号 [A] と、目標 φ_ref = 0 へのPD制御入力 u のPythonコード [B] を答えよ（変数 kp, kd, phi, omega を使用）。",
+          code: "u = [B]\ndomega = [A](g / l) * np.sin(phi) + u",
+          inputs: [
+            { id: "a", label: "[A] 重力項の符号", kind: "select", options: ["", "+", "-"], answerText: "+", check: checkExactList(["+"]) },
+            { id: "b", label: "[B] 制御入力 u =", kind: "expr", placeholder: "-kp * phi - kd * omega", answerText: "-kp * phi - kd * omega (または kp*(0-phi) - kd*omega)", check: checkExprEquiv(function(p){ return -p.kp * p.phi - p.kd * p.omega; }, [{kp:15, kd:4, phi:0.2, omega:-0.5}, {kp:10, kd:3, phi:-0.1, omega:0.8}]) }
+          ],
+          explain: "φ = 0 が真上なので少し傾くとさらに倒れる向きに重力トルク +(g/l) sinφ が働く（真下基準の -(g/l)sinθ と逆符号）。"
+        },
+        {
+          id: "u6_q2",
+          topic: "PD制御による漸近安定条件",
+          prompt: "sinφ ≈ φ と線形化すると φ'' + kd φ' + (kp - g/l) φ = 0（τ = -kd, Δ = kp - g/l）となる。漸近安定（τ < 0 かつ Δ > 0）となる条件を埋めよ。",
+          inputs: [
+            { id: "kd", label: "kd > ?", kind: "number", placeholder: "数値", answerText: "0", check: checkNum(0, 1e-6) },
+            { id: "kp", label: "kp > ?", kind: "text", placeholder: "記号式 (例: g/l)", answerText: "g/l", check: checkCodeList(["g/l"]) }
+          ],
+          explain: "kd > 0 がブレーキ（減衰）、kp > g/l が倒れようとする重力に打ち勝つ復元ばねの役割を果たす。制御工学の「閉ループ極」は状態空間のヤコビアンの「固有値」と同じものである。"
+        },
+        {
+          id: "u6_q3",
+          topic: "臨界減衰となるゲイン kp の計算",
+          prompt: "g/l = 9.8, kd = 6 のとき、臨界減衰（τ^2 = 4Δ）となる比例ゲイン kp の値を求めよ。",
+          inputs: [
+            { id: "kp", label: "kp =", kind: "number", placeholder: "数値", answerText: "18.8", check: checkNum(18.8, 1e-4) }
+          ],
+          explain: "τ^2 = 4Δ より kd^2 = 4(kp - g/l)。よって kp = g/l + kd^2 / 4 = 9.8 + 36 / 4 = 18.8。なお離散時間制御でゲインを大きくしすぎると1ステップ変化が過大になり数値発散する。"
+        }
+      ]
+    },
+    {
+      id: "u7",
+      title: "7. ニュートン法（1次元・2次元連立）（第11〜12回）",
+      desc: "更新式の導出・手計算・失敗する初期値・2元連立の実装",
+      questions: [
+        {
+          id: "u7_q1",
+          topic: "1次元ニュートン法の更新式",
+          prompt: "f(x) = 0 を解く1次元ニュートン法の更新式 x_{k+1} = x_k - ([A]) / ([B]) を入力せよ。",
+          inputs: [
+            { id: "a", label: "[A] 分子", kind: "text", placeholder: "f(x_k)", answerText: "f(x_k)", check: checkCodeList(["f(x_k)", "f(xk)", "f(x)"]) },
+            { id: "b", label: "[B] 分母", kind: "text", placeholder: "f'(x_k)", answerText: "f'(x_k)", check: checkCodeList(["f'(x_k)", "f'(xk)", "f'(x)", "df(x_k)", "df(xk)", "df(x)"]) }
+          ],
+          explain: "テイラー1次近似 f(x + δ) ≈ f(x) + f'(x)δ = 0 より δ = -f(x)/f'(x)。図形的には点 (x_k, f(x_k)) での接線と x 軸との交点を次の点とする。"
+        },
+        {
+          id: "u7_q2",
+          topic: "ニュートン法 1ステップの手計算",
+          prompt: "13の立方根（f(x) = x^3 - 13 = 0）を初期値 x0 = 2 から1ステップ計算した x1 の値を求めよ（分数または小数第3位まで）。",
+          inputs: [
+            { id: "x1", label: "x1 =", kind: "number", placeholder: "例: 29/12 または 2.417", answerText: "29/12 (約 2.417)", check: checkNum(29/12, 0.002) }
+          ],
+          explain: "f'(x) = 3x^2 より x1 = 2 - (2^3 - 13) / (3 * 2^2) = 2 - (-5)/12 = 29/12 ≈ 2.4167。"
+        },
+        {
+          id: "u7_q3",
+          topic: "ニュートン法が失敗・収束しない理由",
+          prompt: "(A) f'(x_k) = 0 の点で何が起きるか？ (B) f(x) = x^3 - 2x + 2 に初期値 x0 = 0 を与えるとどうなるか？",
+          inputs: [
+            { id: "a", label: "[A] f'(x_k) = 0 の理由", kind: "select", options: ["", "接線が水平になり分母0（ゼロ除算）で更新停止する", "必ず真の解に1回で収束する", "計算誤差が0になる"], answerText: "接線が水平になり分母0（ゼロ除算）で更新停止する", check: checkExactList(["接線が水平になり分母0（ゼロ除算）で更新停止する"]) },
+            { id: "b", label: "[B] f(x)=x^3-2x+2, x0=0", kind: "select", options: ["", "0 と 1 の間を永久に往復する2周期解になり収束しない", "x = 1 で直ちに収束する", "無限大へ発散する"], answerText: "0 と 1 の間を永久に往復する2周期解になり収束しない", check: checkExactList(["0 と 1 の間を永久に往復する2周期解になり収束しない"]) }
+          ],
+          explain: "x0=0 -> x1 = 0 - 2/(-2) = 1、x2 = 1 - 1/1 = 0 となり 0 <-> 1 を往復する。ニュートン法は初期値選びが重要である。"
+        },
+        {
+          id: "u7_q4",
+          topic: "2次元連立ニュートン法とPython実装",
+          prompt: "連立非線形方程式 f(x) = 0 に対するニュートン法で、各反復で解くべき線形方程式 J(x_k) δ = [A] と、そのPythonコード np.linalg.solve([B]) の引数を入力せよ。",
+          code: "delta = np.linalg.solve([B])\nx_next = x + delta",
+          inputs: [
+            { id: "a", label: "[A] 右辺", kind: "text", placeholder: "-f(x_k)", answerText: "-f(x_k) (マイナス符号が必須)", check: checkCodeList(["-f(x_k)", "-f(xk)", "-f(x)", "-f", "-fz"]) },
+            { id: "b", label: "[B] solveの引数 (ヤコビ行列 Jz, 関数値 fz)", kind: "text", placeholder: "Jz, -fz", answerText: "Jz, -fz", check: checkCodeList(["jz,-fz", "j,-f"]) }
+          ],
+          explain: "2次元ではヤコビ行列 J(x_k) を用いて J(x_k) δ = -f(x_k) を解く。第2引数のマイナス符号 -fz を落としやすいので注意。また det J = 0（特異行列）の初期値（例: (0.5, 0.5)）では停止する。"
+        }
+      ]
+    },
+    {
+      id: "u8",
+      title: "8. 線形連立方程式・LU分解・固有値（第12回）",
+      desc: "ピボット選択・LU分解の利点・solve推奨・べき乗法/逆べき乗法",
+      questions: [
+        {
+          id: "u8_q1",
+          topic: "部分ピボット選択を行う2つの理由",
+          prompt: "ガウスの消去法で、各ステップで絶対値最大の成分を行入れ替えで対角に持ってくる（部分ピボット選択）2つの理由はどれか？",
+          inputs: [
+            { id: "a", label: "2つの理由", kind: "select", options: ["", "対角成分0のゼロ除算回避 と 微小値除算による丸め誤差拡大の防止", "行列を対称行列に変換するため と 逆行列を不要にするため", "LU分解をO(n)に高速化するため と メモリ消費をゼロにするため"], answerText: "対角成分0のゼロ除算回避 と 微小値除算による丸め誤差拡大の防止", check: checkExactList(["対角成分0のゼロ除算回避 と 微小値除算による丸め誤差拡大の防止"]) }
+          ],
+          explain: "1つ目は a_kk = 0 によるゼロ除算回避、2つ目は非常に小さい数で割ることによる丸め誤差の急拡大を防いで数値的安定性を保つこと。"
+        },
+        {
+          id: "u8_q2",
+          topic: "LU分解の手順と計算量",
+          prompt: "A = L U を用いて A x = b を解くとき、L y = b を上から順に解く操作を [A]、U x = y を下から順に解く操作を [B] という。分解は O(n^3) だが、新しい b に対する代入計算は O([C]) で済む。",
+          inputs: [
+            { id: "a", label: "[A] L y = b の解法名", kind: "text", placeholder: "○○代入", answerText: "前進代入", check: checkExactList(["前進代入", "ぜんしんだいにゅう"]) },
+            { id: "b", label: "[B] U x = y の解法名", kind: "text", placeholder: "○○代入", answerText: "後退代入", check: checkExactList(["後退代入", "こうたいだいにゅう"]) },
+            { id: "c", label: "[C] 代入の計算量オーダー O(?)", kind: "text", placeholder: "例: n^2", answerText: "n^2", check: checkCodeList(["n^2", "n**2", "n2"]) }
+          ],
+          explain: "同じ係数行列 A で右辺 b だけを変えて何度も解く場合、O(n^3) の LU分解を1回だけ行えば、各 b に対しては O(n^2) の前進・後退代入だけで高速に解ける。"
+        },
+        {
+          id: "u8_q3",
+          topic: "べき乗法・逆べき乗法・solveの優位性",
+          prompt: "(A) 最大固有値を反復で求める手法名、(B) A y = x を解いて最小固有値を求める手法名、(C) np.linalg.inv(A) @ b は np.linalg.solve(A, b) の約何倍の計算量がかかるか（整数）を答えよ。",
+          inputs: [
+            { id: "a", label: "[A] 最大固有値の手法", kind: "text", placeholder: "○○法", answerText: "べき乗法", check: checkExactList(["べき乗法", "べきじょうほう", "冪乗法"]) },
+            { id: "b", label: "[B] 最小固有値の手法", kind: "text", placeholder: "○○法", answerText: "逆べき乗法", check: checkExactList(["逆べき乗法", "ぎゃくべきじょうほう", "逆冪乗法"]) },
+            { id: "c", label: "[C] inv の計算量倍率", kind: "number", placeholder: "整数", answerText: "約3倍 (3)", check: checkNum(3, 0.1) }
+          ],
+          explain: "逆べき乗法では A^{-1} の最大固有値 1/λ_min が求まるため、その逆数から最小固有値 λ_min が得られる。また逆行列の直接計算は通常の求解 (solve) の約3倍の演算量がかかり丸め誤差も増えるため非推奨。"
+        }
+      ]
+    }
+  ];
+
+  // --- State ---
+  let state = {
+    answers: {},    // { qid: { inputId: value } }
+    results: {},    // { qid: "ok" | "ng" | null }
+    streak: 0,
+    studyAll: false,
+    filterNg: false
+  };
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") {
+          state.answers = parsed.answers || {};
+          state.results = parsed.results || {};
+          state.streak = parsed.streak || 0;
+        }
+      }
+    } catch (e) {}
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        answers: state.answers,
+        results: state.results,
+        streak: state.streak
+      }));
+    } catch (e) {}
+  }
+
+  function findQuestion(qid) {
+    for (let u = 0; u < UNITS.length; u++) {
+      for (let q = 0; q < UNITS[u].questions.length; q++) {
+        if (UNITS[u].questions[q].id === qid) return UNITS[u].questions[q];
+      }
+    }
+    return null;
+  }
+
+  function evaluateQuestion(q, updateStreak) {
+    const qAns = state.answers[q.id] || {};
+    let allFilled = true;
+    let allOk = true;
+    const perInput = {};
+
+    for (let i = 0; i < q.inputs.length; i++) {
+      const inp = q.inputs[i];
+      const val = qAns[inp.id] != null ? qAns[inp.id] : "";
+      if (!String(val).trim()) {
+        allFilled = false;
+        allOk = false;
+        perInput[inp.id] = false;
+      } else {
+        const ok = !!inp.check(val);
+        perInput[inp.id] = ok;
+        if (!ok) allOk = false;
+      }
+    }
+
+    const verdict = allOk ? "ok" : "ng";
+    state.results[q.id] = verdict;
+    if (updateStreak) {
+      state.streak = allOk ? (state.streak + 1) : 0;
+    }
+    saveState();
+    applyQuestionUI(q, perInput, allFilled);
+    updateDashboard();
+    return verdict;
+  }
+
+  function applyQuestionUI(q, perInput, allFilled) {
+    const card = document.getElementById("card-" + q.id);
+    const badge = document.getElementById("badge-" + q.id);
+    const fb = document.getElementById("fb-" + q.id);
+    const verdict = state.results[q.id];
+
+    card.classList.remove("is-ok", "is-ng");
+    badge.classList.remove("ok", "ng");
+    fb.classList.remove("show", "ok", "ng");
+
+    for (let i = 0; i < q.inputs.length; i++) {
+      const inp = q.inputs[i];
+      const el = document.getElementById("in-" + q.id + "-" + inp.id);
+      if (!el) continue;
+      el.classList.remove("field-ok", "field-ng");
+      if (perInput && verdict) {
+        el.classList.add(perInput[inp.id] ? "field-ok" : "field-ng");
+      }
+    }
+
+    if (verdict === "ok") {
+      card.classList.add("is-ok");
+      badge.classList.add("ok");
+      badge.textContent = "[正解]";
+      fb.classList.add("show", "ok");
+      fb.querySelector(".feedback-title").textContent = "[正解] よく覚えています。";
+    } else if (verdict === "ng") {
+      card.classList.add("is-ng");
+      badge.classList.add("ng");
+      badge.textContent = "[不正解]";
+      fb.classList.add("show", "ng");
+      fb.querySelector(".feedback-title").textContent = allFilled === false
+        ? "[不正解] 未入力の項目があります。下の模範解答を確認してください。"
+        : "[不正解] 入力内容を見直して、下の模範解答を確認してください。";
+    } else {
+      badge.textContent = "未解答";
+      if (state.studyAll) {
+        fb.classList.add("show");
+        fb.querySelector(".feedback-title").textContent = "[暗記用表示] 模範解答と解説";
+      }
+    }
+
+    if (state.filterNg && verdict === "ok") {
+      card.classList.add("hidden-by-filter");
+    } else {
+      card.classList.remove("hidden-by-filter");
+    }
+  }
+
+  function updateDashboard() {
+    let total = 0;
+    let okCount = 0;
+    let ngCount = 0;
+    let noneCount = 0;
+
+    for (let u = 0; u < UNITS.length; u++) {
+      const unit = UNITS[u];
+      let unitOk = 0;
+      for (let q = 0; q < unit.questions.length; q++) {
+        total++;
+        const r = state.results[unit.questions[q].id];
+        if (r === "ok") { okCount++; unitOk++; }
+        else if (r === "ng") { ngCount++; }
+        else { noneCount++; }
+      }
+      const chip = document.getElementById("chip-" + unit.id);
+      if (chip) {
+        chip.textContent = unit.title.split("（")[0] + " (" + unitOk + "/" + unit.questions.length + ")";
+        if (unitOk === unit.questions.length) chip.classList.add("done");
+        else chip.classList.remove("done");
+      }
+    }
+
+    document.getElementById("score-main").textContent = "正解: " + okCount + " / " + total + " 問";
+    document.getElementById("score-sub").textContent =
+      "未解答: " + noneCount + " / 不正解: " + ngCount + " / 連続正解: " + state.streak;
+    const pct = total > 0 ? Math.round((okCount / total) * 100) : 0;
+    document.getElementById("progress-fill").style.width = pct + "%";
+  }
+
+  function render() {
+    const nav = document.getElementById("unit-nav");
+    const root = document.getElementById("quiz-root");
+    nav.innerHTML = "";
+    root.innerHTML = "";
+
+    let globalIndex = 0;
+
+    UNITS.forEach(function(unit) {
+      const chip = document.createElement("a");
+      chip.className = "unit-chip";
+      chip.id = "chip-" + unit.id;
+      chip.href = "#" + unit.id;
+      chip.textContent = unit.title.split("（")[0];
+      nav.appendChild(chip);
+
+      const sec = document.createElement("section");
+      sec.className = "unit-section";
+      sec.id = unit.id;
+
+      const head = document.createElement("div");
+      head.className = "unit-head";
+      head.innerHTML =
+        '<div><h2 class="unit-title">' + unit.title + '</h2>' +
+        '<div class="unit-meta">' + unit.desc + '</div></div>' +
+        '<button type="button" data-unit-check="' + unit.id + '">この単元を判定</button>';
+      sec.appendChild(head);
+
+      unit.questions.forEach(function(q) {
+        globalIndex++;
+        const card = document.createElement("article");
+        card.className = "q-card";
+        card.id = "card-" + q.id;
+
+        const qAns = state.answers[q.id] || {};
+        let html =
+          '<div class="q-top">' +
+            '<div class="q-id-group">' +
+              '<span class="q-num">Q' + globalIndex + '</span>' +
+              '<span class="q-topic">' + q.topic + '</span>' +
+            '</div>' +
+            '<span class="q-badge" id="badge-' + q.id + '">未解答</span>' +
+          '</div>' +
+          '<p class="q-prompt">' + q.prompt + '</p>';
+
+        if (q.code) {
+          html += '<pre class="code-block">' + q.code.replace(/</g, "&lt;").replace(/>/g, "&gt;") + '</pre>';
+        }
+
+        html += '<div class="input-grid">';
+        q.inputs.forEach(function(inp) {
+          const val = qAns[inp.id] != null ? qAns[inp.id] : "";
+          const domId = "in-" + q.id + "-" + inp.id;
+          html += '<div class="field"><label for="' + domId + '">' + inp.label + '</label>';
+          if (inp.kind === "select") {
+            html += '<select id="' + domId + '" data-qid="' + q.id + '" data-iid="' + inp.id + '">';
+            inp.options.forEach(function(opt) {
+              const sel = opt === val ? " selected" : "";
+              const label = opt === "" ? "-- 選択してください --" : opt;
+              html += '<option value="' + opt.replace(/"/g, "&quot;") + '"' + sel + '>' + label + '</option>';
+            });
+            html += '</select>';
+          } else {
+            html += '<input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" ' +
+              'id="' + domId + '" data-qid="' + q.id + '" data-iid="' + inp.id + '" ' +
+              'placeholder="' + (inp.placeholder || "") + '" value="' + String(val).replace(/"/g, "&quot;") + '">';
+          }
+          html += '</div>';
+        });
+        html += '</div>';
+
+        const ansSummary = q.inputs.map(function(inp) {
+          return (q.inputs.length > 1 ? inp.label + ": " : "答え: ") + inp.answerText;
+        }).join(" / ");
+
+        html +=
+          '<div class="q-actions">' +
+            '<button type="button" class="primary" data-check="' + q.id + '">判定する</button>' +
+            '<button type="button" data-peek="' + q.id + '">答えを見る / 隠す</button>' +
+            '<button type="button" data-clear="' + q.id + '">入力クリア</button>' +
+          '</div>' +
+          '<div class="feedback" id="fb-' + q.id + '">' +
+            '<div class="feedback-title"></div>' +
+            '<div class="answer-line">' + ansSummary + '</div>' +
+            '<div class="explain-line">' + q.explain + '</div>' +
+          '</div>';
+
+        card.innerHTML = html;
+        sec.appendChild(card);
+      });
+
+      root.appendChild(sec);
+    });
+
+    // Re-apply stored results
+    UNITS.forEach(function(unit) {
+      unit.questions.forEach(function(q) {
+        if (state.results[q.id]) {
+          evaluateQuestion(q, false);
+        } else {
+          applyQuestionUI(q, null, true);
+        }
+      });
+    });
+    updateDashboard();
+  }
+
+  // --- Event Listeners ---
+  document.addEventListener("input", function(e) {
+    const t = e.target;
+    if (t && t.dataset && t.dataset.qid) {
+      const qid = t.dataset.qid;
+      const iid = t.dataset.iid;
+      if (!state.answers[qid]) state.answers[qid] = {};
+      state.answers[qid][iid] = t.value;
+      saveState();
+    }
+  });
+
+  document.addEventListener("change", function(e) {
+    const t = e.target;
+    if (t && t.tagName === "SELECT" && t.dataset && t.dataset.qid) {
+      const qid = t.dataset.qid;
+      const iid = t.dataset.iid;
+      if (!state.answers[qid]) state.answers[qid] = {};
+      state.answers[qid][iid] = t.value;
+      saveState();
+    }
+  });
+
+  document.addEventListener("keydown", function(e) {
+    if (e.key === "Enter" && e.target && e.target.dataset && e.target.dataset.qid) {
+      e.preventDefault();
+      const q = findQuestion(e.target.dataset.qid);
+      if (q) evaluateQuestion(q, true);
+    }
+  });
+
+  document.addEventListener("click", function(e) {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+
+    if (btn.dataset.check) {
+      const q = findQuestion(btn.dataset.check);
+      if (q) evaluateQuestion(q, true);
+      return;
+    }
+
+    if (btn.dataset.peek) {
+      const q = findQuestion(btn.dataset.peek);
+      if (!q) return;
+      const fb = document.getElementById("fb-" + q.id);
+      if (fb.classList.contains("show")) {
+        fb.classList.remove("show");
+      } else {
+        if (!state.results[q.id]) {
+          fb.querySelector(".feedback-title").textContent = "[確認] 模範解答と解説";
+        }
+        fb.classList.add("show");
+      }
+      return;
+    }
+
+    if (btn.dataset.clear) {
+      const q = findQuestion(btn.dataset.clear);
+      if (!q) return;
+      delete state.answers[q.id];
+      delete state.results[q.id];
+      q.inputs.forEach(function(inp) {
+        const el = document.getElementById("in-" + q.id + "-" + inp.id);
+        if (el) el.value = "";
+      });
+      saveState();
+      applyQuestionUI(q, null, true);
+      updateDashboard();
+      return;
+    }
+
+    if (btn.dataset.unitCheck) {
+      const uid = btn.dataset.unitCheck;
+      const unit = UNITS.find(function(u) { return u.id === uid; });
+      if (unit) {
+        unit.questions.forEach(function(q) {
+          evaluateQuestion(q, false);
+        });
+      }
+      return;
+    }
+  });
+
+  document.getElementById("btn-check-all").addEventListener("click", function() {
+    let checked = 0;
+    UNITS.forEach(function(unit) {
+      unit.questions.forEach(function(q) {
+        const qAns = state.answers[q.id] || {};
+        const hasAny = q.inputs.some(function(inp) {
+          return String(qAns[inp.id] || "").trim().length > 0;
+        });
+        if (hasAny) {
+          evaluateQuestion(q, false);
+          checked++;
+        }
+      });
+    });
+    if (checked === 0) {
+      UNITS.forEach(function(unit) {
+        unit.questions.forEach(function(q) {
+          evaluateQuestion(q, false);
+        });
+      });
+    }
+  });
+
+  document.getElementById("btn-toggle-study").addEventListener("click", function() {
+    state.studyAll = !state.studyAll;
+    this.classList.toggle("active-filter", state.studyAll);
+    this.textContent = state.studyAll ? "模範解答を隠す（未解答分）" : "すべて模範解答を表示";
+    UNITS.forEach(function(unit) {
+      unit.questions.forEach(function(q) {
+        const fb = document.getElementById("fb-" + q.id);
+        if (state.studyAll) {
+          if (!state.results[q.id]) {
+            fb.querySelector(".feedback-title").textContent = "[暗記用表示] 模範解答と解説";
+          }
+          fb.classList.add("show");
+        } else {
+          if (!state.results[q.id]) {
+            fb.classList.remove("show");
+          }
+        }
+      });
+    });
+  });
+
+  document.getElementById("btn-filter-ng").addEventListener("click", function() {
+    state.filterNg = !state.filterNg;
+    this.classList.toggle("active-filter", state.filterNg);
+    this.textContent = state.filterNg ? "すべて表示に戻す" : "苦手・未解答のみ";
+    UNITS.forEach(function(unit) {
+      unit.questions.forEach(function(q) {
+        const card = document.getElementById("card-" + q.id);
+        if (state.filterNg && state.results[q.id] === "ok") {
+          card.classList.add("hidden-by-filter");
+        } else {
+          card.classList.remove("hidden-by-filter");
+        }
+      });
+    });
+  });
+
+  document.getElementById("btn-reset").addEventListener("click", function() {
+    if (!confirm("入力内容と正誤の記録をすべてリセットしますか？")) return;
+    state.answers = {};
+    state.results = {};
+    state.streak = 0;
+    state.studyAll = false;
+    state.filterNg = false;
+    saveState();
+    const tBtn = document.getElementById("btn-toggle-study");
+    tBtn.classList.remove("active-filter");
+    tBtn.textContent = "すべて模範解答を表示";
+    const fBtn = document.getElementById("btn-filter-ng");
+    fBtn.classList.remove("active-filter");
+    fBtn.textContent = "苦手・未解答のみ";
+    render();
+  });
+
+  // Expose minimal test hook for automated CLI verification
+  window.__SIM_EXAM_QUIZ__ = {
+    UNITS: UNITS,
+    evalSafeExpr: evalSafeExpr,
+    parseNumOrFrac: parseNumOrFrac
+  };
+
+  if (/\/tool\/memorize_list\.html$/i.test(location.pathname) || location.protocol.indexOf("http") === 0) {
+    var bl = document.getElementById("back-link");
+    if (bl) bl.style.display = "inline-block";
+  }
+
+  loadState();
+  render();
+})();
+</script>
+</body>
+</html>
