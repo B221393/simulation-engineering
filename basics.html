@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>シミュレーション工学 期末試験 最小限ここだけ（前提から）</title>
+<style>
+  :root { --fg:#1b1b1f; --muted:#5f6470; --line:#e2e4ea; --accent:#2b5cd9; --ok:#137333; --ng:#b3261e; --bg:#fbfbfd; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); line-height:1.75;
+         font-family:-apple-system,"Segoe UI","Yu Gothic","Hiragino Sans","Noto Sans JP",sans-serif; }
+  main { max-width:720px; margin:0 auto; padding:24px 16px 64px; }
+  h1 { font-size:1.3rem; margin:0 0 6px; line-height:1.4; }
+  .lead { color:var(--muted); font-size:.88rem; margin:0 0 28px; }
+  h2 { font-size:1rem; margin:34px 0 12px; padding-bottom:6px; border-bottom:2px solid var(--accent); }
+  h2 span { color:var(--accent); font-size:.8rem; display:block; letter-spacing:.08em; }
+  ol, ul { margin:0; padding-left:1.4em; }
+  li { margin:0 0 10px; font-size:.92rem; }
+  b { color:var(--fg); }
+  .math { font-family:"Cambria Math","Times New Roman",Georgia,serif; }
+  .why { color:var(--muted); font-size:.85rem; }
+  table { width:100%; border-collapse:collapse; font-size:.86rem; background:#fff; }
+  th, td { border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top; }
+  th { background:#f4f6fb; font-size:.8rem; }
+  td:first-child { white-space:nowrap; font-weight:700; }
+  .next { margin-top:34px; border-top:1px solid var(--line); padding-top:16px; }
+  .next p { margin:0 0 10px; font-size:.88rem; color:var(--muted); }
+  .row { display:flex; gap:8px; flex-wrap:wrap; }
+  a.btn { flex:1 1 0; min-width:150px; text-align:center; text-decoration:none; padding:11px 10px;
+          border-radius:9px; font-size:.9rem; font-weight:600; border:1px solid var(--accent); color:var(--accent); background:#fff; }
+  a.btn.solid { background:var(--accent); color:#fff; }
+  footer { text-align:center; font-size:.75rem; color:var(--muted); margin-top:32px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>期末試験 最小限ここだけ</h1>
+  <p class="lead">
+    全部覚える必要はありません。まず<b>前提の3つ</b>を押さえ、次に<b>10個</b>だけ手で書けるようにします。
+    細かい問題演習は最後に回してください。
+  </p>
+
+  <h2><span>STEP 1</span>前提: この3つが分かれば全体が読める</h2>
+  <ol>
+    <li>
+      <b>微分 = 変化の割合。</b>
+      <span class="math">dx/dt</span> は「その瞬間に x がどれだけ増えるか」。だから少し進んだ値は
+      <span class="math">x(t + dt) ≈ x(t) + dt · (dx/dt)</span>。<br>
+      <span class="why">オイラー法はこの1行そのものです。公式を暗記する対象ではありません。</span>
+    </li>
+    <li>
+      <b>2階微分 = 加速度。状態を2つに分ければ1階になる。</b>
+      <span class="math">x'' + c x' + k x = u</span> は、位置 <span class="math">x1 = x</span> と速度
+      <span class="math">x2 = x'</span> の2本の1階方程式に分けられます。<br>
+      <span class="why">「1階連立化」と呼ばれる作業はこれだけ。最高階について解いて、m で割るのを忘れないこと。</span>
+    </li>
+    <li>
+      <b>固有値 = 向きごとの伸び縮み。</b>
+      <span class="math">A w = λ w</span> の λ。λ が負なら縮む（戻る）、正なら伸びる（離れる）、純虚数なら回る。<br>
+      <span class="why">固定点の分類は、この「戻る・離れる・回る」を λ で言い換えただけです。</span>
+    </li>
+  </ol>
+
+  <h2><span>STEP 2</span>暗記は10個だけ</h2>
+  <ol>
+    <li><b>誤差は4種類。</b>丸め（有限桁で表す）／打ち切り（有限回で切る）／情報落ち（大きい数＋小さい数）／桁落ち（近い値の引き算）。</li>
+    <li><b>有効桁は 7 と 16。</b>float32 が約7桁、float64 が約16桁。Python のべき乗は <span class="math">**</span>（<span class="math">^</span> は別物）。</li>
+    <li><b>前進オイラー: </b><span class="math">x[n+1] = x[n] + dt·f(t[n], x[n])</span>。1次精度（誤差は dt に比例）。</li>
+    <li><b>ホインは2次、RK4は4次。</b>RK4 の重みは <span class="math">(k1 + 2k2 + 2k3 + k4)/6</span>。dt を 1/10 にすると誤差は 1/10、1/100、1/10000。</li>
+    <li><b>安定条件: </b><span class="math">|1 + k·dt| ≤ 1</span>、つまり <span class="math">dt ≤ 2/|k|</span>（k&lt;0）。後退（陰）オイラーは k&lt;0 なら刻み幅によらず安定。</li>
+    <li><b>2階 → 1階: </b><span class="math">x1 = x</span>、<span class="math">x2 = x'</span>、<span class="math">dx2/dt = (u − c·x2 − k·x1)/m</span>。</li>
+    <li><b>1次元の固定点: </b><span class="math">f'(x*) &lt; 0</span> なら安定、<span class="math">&gt; 0</span> なら不安定、<span class="math">= 0</span> は判定不可（半安定があり得る）。</li>
+    <li><b>2次元の固定点: </b>τ = tr(A)、Δ = det(A)。Δ&lt;0 は鞍点。Δ&gt;0 なら τ&lt;0 で安定、τ&gt;0 で不安定、τ=0 で中心点。τ²−4Δ&lt;0 なら渦状点。</li>
+    <li><b>ニュートン法: </b><span class="math">x ← x − f(x)/f'(x)</span>。連立なら <span class="math">J δ = −f</span> を解く（マイナスを落とさない）。</li>
+    <li><b>線形代数: </b>ピボット選択は「ゼロ除算の回避」と「丸め誤差の拡大防止」。LU分解は b が変わっても代入だけで O(n²)。逆行列は solve の約3倍かかるので使わない。</li>
+  </ol>
+
+  <h2><span>STEP 3</span>混同しやすい組だけ、違いを1行で</h2>
+  <table>
+    <tr><th>組</th><th>違い</th></tr>
+    <tr><td>丸め / 打ち切り</td><td>丸めは「数の表し方」の限界。打ち切りは「計算を途中でやめる」こと。</td></tr>
+    <tr><td>情報落ち / 桁落ち</td><td>情報落ちは足し算で小さい側が消える。桁落ちは引き算で有効数字が消える。</td></tr>
+    <tr><td>陽 / 陰（後退）</td><td>陽は既知の値だけで次を出す。陰は次の値自身を含む式を解く。陰のほうが安定。</td></tr>
+    <tr><td>安定 / 漸近安定</td><td>安定は「離れていかない」。漸近安定は「最終的に近づく」。中心点は安定だが漸近安定ではない。</td></tr>
+    <tr><td>中心点 / 渦状点</td><td>固有値が純虚数なら中心点（回り続ける）。実部が負の複素数なら渦状点（渦を巻いて近づく）。</td></tr>
+    <tr><td>鞍点 / 結節点</td><td>Δ&lt;0 は必ず鞍点。Δ&gt;0 で τ²−4Δ&gt;0 なら結節点（回らずに近づく・離れる）。</td></tr>
+    <tr><td>θ = π と −π</td><td>角度は 2π 周期なので同じ1点。固定点を2個と数えると減点。</td></tr>
+    <tr><td>1ステップ誤差 / 積算誤差</td><td>1ステップは O(dt^(p+1))、それを T/dt 回積むと O(dt^p)。次数の言い間違いに注意。</td></tr>
+    <tr><td>倒立振り子 / 普通の振り子</td><td>真上基準は重力項が +、真下基準は −。符号を逆にすると制御が倒れる向きに働く。</td></tr>
+  </table>
+
+  <section class="next">
+    <p>手を動かす段階に進むときだけ、次を使ってください。</p>
+    <div class="row">
+      <a class="btn solid" href="tool/memorize_quiz.html">4択クイズ（35問）</a>
+      <a class="btn" href="tool/memorize_list.html">入力チェック（32問）</a>
+    </div>
+  </section>
+
+  <footer>シミュレーション工学 期末試験 最小限ここだけ</footer>
+</main>
+</body>
+</html>
