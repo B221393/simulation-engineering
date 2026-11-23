@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>シミュレーション工学 レポート演習1・2 完全まとめ</title>
+<style>
+  :root {
+    --fg: #1b1b1f;
+    --muted: #5f6470;
+    --line: #dfe2ea;
+    --accent: #2b5cd9;
+    --accent-bg: #eef3ff;
+    --bg: #f8f9fc;
+    --card: #ffffff;
+    --ok: #137333;
+    --ok-bg: #e6f4ea;
+    --ok-line: #a8dab5;
+    --ng: #b3261e;
+    --ng-bg: #fce8e6;
+    --ng-line: #f2b8b5;
+    --warn: #8a5300;
+    --warn-bg: #fef7e0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, "Segoe UI", "Yu Gothic", "Hiragino Sans", "Noto Sans JP", sans-serif;
+    line-height: 1.65;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 16px 14px 72px; }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 10px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  .top-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .kicker { font-size: 0.74rem; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+  h1 { font-size: 1.28rem; margin: 4px 0 6px; line-height: 1.35; }
+  .sub { font-size: 0.85rem; color: var(--muted); margin: 0; }
+
+  .nav-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .nav-pill {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 5px 11px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--fg);
+    text-decoration: none;
+  }
+  .nav-pill:hover { border-color: var(--accent); color: var(--accent); }
+
+  h2.sec-title {
+    font-size: 1.06rem;
+    margin: 26px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--accent);
+  }
+  h2.sec-title span {
+    display: block;
+    font-size: 0.74rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
+
+  .tbl-wrap { overflow-x: auto; margin-bottom: 16px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border: 1px solid var(--line);
+    font-size: 0.84rem;
+  }
+  th, td {
+    border: 1px solid var(--line);
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: #f2f5fb; font-size: 0.79rem; }
+  td:first-child { font-weight: 700; }
+
+  .step-list { display: grid; gap: 10px; }
+  .step-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 13px 15px;
+  }
+  .step-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+  .step-badge {
+    font-size: 0.73rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--accent-bg);
+    color: var(--accent);
+  }
+  .step-title { font-size: 0.96rem; font-weight: 800; margin: 0; }
+  .eq-box {
+    background: #f5f7fb;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin: 6px 0;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.84rem;
+    overflow-x: auto;
+  }
+  .step-card ul { margin: 4px 0 0; padding-left: 1.3em; font-size: 0.86rem; color: #2b2f38; }
+  .step-card li { margin-bottom: 3px; }
+  .mono {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.88em;
+    background: #f1f3f8;
+    padding: 1px 4px;
+    border-radius: 4px;
+  }
+
+  .warn-banner {
+    background: var(--warn-bg);
+    border: 1px solid #f0d7a0;
+    border-left: 4px solid var(--warn);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.84rem;
+    color: #4f3200;
+    margin-bottom: 12px;
+  }
+
+  .tool-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  a.small-btn {
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    background: #fff;
+  }
+
+  /* Dynamic Quiz */
+  .quiz-hud {
+    position: sticky;
+    top: 8px;
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  }
+  .hud-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .hud-score { font-size: 1rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .hud-sub { font-size: 0.82rem; color: var(--muted); }
+  .progress-track {
+    width: 100%;
+    height: 7px;
+    background: #ebedf3;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .progress-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.25s; }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--fg);
+    padding: 7px 11px;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+  button:hover { background: #f4f6fb; border-color: #b9bfd0; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.primary:hover { opacity: 0.92; background: var(--accent); }
+  button.danger { color: var(--ng); border-color: var(--ng-line); }
+  button.danger:hover { background: var(--ng-bg); }
+
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .q-card.is-ok { border-color: var(--ok-line); background: #fbfefc; }
+  .q-card.is-ng { border-color: var(--ng-line); background: #fffbfa; }
+  .q-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+  .q-tag {
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: var(--accent);
+    background: var(--accent-bg);
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+  .q-badge {
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    background: #f5f6fa;
+  }
+  .q-badge.ok { background: var(--ok-bg); border-color: var(--ok-line); color: var(--ok); }
+  .q-badge.ng { background: var(--ng-bg); border-color: var(--ng-line); color: var(--ng); }
+  .q-prompt { font-size: 0.93rem; font-weight: 700; margin: 4px 0 10px; }
+
+  .input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 0.78rem; font-weight: 700; color: var(--muted); }
+  .field input, .field select {
+    width: 100%;
+    padding: 9px 10px;
+    font-size: 16px;
+    font-family: inherit;
+    border: 1px solid #c9cedb;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--fg);
+  }
+  .field input:focus, .field select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(43, 92, 217, 0.14);
+  }
+  .field input.field-ok, .field select.field-ok { border-color: var(--ok); background: #f6fbf7; }
+  .field input.field-ng, .field select.field-ng { border-color: var(--ng); background: #fff7f6; }
+
+  .q-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+  .feedback {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    border: 1px solid var(--line);
+    background: #f5f7fb;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: var(--ok-bg); border-color: var(--ok-line); }
+  .feedback.ng { background: var(--ng-bg); border-color: var(--ng-line); }
+  .fb-title { font-weight: 800; margin-bottom: 3px; }
+  .feedback.ok .fb-title { color: var(--ok); }
+  .feedback.ng .fb-title { color: var(--ng); }
+  .fb-ans { font-weight: 700; margin-bottom: 3px; color: var(--fg); }
+
+  .next-box {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  a.btn-link {
+    flex: 1 1 160px;
+    text-align: center;
+    text-decoration: none;
+    padding: 11px 12px;
+    border-radius: 9px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    background: #fff;
+  }
+  a.btn-link.solid { background: var(--accent); color: #fff; }
+  footer { text-align: center; font-size: 0.76rem; color: var(--muted); margin-top: 28px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back-link" id="back-link" href="index.html" style="display:none;">[トップページへ戻る]</a>
+
+  <header class="top-card">
+    <div class="kicker">SIMULATION ENGINEERING // EXERCISE 1 &amp; 2 REPORT SUMMARY</div>
+    <h1>レポート演習1（単振り子）・演習2（静電アクチュエータ）完全まとめ</h1>
+    <p class="sub">
+      2つのレポート課題が「何を確かめるためのストーリーになっているか」を導出・考察・物理的意味ごとに整理しました。下部の10問チェックで自分の理解を判定できます。
+    </p>
+  </header>
+
+  <nav class="nav-pills">
+    <a class="nav-pill" href="#compare">横断比較表</a>
+    <a class="nav-pill" href="#ex1">演習1: 単振り子 (1)-(8)</a>
+    <a class="nav-pill" href="#ex2">演習2: 静電アクチュエータ (1)-(7)</a>
+    <a class="nav-pill" href="#report-quiz">理解度チェック (10問)</a>
+  </nav>
+
+  <h2 class="sec-title" id="compare"><span>OVERVIEW</span>演習1 と 演習2 の共通ストーリー（横断比較）</h2>
+  <div class="tbl-wrap">
+    <table>
+      <tr>
+        <th style="width:20%;">共通ステップ</th>
+        <th style="width:40%;">演習1：単振り子の運動（第7-8回・試験中心）</th>
+        <th style="width:40%;">演習2：静電アクチュエータ（第13-14回）</th>
+      </tr>
+      <tr>
+        <td>1. 物理モデルと1階変換</td>
+        <td><span class="mono">theta' = omega</span>, <span class="mono">omega' = -(g/l) sin(theta)</span>（質量 <span class="mono">m</span> は消える）</td>
+        <td><span class="mono">z' = v</span>, <span class="mono">v' = -beta*v - z + alpha/(1-z)^2</span>（<span class="mono">0 &lt;= z &lt; 1</span>）</td>
+      </tr>
+      <tr>
+        <td>2. 固定点の求め方</td>
+        <td><span class="mono">omega = 0, sin(theta) = 0</span> から手計算で <span class="mono">theta* = 0, pi</span>（<span class="mono">-pi</span> は同一）</td>
+        <td><span class="mono">alpha = z(1-z)^2</span> は3次式なので <b>ニュートン法</b> で <span class="mono">1/7, 4/7</span> を探索</td>
+      </tr>
+      <tr>
+        <td>3. 数値積分と検証</td>
+        <td>オイラー法 vs RK4（<span class="mono">dt=0.01,0.001,0.0001</span>）、エネルギー保存と両対数傾きで妥当性検証</td>
+        <td>連立RK4で <span class="mono">(0.30, 0)</span> 収束 vs <span class="mono">(0.60, 0)</span> 電極接触（プルイン）を比較</td>
+      </tr>
+      <tr>
+        <td>4. ヤコビアンと相図</td>
+        <td><span class="mono">(0,0)</span> は中心点（中立安定・閉軌道）、<span class="mono">(pi,0)</span> は鞍点（振動と回転を分ける境界）</td>
+        <td><span class="mono">1/7</span> は安定渦状点（黒丸・ばね勝ち）、<span class="mono">4/7</span> は鞍点（白丸・静電力勝ち）</td>
+      </tr>
+      <tr>
+        <td>5. 発展・制御・分岐</td>
+        <td>上死点 <span class="mono">pi</span> を重力補償＋PD制御で倒立安定化</td>
+        <td>サドルノード分岐（<span class="mono">alpha = 4/27</span> で固定点消滅）と非負電圧PD制御</td>
+      </tr>
+    </table>
+  </div>
+
+  <h2 class="sec-title" id="ex1"><span>PART 1 (試験配点の中心)</span>演習1「単振り子の運動」レポート (1)-(8) まとめ</h2>
+  <div class="step-list">
+    <article class="step-card">
+      <div class="step-head"><span class="step-badge">演習1 (1)-(2)</span><h3 class="step-title">運動方程式の導出と1階連立化・エネルギー保存</h3></div>
+      <div class="eq-box">m * l * theta'' = -m * g * sin(theta)  =&gt;  theta'' = -(g/l) * sin(theta)
+d(theta)/dt = omega,   d(omega)/dt = -(g/l) * sin(theta)</div>
+      <ul>
+        <li><b>試験のツボ:</b> 両辺を <span class="mono">ml</span>（または回転方程式 <span class="mono">ml^2 * theta'' = -mgl sin(theta)</span> を <span class="mono">ml^2</span>）で割ると質量 <span class="mono">m</span> が消え、動きは質量に依存しない（ただしエネルギー <span class="mono">E = 0.5*m*l^2*omega^2 + m*g*l*(1 - cos(theta))</span> の計算には <span class="mono">m</span> を使う）。</li>
+      </ul>
+    </article>
+
+    <article class="step-card">
+      <div class="step-head"><span class="step-badge">演習1 (3)-(4)</span><h3 class="step-title">オイラー法とRK4の比較（なぜ振幅が膨らむか）</h3></div>
+      <div class="eq-box">前進オイラー: theta[n+1] = theta[n] + dt*omega[n],  omega[n+1] = omega[n] - dt*(g/l)*sin(theta[n])
+RK4(2変数): 各段階 k1 -> k2 -> k3 -> k4 ごとに theta と omega をペアで同時に進めて評価する</div>
+      <ul>
+        <li><b>オイラー法の結果と考察:</b> 刻み幅 <span class="mono">dt</span> が大きいと前進オイラー法は <b>力学的エネルギーを人工的に増やす</b> ため、相図が閉じた円にならず外へ膨らみ振幅が増大する。<span class="mono">dt = 0.01 -&gt; 0.001 -&gt; 0.0001</span> と細かくすると真値へ近づく。</li>
+        <li><b>RK4の考察:</b> <span class="mono">dt = 0.01, 0.001, 0.0001</span> で曲線がほぼ重なるが、曲線が一致するだけでは式自体のバグがない証明にならないため、次の (5) で独立した物理保存則を確認する。</li>
+      </ul>
+    </article>
+
+    <article class="step-card">
+      <div class="step-head"><span class="step-badge">演習1 (5)-(6)</span><h3 class="step-title">プログラムの妥当性評価と精度の次数</h3></div>
+      <ul>
+        <li><b>妥当性評価:</b> 減衰なし単振り子では力学的エネルギー <span class="mono">E</span> が一定に保たれる。そこでエネルギー保存誤差 <span class="mono">|E(t) - E(0)|</span> を両対数グラフに描き、傾きがオイラー法で <b>1</b>（1次精度 <span class="mono">O(dt)</span>）、RK4で <b>4</b>（4次精度 <span class="mono">O(dt^4)</span>）になることを確認すれば実装の強い根拠になる。</li>
+        <li><b>誤差次数の区別:</b> オイラー法のテイラー展開より、1ステップの局所打ち切り誤差は <span class="mono">O(dt^2)</span>、一定時間 <span class="mono">T</span>（<span class="mono">T/dt</span> ステップ）の積算（大域）誤差は <span class="mono">O(dt)</span>。</li>
+      </ul>
+    </article>
+
+    <article class="step-card">
+      <div class="step-head"><span class="step-badge">演習1 (7)</span><h3 class="step-title">相図と6つの初期条件の解釈</h3></div>
+      <div class="tbl-wrap" style="margin:6px 0 4px;">
+        <table>
+          <tr><th>初期条件 <span class="mono">(theta0, omega0)</span></th><th>運動と相図上の軌道</th><th>物理的ポイント</th></tr>
+          <tr><td><span class="mono">(0, 0)</span></td><td>最下点で静止（固定点・中心点）</td><td>ヤコビ固有値 <span class="mono">+-i*sqrt(g/l)</span>、中立安定（漸近安定ではない）</td></tr>
+          <tr><td><span class="mono">(pi/2, 0)</span></td><td>行って戻る往復振動（閉軌道）</td><td>エネルギー <span class="mono">E = mgl &lt; 2mgl</span>。非線形系なので周期は振幅に依存</td></tr>
+          <tr><td><span class="mono">(pi, 0)</span> と <span class="mono">(-pi, 0)</span></td><td>真上の不安定平衡点（鞍点・同一の点）</td><td><span class="mono">2*pi</span> 周期で同一姿勢。数値上は <span class="mono">sin(pi)!=0</span> の丸め誤差でも落下する</td></tr>
+          <tr><td><span class="mono">(-pi, 1)</span> / <span class="mono">(pi, -1)</span></td><td>上下の帯状の連続回転（大車輪）</td><td>真上で速度を持つため <span class="mono">E &gt; 2mgl</span>（位置エネルギー障壁越え）</td></tr>
+        </table>
+      </div>
+      <ul>
+        <li><b>セパラトリクス:</b> <span class="mono">(+-pi, 0)</span> を通る軌道が「振動（閉軌道）」と「回転（上下の帯）」を分ける境界線になる。</li>
+      </ul>
+    </article>
+
+    <article class="step-card">
+      <div class="step-head"><span class="step-badge">演習1 (8) 発展</span><h3 class="step-title">倒立状態の安定化制御</h3></div>
+      <ul>
+        <li>真上（<span class="mono">phi = 0</span>）基準の座標にすると重力項の符号は <span class="mono">+(g/l)*sin(phi)</span> に変わる。</li>
+        <li>重力補償＋PD制御（または線形倒立振り子のPD制御 <span class="mono">u = -kp*phi - kd*omega</span>）により、<span class="mono">tau = -kd &lt; 0, Delta = kp - g/l &gt; 0</span>（<span class="mono">kd &gt; 0, kp &gt; g/l</span>）を満たせば上死点近傍で漸近安定化できる。ただし局所安定化であり、トルク飽和やセンサノイズには注意が必要。</li>
+      </ul>
+    </article>
+  </div>
+
+  <h2 class="sec-title" id="ex2"><span>PART 2</span>演習2「静電アクチュエータ」レポート (1)-(7) 要点まとめ</h2>
+  <div class="warn-banner">
+    注意: 演習2（第13-14回）は今回の期末試験では範囲外の可能性もあります（掲示・告知で確認してください）。ただし「1階変換・ニュートン法・ヤコビアン・相図手描き」の手順そのものは試験でもそのまま出題される重要パターンです。
+  </div>
+
+  <div class="step-list">
+    <article class="step-card">
+      <div class="step-head"><span class="step-badge">演習2 (1)-(2)</span><h3 class="step-title">無次元運動方程式・固定点条件・ニュートン法</h3></div>
+      <div class="eq-box">z' = v,   v' = -beta*v - z + alpha/(1 - z)^2   (0 &lt;= z &lt; 1)
+固定点条件: v = 0,   alpha = z*(1 - z)^2
+ニュートン法: f(z) = alpha - z*(1 - z)^2,   f'(z) = (1 - z)*(3*z - 1)</div>
+      <ul>
+        <li><span class="mono">alpha = 36/343</span> での2つの物理的固定点は <span class="mono">z* = 1/7</span>（初期値 0.1 から収束）と <span class="mono">z* = 4/7</span>（初期値 0.6 から収束）。</li>
+        <li><b>失敗する初期値:</b> <span class="mono">z0 = 1/3</span>（山の頂上）および <span class="mono">z0 = 1</span> では <span class="mono">f'(z0) = 0</span> で接線が水平・分母 0 となり更新停止。<span class="mono">z0 &gt; 1</span> は範囲外の根 <span class="mono">9/7</span> に収束する。</li>
+      </ul>
+    </article>
+
+    <article class="step-card">
+      <div class="step-head"><span class="step-badge">演習2 (3)-(5)</span><h3 class="step-title">ヤコビアン・相図手描きと物理的解釈</h3></div>
+      <ul>
+        <li><b>固定点 <span class="mono">(1/7, 0)</span>（<span class="mono">beta = 1</span>）:</b> <span class="mono">J = [[0, 1], [-2/3, -1]]</span>。<span class="mono">tau = -1, Delta = 2/3, tau^2 - 4*Delta = -5/3 &lt; 0</span> より <b>安定渦状点（黒丸・時計回り）</b>。なお <span class="mono">beta = 2</span> に強めると <span class="mono">tau^2 - 4*Delta = 4/3 &gt; 0</span> となり <b>安定結節点</b> へ変わる。</li>
+        <li><b>固定点 <span class="mono">(4/7, 0)</span>:</b> <span class="mono">J = [[0, 1], [5/3, -1]]</span>。<span class="mono">Delta = -5/3 &lt; 0</span> より <b>鞍点（不安定・白丸）</b>。固有ベクトルは <span class="mono">w = (1, lambda)^T</span>（正の固有値 <span class="mono">approx +0.88</span> は外向き、負 <span class="mono">approx -1.88</span> は内向き）。</li>
+        <li><b>物理的理由:</b> ばね力 <span class="mono">z</span> の増え方と静電力 <span class="mono">alpha/(1-z)^2</span> の増え方を比べると、<span class="mono">1/7</span> ではばねの増加率が勝って押し戻す（安定）、<span class="mono">4/7</span> では静電力の増加率が勝って引き込まれ電極接触（プルイン）する。初期値 <span class="mono">(0, 0.5)</span> は <span class="mono">1/7</span> へ収束し、<span class="mono">(0, 0.8)</span> はセパラトリクスを越えて接触する。</li>
+      </ul>
+    </article>
+
+    <article class="step-card">
+      <div class="step-head"><span class="step-badge">演習2 (6)-(7)</span><h3 class="step-title">サドルノード分岐と電圧フィードバック制御</h3></div>
+      <ul>
+        <li><b>サドルノード分岐:</b> <span class="mono">g(z) = z(1-z)^2</span> は <span class="mono">z = 1/3</span> で極大値 <b><span class="mono">alpha = 4/27</span></b> をとる。<span class="mono">0 &lt; alpha &lt; 4/27</span> で2個、<span class="mono">alpha = 4/27</span> で1個（固有値 <span class="mono">0, -1</span>：線形化だけでは判定不可・半安定）、<span class="mono">alpha &gt; 4/27</span> で固定点 0 個となり全初期値から必ず接触する。</li>
+        <li><b>電圧PD制御:</b> <span class="mono">alpha</span> は印加電圧の2乗（<span class="mono">V^2</span>）に比例するため負にできない。よって <span class="mono">alpha(z, v) = max(0, alpha_ff - Kp*(z - z_ref) - Kd*v)</span> と 0 でクリップして <span class="mono">z_ref &gt; 1/3</span> の位置も安定化する。</li>
+      </ul>
+      <div class="tool-row">
+        <a class="small-btn" href="tool/ex2_summary.html">演習2 詳細まとめ</a>
+        <a class="small-btn" href="tool/fixedpoint_quiz.html">固定点分類トレーニング</a>
+        <a class="small-btn" href="tool/paper_list.html">紙に書く手順リスト</a>
+      </div>
+    </article>
+  </div>
+
+  <h2 class="sec-title" id="report-quiz"><span>PART 3</span>レポート演習 理解度チェック（入力・選択 10問）</h2>
+
+  <div class="quiz-hud">
+    <div class="hud-row">
+      <div>
+        <span class="hud-score" id="hud-score">正解: 0 / 10 問</span>
+        <span class="hud-sub" id="hud-sub">（解答: 0 / 10）</span>
+      </div>
+      <div style="display:flex; gap:6px; flex-wrap:wrap;">
+        <button type="button" class="primary" id="btn-check-all">入力済みをまとめて判定</button>
+        <button type="button" class="danger" id="btn-reset">記録をリセット</button>
+      </div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+
+  <div id="quiz-root"></div>
+
+  <div class="next-box">
+    <a class="btn-link solid" href="ideas.html">大事な発想ガイド（8つの発想）へ</a>
+    <a class="btn-link" href="tool/memorize_list.html">全範囲 入力チェック（32問）へ</a>
+    <a class="btn-link" href="tool/memorize_quiz.html">4択クイズ（35問）へ</a>
+  </div>
+
+  <footer>シミュレーション工学 レポート演習1・2 完全まとめ</footer>
+</div>
+
+<script>
+(function() {
+  "use strict";
+
+  const STORAGE_KEY = "sim_eng_reports_v1";
+
+  function normText(s) {
+    return String(s || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[！-～]/g, function(ch) {
+        return String.fromCharCode(ch.charCodeAt(0) - 0xFEE0);
+      })
+      .replace(/　/g, " ")
+      .replace(/\s+/g, "")
+      .replace(/[。、．，・\(\)\[\]「」『』]/g, "");
+  }
+
+  function normCode(s) {
+    return String(s || "")
+      .trim()
+      .replace(/[！-～]/g, function(ch) {
+        return String.fromCharCode(ch.charCodeAt(0) - 0xFEE0);
+      })
+      .replace(/　/g, " ")
+      .replace(/\s+/g, "")
+      .toLowerCase();
+  }
+
+  function parseNumOrFrac(s) {
+    const t = normCode(s).replace(/≈/g, "").replace(/約/g, "");
+    if (!t) return NaN;
+    if (/^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/.test(t)) return Number(t);
+    const m = t.match(/^([+-]?\d+(?:\.\d+)?)\/([+-]?\d+(?:\.\d+)?)$/);
+    if (m) {
+      const den = Number(m[2]);
+      return den === 0 ? NaN : Number(m[1]) / den;
+    }
+    return NaN;
+  }
+
+  function checkNum(expected, tol) {
+    const t = tol == null ? 1e-4 : tol;
+    return function(raw) {
+      const v = parseNumOrFrac(raw);
+      return Number.isFinite(v) && Math.abs(v - expected) <= t;
+    };
+  }
+
+  function checkExactList(list) {
+    const set = list.map(normText);
+    return function(raw) {
+      const v = normText(raw);
+      return !!v && set.indexOf(v) !== -1;
+    };
+  }
+
+  function checkCodeList(list) {
+    const set = list.map(normCode);
+    return function(raw) {
+      const v = normCode(raw);
+      return !!v && set.indexOf(v) !== -1;
+    };
+  }
+
+  function evalSafeExpr(expr, vars) {
+    let s = String(expr || "")
+      .trim()
+      .replace(/[！-～]/g, function(ch) {
+        return String.fromCharCode(ch.charCodeAt(0) - 0xFEE0);
+      })
+      .replace(/−/g, "-")
+      .replace(/×/g, "*")
+      .replace(/÷/g, "/")
+      .replace(/\^/g, "**")
+      .replace(/\s+/g, "");
+    if (!s || !/^[a-zA-Z0-9_+\-*/().]+$/.test(s)) return NaN;
+    if (/(window|document|eval|function|return|this|global|process|constructor|prototype)/i.test(s)) return NaN;
+    s = s.replace(/(\d)(?![eE][+-]?\d)([a-zA-Z(])/g, "$1*$2").replace(/(\))([a-zA-Z0-9(])/g, "$1*$2");
+    try {
+      const keys = Object.keys(vars);
+      const vals = keys.map(function(k) { return vars[k]; });
+      const fn = new Function(keys.join(","), "return (" + s + ");");
+      const out = fn.apply(null, vals);
+      return typeof out === "number" && Number.isFinite(out) ? out : NaN;
+    } catch (e) {
+      return NaN;
+    }
+  }
+
+  function checkExprEquiv(refFn, varSets) {
+    return function(raw) {
+      if (!String(raw || "").trim()) return false;
+      for (let i = 0; i < varSets.length; i++) {
+        const v = evalSafeExpr(raw, varSets[i]);
+        const r = refFn(varSets[i]);
+        if (!Number.isFinite(v) || Math.abs(v - r) > 1e-6) return false;
+      }
+      return true;
+    };
+  }
+
+  const QUESTIONS = [
+    {
+      id: "rq1",
+      tag: "演習1 (1)(2) 単振り子の運動方程式",
+      prompt: "単振り子 ml^2 theta'' = -mgl sin(theta) を整理したとき、質量 m = 2 kg を m = 10 kg に増やすと角度 theta(t) の時間発展は変わるか？",
+      inputs: [
+        { id: "a", label: "質量 m の影響", kind: "select", options: ["", "m が両辺で約分されて消えるため角度・角速度の動きは変わらない", "m に比例して速く振動する", "重くなると必ず発散する"], answerText: "m が両辺で約分されて消えるため角度・角速度の動きは変わらない", check: checkExactList(["m が両辺で約分されて消えるため角度・角速度の動きは変わらない"]) }
+      ],
+      explain: "運動方程式は theta'' = -(g/l) sin(theta) となり m を含みません。ただし力学的エネルギー E を計算する式には m が入ります。"
+    },
+    {
+      id: "rq2",
+      tag: "演習1 (3) オイラー法の挙動",
+      prompt: "減衰なし単振り子を前進オイラー法（大きめの dt）で計算すると、時間経過とともに振り子の振幅がだんだん大きくなってしまう。その理由は？",
+      inputs: [
+        { id: "a", label: "振幅が増える理由", kind: "select", options: ["", "前進オイラー法が力学的エネルギーを人工的に増やす傾向があるから", "重力加速度 g が時間とともに大きくなるから", "sin(theta) が 1 を超えるから"], answerText: "前進オイラー法が力学的エネルギーを人工的に増やす傾向があるから", check: checkExactList(["前進オイラー法が力学的エネルギーを人工的に増やす傾向があるから"]) }
+      ],
+      explain: "単振動・単振り子に前進オイラー法を適用すると更新行列の固有値の絶対値が 1 よりわずかに大きくなり、相図が閉軌道にならず外側へ広がります。"
+    },
+    {
+      id: "rq3",
+      tag: "演習1 (7) 相図とエネルギー障壁",
+      prompt: "単振り子の相図において、(A) theta = pi と theta = -pi の関係は？ (B) 真上の位置エネルギー障壁（最下点基準）E = [B] を超えると連続回転（大車輪）になる。",
+      inputs: [
+        { id: "a", label: "[A] theta = +-pi の扱い", kind: "select", options: ["", "2*pi周期で同一の固定点（真上・不安定鞍点）", "座標が違うので別の2つの安定点"], answerText: "2*pi周期で同一の固定点（真上・不安定鞍点）", check: checkExactList(["2*pi周期で同一の固定点（真上・不安定鞍点）"]) },
+        { id: "b", label: "[B] 真上の位置エネルギー (m, g, l)", kind: "expr", placeholder: "2*m*g*l", answerText: "2*m*g*l", check: function(raw) {
+          if (checkCodeList(["2mgl", "2*mgl", "2*m*g*l"])(raw)) return true;
+          return checkExprEquiv(function(p){ return 2 * p.m * p.g * p.l; }, [{m:2, g:9.8, l:1}, {m:1.5, g:9.8, l:0.5}])(raw);
+        } }
+      ],
+      explain: "E = 0.5*m*l^2*omega^2 + m*g*l*(1 - cos(theta)) より theta = +-pi (cos = -1) の静止エネルギーは 2*m*g*l です。"
+    },
+    {
+      id: "rq4",
+      tag: "演習1 (5) プログラムの妥当性検証",
+      prompt: "減衰なし単振り子のシミュレーションでプログラムにバグがないかを強く検証する手順として正しいものは？",
+      inputs: [
+        { id: "a", label: "妥当性検証の方法", kind: "select", options: ["", "力学的エネルギー保存誤差 |E(t)-E(0)| の両対数傾きが理論次数(オイラー1, RK4 4)に一致するか確認する", "dt = 0.01 で1回だけ theta(t) の波形を描いて滑らかか見る", "初期条件 (0, 0) で値がずっと 0 かだけ見る"], answerText: "力学的エネルギー保存誤差 |E(t)-E(0)| の両対数傾きが理論次数(オイラー1, RK4 4)に一致するか確認する", check: checkExactList(["力学的エネルギー保存誤差 |E(t)-E(0)| の両対数傾きが理論次数(オイラー1, RK4 4)に一致するか確認する"]) }
+      ],
+      explain: "運動方程式から独立に導かれる保存量（エネルギー一定）と、dt を変えたときの収束次数を両対数グラフで確認するのが王道です。"
+    },
+    {
+      id: "rq5",
+      tag: "演習1 (8) 倒立状態のPD制御",
+      prompt: "倒立位置（phi = 0 が真上）の座標で運動方程式の重力項の符号 [A] と、PD制御 u = -kp*phi - kd*omega で漸近安定にする条件 [B] を答えよ。",
+      inputs: [
+        { id: "a", label: "[A] 重力項 (g/l)*sin(phi) の符号", kind: "select", options: ["", "+", "-"], answerText: "+", check: checkExactList(["+"]) },
+        { id: "b", label: "[B] 漸近安定条件", kind: "select", options: ["", "kd > 0 かつ kp > g/l", "kd = 0 かつ kp < g/l", "kd < 0 かつ kp > 0"], answerText: "kd > 0 かつ kp > g/l", check: checkExactList(["kd > 0 かつ kp > g/l"]) }
+      ],
+      explain: "真上基準では少し傾くとさらに倒れる向きに重力トルク +(g/l)*sin(phi) が働きます。線形化後に tau = -kd < 0, Delta = kp - g/l > 0 が必要です。"
+    },
+    {
+      id: "rq6",
+      tag: "演習2 (1) 静電アクチュエータの固定点",
+      prompt: "z' = v, v' = -beta*v - z + alpha/(1-z)^2 の固定点（z'=0 かつ v'=0）では、v = [A]、alpha = [B] となる（変数 z を使用）。",
+      inputs: [
+        { id: "v", label: "[A] 固定点の速度 v", kind: "number", placeholder: "数値", answerText: "0", check: checkNum(0, 1e-6) },
+        { id: "a", label: "[B] alpha =", kind: "expr", placeholder: "z*(1-z)**2", answerText: "z*(1-z)**2", check: checkExprEquiv(function(p){ return p.z * (1 - p.z) * (1 - p.z); }, [{z:1/7}, {z:4/7}, {z:0.3}]) }
+      ],
+      explain: "z' = 0 よりまず v = 0、次に v' = 0 に代入して z = alpha/(1-z)^2 から alpha = z*(1-z)^2 が導けます。"
+    },
+    {
+      id: "rq7",
+      tag: "演習2 (2) ニュートン法の失敗する初期値",
+      prompt: "f(z) = alpha - z(1-z)^2 に対するニュートン法で f'(z) = (1-z)(3z-1) = 0 となり、接線が水平（分母 0）で停止する初期値 z0 を2つ答えよ（小さい方と大きい方）。",
+      inputs: [
+        { id: "z1", label: "小さい方の z0", kind: "number", placeholder: "例: 1/3", answerText: "1/3", check: checkNum(1/3, 0.002) },
+        { id: "z2", label: "大きい方の z0", kind: "number", placeholder: "整数", answerText: "1", check: checkNum(1, 1e-6) }
+      ],
+      explain: "z = 1/3 は曲線 y = z(1-z)^2 の山の頂上、z = 1 は電極接触点の極小点であり、どちらも傾き f'(z) = 0 になるため更新できません。"
+    },
+    {
+      id: "rq8",
+      tag: "演習2 (3) ヤコビアンと2つの固定点",
+      prompt: "alpha = 36/343, beta = 1 のとき、2つの固定点 z* = 1/7 と z* = 4/7 はそれぞれどの分類になるか？",
+      inputs: [
+        { id: "c1", label: "z* = 1/7 の分類", kind: "select", options: ["", "安定渦状点（黒丸・時計回り）", "鞍点（不安定・白丸）", "中心点（中立安定）"], answerText: "安定渦状点（黒丸・時計回り）", check: checkExactList(["安定渦状点（黒丸・時計回り）"]) },
+        { id: "c2", label: "z* = 4/7 の分類", kind: "select", options: ["", "鞍点（不安定・白丸）", "安定渦状点（黒丸・時計回り）", "安定結節点（黒丸）"], answerText: "鞍点（不安定・白丸）", check: checkExactList(["鞍点（不安定・白丸）"]) }
+      ],
+      explain: "1/7 ではばねの増加率が静電力に勝るため安定渦状点、4/7 では静電力の増加率が勝るため Delta < 0 の鞍点になります。"
+    },
+    {
+      id: "rq9",
+      tag: "演習2 (6) サドルノード分岐点",
+      prompt: "g(z) = z(1-z)^2 の極大値であり、これを越えると固定点が消滅して必ず電極接触する臨界値 alpha = [A]（分数または小数）と、分岐点での固有値判定 [B] を答えよ。",
+      inputs: [
+        { id: "a", label: "[A] 臨界値 alpha =", kind: "number", placeholder: "例: 4/27", answerText: "4/27 (約 0.1481)", check: checkNum(4/27, 0.002) },
+        { id: "b", label: "[B] 分岐点の安定性判定", kind: "select", options: ["", "固有値 0 を含むため線形化だけでは判定不可（非線形では半安定）", "2つの固有値がともに負なので漸近安定"], answerText: "固有値 0 を含むため線形化だけでは判定不可（非線形では半安定）", check: checkExactList(["固有値 0 を含むため線形化だけでは判定不可（非線形では半安定）"]) }
+      ],
+      explain: "g'(z) = (1-z)(1-3z) = 0 より z = 1/3 で極大値 g(1/3) = (1/3)*(2/3)^2 = 4/27。この点では固有値が 0, -1 になるため線形化だけでは判定できません。"
+    },
+    {
+      id: "rq10",
+      tag: "演習2 (7) 電圧制御の非負制約",
+      prompt: "目標位置 z_ref > 1/3 に対する電圧制御則 alpha(z, v) = max(0, alpha_ff - Kp*(z - z_ref) - Kd*v) で、なぜ 0 未満を切り捨てる（非負制約）必要があるのか？",
+      inputs: [
+        { id: "a", label: "非負制約の物理的理由", kind: "select", options: ["", "alpha は電圧 V の2乗に比例するため負にできず（静電力は常に引力）、斥力を出せないから", "Pythonの配列インデックスが負になるとエラーになるから", "ばね定数 k が負になるから"], answerText: "alpha は電圧 V の2乗に比例するため負にできず（静電力は常に引力）、斥力を出せないから", check: checkExactList(["alpha は電圧 V の2乗に比例するため負にできず（静電力は常に引力）、斥力を出せないから"]) }
+      ],
+      explain: "静電力は alpha = epsilon_0*A*V^2/(2*k*d^3) >= 0 であり、電極同士を引き合う向き（引力）しか作れません。"
+    }
+  ];
+
+  let state = { answers: {}, results: {} };
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const p = JSON.parse(raw);
+        if (p && typeof p === "object") {
+          state.answers = p.answers || {};
+          state.results = p.results || {};
+        }
+      }
+    } catch (e) {}
+  }
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  function findQ(qid) {
+    return QUESTIONS.find(function(q) { return q.id === qid; });
+  }
+
+  function evaluateQ(q) {
+    const qAns = state.answers[q.id] || {};
+    let allFilled = true;
+    let allOk = true;
+    const per = {};
+    q.inputs.forEach(function(inp) {
+      const val = qAns[inp.id] != null ? qAns[inp.id] : "";
+      if (!String(val).trim()) {
+        allFilled = false;
+        allOk = false;
+        per[inp.id] = false;
+      } else {
+        const ok = !!inp.check(val);
+        per[inp.id] = ok;
+        if (!ok) allOk = false;
+      }
+    });
+    state.results[q.id] = allOk ? "ok" : "ng";
+    save();
+    applyQ(q, per, allFilled);
+    updateHud();
+  }
+
+  function applyQ(q, per, allFilled) {
+    const card = document.getElementById("card-" + q.id);
+    const badge = document.getElementById("badge-" + q.id);
+    const fb = document.getElementById("fb-" + q.id);
+    const v = state.results[q.id];
+
+    card.classList.remove("is-ok", "is-ng");
+    badge.classList.remove("ok", "ng");
+    fb.classList.remove("show", "ok", "ng");
+
+    q.inputs.forEach(function(inp) {
+      const el = document.getElementById("in-" + q.id + "-" + inp.id);
+      if (!el) return;
+      el.classList.remove("field-ok", "field-ng");
+      if (per && v) el.classList.add(per[inp.id] ? "field-ok" : "field-ng");
+    });
+
+    if (v === "ok") {
+      card.classList.add("is-ok");
+      badge.classList.add("ok");
+      badge.textContent = "[正解]";
+      fb.classList.add("show", "ok");
+      fb.querySelector(".fb-title").textContent = "[正解]";
+    } else if (v === "ng") {
+      card.classList.add("is-ng");
+      badge.classList.add("ng");
+      badge.textContent = "[不正解]";
+      fb.classList.add("show", "ng");
+      fb.querySelector(".fb-title").textContent = allFilled === false
+        ? "[不正解] 未入力があります。下の模範解答を確認してください。"
+        : "[不正解] 下の模範解答と解説を確認してください。";
+    } else {
+      badge.textContent = "未解答";
+    }
+  }
+
+  function updateHud() {
+    let ok = 0, ng = 0, none = 0;
+    QUESTIONS.forEach(function(q) {
+      const r = state.results[q.id];
+      if (r === "ok") ok++;
+      else if (r === "ng") ng++;
+      else none++;
+    });
+    document.getElementById("hud-score").textContent = "正解: " + ok + " / " + QUESTIONS.length + " 問";
+    document.getElementById("hud-sub").textContent = "（未解答: " + none + " / 不正解: " + ng + "）";
+    document.getElementById("progress-fill").style.width = Math.round((ok / QUESTIONS.length) * 100) + "%";
+  }
+
+  function render() {
+    const root = document.getElementById("quiz-root");
+    root.innerHTML = "";
+    QUESTIONS.forEach(function(q, idx) {
+      const card = document.createElement("article");
+      card.className = "q-card";
+      card.id = "card-" + q.id;
+      const qAns = state.answers[q.id] || {};
+
+      let html =
+        '<div class="q-top">' +
+          '<span class="q-tag">Q' + (idx + 1) + ' / ' + q.tag + '</span>' +
+          '<span class="q-badge" id="badge-' + q.id + '">未解答</span>' +
+        '</div>' +
+        '<div class="q-prompt">' + q.prompt + '</div>' +
+        '<div class="input-grid">';
+
+      q.inputs.forEach(function(inp) {
+        const val = qAns[inp.id] != null ? qAns[inp.id] : "";
+        const domId = "in-" + q.id + "-" + inp.id;
+        html += '<div class="field"><label for="' + domId + '">' + inp.label + '</label>';
+        if (inp.kind === "select") {
+          html += '<select id="' + domId + '" data-qid="' + q.id + '" data-iid="' + inp.id + '">';
+          inp.options.forEach(function(opt) {
+            const sel = opt === val ? " selected" : "";
+            const label = opt === "" ? "-- 選択してください --" : opt;
+            html += '<option value="' + opt.replace(/"/g, "&quot;") + '"' + sel + '>' + label + '</option>';
+          });
+          html += '</select>';
+        } else {
+          html += '<input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" ' +
+            'id="' + domId + '" data-qid="' + q.id + '" data-iid="' + inp.id + '" ' +
+            'placeholder="' + (inp.placeholder || "") + '" value="' + String(val).replace(/"/g, "&quot;") + '">';
+        }
+        html += '</div>';
+      });
+
+      const ansSummary = q.inputs.map(function(inp) {
+        return (q.inputs.length > 1 ? inp.label + ": " : "答え: ") + inp.answerText;
+      }).join(" / ");
+
+      html +=
+        '</div>' +
+        '<div class="q-actions">' +
+          '<button type="button" class="primary" data-check="' + q.id + '">判定する</button>' +
+          '<button type="button" data-peek="' + q.id + '">答えを見る / 隠す</button>' +
+        '</div>' +
+        '<div class="feedback" id="fb-' + q.id + '">' +
+          '<div class="fb-title"></div>' +
+          '<div class="fb-ans">' + ansSummary + '</div>' +
+          '<div>' + q.explain + '</div>' +
+        '</div>';
+
+      card.innerHTML = html;
+      root.appendChild(card);
+
+      if (state.results[q.id]) evaluateQ(q);
+      else applyQ(q, null, true);
+    });
+    updateHud();
+  }
+
+  document.addEventListener("input", function(e) {
+    const t = e.target;
+    if (t && t.dataset && t.dataset.qid) {
+      if (!state.answers[t.dataset.qid]) state.answers[t.dataset.qid] = {};
+      state.answers[t.dataset.qid][t.dataset.iid] = t.value;
+      save();
+    }
+  });
+
+  document.addEventListener("change", function(e) {
+    const t = e.target;
+    if (t && t.tagName === "SELECT" && t.dataset && t.dataset.qid) {
+      if (!state.answers[t.dataset.qid]) state.answers[t.dataset.qid] = {};
+      state.answers[t.dataset.qid][t.dataset.iid] = t.value;
+      save();
+    }
+  });
+
+  document.addEventListener("keydown", function(e) {
+    if (e.key === "Enter" && e.target && e.target.dataset && e.target.dataset.qid) {
+      e.preventDefault();
+      const q = findQ(e.target.dataset.qid);
+      if (q) evaluateQ(q);
+    }
+  });
+
+  document.addEventListener("click", function(e) {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    if (btn.dataset.check) {
+      const q = findQ(btn.dataset.check);
+      if (q) evaluateQ(q);
+    } else if (btn.dataset.peek) {
+      const q = findQ(btn.dataset.peek);
+      if (!q) return;
+      const fb = document.getElementById("fb-" + q.id);
+      if (fb.classList.contains("show")) fb.classList.remove("show");
+      else {
+        if (!state.results[q.id]) fb.querySelector(".fb-title").textContent = "[確認] 模範解答と解説";
+        fb.classList.add("show");
+      }
+    }
+  });
+
+  document.getElementById("btn-check-all").addEventListener("click", function() {
+    let n = 0;
+    QUESTIONS.forEach(function(q) {
+      const qAns = state.answers[q.id] || {};
+      if (q.inputs.some(function(inp){ return String(qAns[inp.id] || "").trim().length > 0; })) {
+        evaluateQ(q);
+        n++;
+      }
+    });
+    if (n === 0) QUESTIONS.forEach(evaluateQ);
+  });
+
+  document.getElementById("btn-reset").addEventListener("click", function() {
+    state = { answers: {}, results: {} };
+    save();
+    render();
+  });
+
+  if (location.protocol.indexOf("http") === 0) {
+    var bl = document.getElementById("back-link");
+    if (bl) bl.style.display = "inline-block";
+  }
+
+  window.__SIM_REPORTS_QUIZ__ = { QUESTIONS: QUESTIONS };
+
+  load();
+  render();
+})();
+</script>
+</body>
+</html>

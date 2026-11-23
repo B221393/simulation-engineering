@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>シミュレーション工学 期末試験 大事な発想と解法ガイド</title>
+<style>
+  :root {
+    --fg: #1b1b1f;
+    --muted: #5f6470;
+    --line: #dfe2ea;
+    --accent: #2b5cd9;
+    --accent-bg: #eef3ff;
+    --bg: #f8f9fc;
+    --card: #ffffff;
+    --ok: #137333;
+    --ok-bg: #e6f4ea;
+    --ok-line: #a8dab5;
+    --ng: #b3261e;
+    --ng-bg: #fce8e6;
+    --ng-line: #f2b8b5;
+    --warn: #8a5300;
+    --warn-bg: #fef7e0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, "Segoe UI", "Yu Gothic", "Hiragino Sans", "Noto Sans JP", sans-serif;
+    line-height: 1.65;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 16px 14px 72px; }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 10px;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  .top-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .kicker { font-size: 0.74rem; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
+  h1 { font-size: 1.28rem; margin: 4px 0 6px; line-height: 1.35; }
+  .sub { font-size: 0.85rem; color: var(--muted); margin: 0; }
+
+  .nav-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+  .nav-pill {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 5px 11px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--fg);
+    text-decoration: none;
+  }
+  .nav-pill:hover { border-color: var(--accent); color: var(--accent); }
+
+  h2.sec-title {
+    font-size: 1.05rem;
+    margin: 26px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--accent);
+  }
+  h2.sec-title span {
+    display: block;
+    font-size: 0.74rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+  }
+
+  .tbl-wrap { overflow-x: auto; margin-bottom: 18px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border: 1px solid var(--line);
+    font-size: 0.85rem;
+  }
+  th, td {
+    border: 1px solid var(--line);
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: #f2f5fb; font-size: 0.8rem; color: var(--fg); }
+  td:first-child { font-weight: 700; white-space: nowrap; }
+
+  .idea-grid { display: grid; gap: 12px; }
+  .idea-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+  .idea-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .idea-num {
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: var(--accent);
+    background: var(--accent-bg);
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+  .idea-name { font-size: 0.98rem; font-weight: 800; margin: 0; }
+  .core-line {
+    font-size: 0.9rem;
+    font-weight: 700;
+    background: #f5f7fc;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin: 6px 0 8px;
+  }
+  .idea-list { margin: 0; padding-left: 1.25em; font-size: 0.85rem; color: #2b2f38; }
+  .idea-list li { margin-bottom: 4px; }
+  .mono {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.88em;
+    background: #f1f3f8;
+    padding: 1px 4px;
+    border-radius: 4px;
+  }
+
+  /* Quiz Section */
+  .quiz-hud {
+    position: sticky;
+    top: 8px;
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  }
+  .hud-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .hud-score { font-size: 1rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .hud-sub { font-size: 0.82rem; color: var(--muted); }
+  .progress-track {
+    width: 100%;
+    height: 7px;
+    background: #ebedf3;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .progress-fill { height: 100%; width: 0%; background: var(--accent); transition: width 0.25s; }
+
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--fg);
+    padding: 7px 11px;
+    font-size: 0.82rem;
+    font-weight: 600;
+  }
+  button:hover { background: #f4f6fb; border-color: #b9bfd0; }
+  button.danger { color: var(--ng); border-color: var(--ng-line); }
+  button.danger:hover { background: var(--ng-bg); }
+
+  .q-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .q-card.is-ok { border-color: var(--ok-line); background: #fbfefc; }
+  .q-card.is-ng { border-color: var(--ng-line); background: #fffbfa; }
+  .q-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+  .q-tag {
+    font-size: 0.74rem;
+    font-weight: 800;
+    color: var(--accent);
+    background: var(--accent-bg);
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+  .q-badge {
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    background: #f5f6fa;
+  }
+  .q-badge.ok { background: var(--ok-bg); border-color: var(--ok-line); color: var(--ok); }
+  .q-badge.ng { background: var(--ng-bg); border-color: var(--ng-line); color: var(--ng); }
+  .q-prompt { font-size: 0.94rem; font-weight: 700; margin: 4px 0 10px; }
+
+  .opts { display: grid; gap: 7px; }
+  .opt-btn {
+    width: 100%;
+    text-align: left;
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  .opt-key {
+    flex: 0 0 auto;
+    width: 1.5em;
+    height: 1.5em;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    display: grid;
+    place-items: center;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--muted);
+    background: #fff;
+  }
+  .opt-btn.chosen-ok { background: var(--ok-bg); border-color: var(--ok-line); font-weight: 700; }
+  .opt-btn.chosen-ok .opt-key { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .opt-btn.chosen-ng { background: var(--ng-bg); border-color: var(--ng-line); font-weight: 700; }
+  .opt-btn.chosen-ng .opt-key { background: var(--ng); border-color: var(--ng); color: #fff; }
+  .opt-btn.ans-highlight { border-color: var(--ok); background: #f2faf4; }
+
+  .feedback {
+    margin-top: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.ok { background: var(--ok-bg); border: 1px solid var(--ok-line); }
+  .feedback.ng { background: var(--ng-bg); border: 1px solid var(--ng-line); }
+  .fb-title { font-weight: 800; margin-bottom: 3px; }
+  .feedback.ok .fb-title { color: var(--ok); }
+  .feedback.ng .fb-title { color: var(--ng); }
+
+  .next-box {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  a.btn-link {
+    flex: 1 1 160px;
+    text-align: center;
+    text-decoration: none;
+    padding: 11px 12px;
+    border-radius: 9px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    background: #fff;
+  }
+  a.btn-link.solid { background: var(--accent); color: #fff; }
+  footer { text-align: center; font-size: 0.76rem; color: var(--muted); margin-top: 28px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back-link" id="back-link" href="index.html" style="display:none;">[トップページへ戻る]</a>
+
+  <header class="top-card">
+    <div class="kicker">SIMULATION ENGINEERING // CORE IDEAS &amp; STRATEGY</div>
+    <h1>期末試験 大事な発想と解法ガイド（8つの発想 + 8問診断）</h1>
+    <p class="sub">
+      公式の丸暗記だけでなく、「問題文を見たらどの発想で1行目を書くか」「なぜその手法を使うのか」を整理したページです。下部の動的チェックで発想の使い分けを確認できます。
+    </p>
+  </header>
+
+  <nav class="nav-pills">
+    <a class="nav-pill" href="#first-move">1. 初手マップ（8パターン）</a>
+    <a class="nav-pill" href="#eight-ideas">2. 大事な8つの発想</a>
+    <a class="nav-pill" href="#idea-quiz">3. 発想チェック（8問）</a>
+  </nav>
+
+  <h2 class="sec-title" id="first-move"><span>STEP 1</span>問題を見た瞬間の「初手マップ」</h2>
+  <div class="tbl-wrap">
+    <table>
+      <tr>
+        <th style="width:28%;">問題文のキーワード</th>
+        <th style="width:36%;">最初に取るべき発想</th>
+        <th>1行目に書くこと・使う式</th>
+      </tr>
+      <tr>
+        <td>「モデル化せよ」「要素を省く理由」</td>
+        <td>目的に対して必要十分な複雑さだけ残す</td>
+        <td>目的（速度 / 姿勢 / 着地）に不要な要素を削る判断と弊害を書く</td>
+      </tr>
+      <tr>
+        <td>「誤差の種類」「float32 で頭打ち」</td>
+        <td>有限桁表現と丸め・打ち切り・桁落ち・情報落ちを分ける</td>
+        <td>近い数の減算は式変形で回避（解と係数・有理化）、大+小の吸収は情報落ち</td>
+      </tr>
+      <tr>
+        <td>「刻み幅 dt」「精度次数」「発散しない条件」</td>
+        <td>1ステップ誤差と積算誤差の区別、増幅率の絶対値</td>
+        <td>前進オイラーは <span class="mono">|1 + k*dt| &lt;= 1</span>、RK4は4点重み平均 <span class="mono">(1,2,2,1)/6</span></td>
+      </tr>
+      <tr>
+        <td>「2階微分方程式」「プログラムに直せ」</td>
+        <td>状態変数を増やして1階連立へ統一する</td>
+        <td><span class="mono">x1=x, x2=x'</span> と置き、最高階について解く（<span class="mono">m</span> や <span class="mono">ml^2</span> で割る）</td>
+      </tr>
+      <tr>
+        <td>「妥当性を検証せよ」「バグがない根拠」</td>
+        <td>グラフの滑らかさではなく独立した保存則・次数で確かめる</td>
+        <td>エネルギー保存誤差 <span class="mono">|E(t)-E(0)|</span> の両対数傾き（1次/4次）と <span class="mono">dt</span> 収束</td>
+      </tr>
+      <tr>
+        <td>「固定点」「ヤコビアン」「相図」</td>
+        <td>近傍は線形化（<span class="mono">tau, Delta</span>）、境界・遠方は非線形相図で見る</td>
+        <td><span class="mono">dx/dt=0</span> で固定点 -&gt; <span class="mono">J</span> -&gt; <span class="mono">Delta, tau, tau^2-4*Delta</span>。ただし <span class="mono">Re=0</span> は判定不可</td>
+      </tr>
+      <tr>
+        <td>「安定化制御」「臨界減衰ゲイン」</td>
+        <td>制御入力で固有値（極）を左半平面へ動かす</td>
+        <td>線形化して <span class="mono">tau = -kd &lt; 0, Delta = kp - g/l &gt; 0</span>、臨界は <span class="mono">tau^2 = 4*Delta</span></td>
+      </tr>
+      <tr>
+        <td>「ニュートン法」「ピボット」「LU分解」</td>
+        <td>接線で反復更新、連立方程式はピボット・分解再利用・solve優先</td>
+        <td><span class="mono">J*delta = -f</span>（マイナス必須）、LUは前・後退代入で <span class="mono">O(n^2)</span>、逆行列は使わない</td>
+      </tr>
+    </table>
+  </div>
+
+  <h2 class="sec-title" id="eight-ideas"><span>STEP 2</span>シミュレーション工学の大事な8つの発想</h2>
+  <div class="idea-grid">
+
+    <article class="idea-card">
+      <div class="idea-head"><span class="idea-num">発想 1</span><h3 class="idea-name">モデル化：現実を全部入れず「目的に必要十分」を残す</h3></div>
+      <div class="core-line">コア発想: 複雑なモデルが良いモデルとは限らない。目的に効く要素だけを選び、他を削ぎ落とす。</div>
+      <ul class="idea-list">
+        <li><b>なぜ大事か:</b> 要素を増やすほど計算コスト増・調整パラメータ増・誤差原因の不明瞭化・制御設計の困難化を招く。</li>
+        <li><b>具体例:</b> 落下速度だけ知りたいなら「質点」、姿勢変化なら「剛体」、着地後の跳ね返りなら「条件分岐付きのバネ反力」を追加する。</li>
+      </ul>
+    </article>
+
+    <article class="idea-card">
+      <div class="idea-head"><span class="idea-num">発想 2</span><h3 class="idea-name">数値誤差：計算機の有限桁を意識し、近い数の引き算を避ける</h3></div>
+      <div class="core-line">コア発想: コンピュータは単精度 約7桁・倍精度 約16桁の有限桁しか持たないため、式の書き方ひとつで精度が崩れる。</div>
+      <ul class="idea-list">
+        <li><b>4分類の軸:</b> 「数の表し方」が原因なのが <b>丸め誤差</b>、「計算の打ち切り」が原因なのが <b>打ち切り誤差</b>。</li>
+        <li><b>2つの落とし穴:</b> 「大きい数 + 小さい数」で小さい側が消えるのが <b>情報落ち</b>、「近い数 - 近い数」で有効桁が減るのが <b>桁落ち</b>。</li>
+        <li><b>回避の発想:</b> 2次方程式では大きい解だけ公式で出し、小さい解は解と係数の関係 <span class="mono">x1 = c/(a*x2)</span> で引き算を消す。</li>
+      </ul>
+    </article>
+
+    <article class="idea-card">
+      <div class="idea-head"><span class="idea-num">発想 3</span><h3 class="idea-name">時間発展：1ステップ誤差と積算誤差、陽解法と陰解法のトレードオフ</h3></div>
+      <div class="core-line">コア発想: 微分方程式を小さな刻み dt で進める際、「安定性」と「精度あたりの計算コスト」を天秤にかける。</div>
+      <ul class="idea-list">
+        <li><b>安定条件の意味:</b> 前進オイラー法（陽解法）は <span class="mono">|1 + k*dt| &lt;= 1</span> を超えると振動発散する。後退オイラー法（陰解法）は次時刻の式を解く手間と引き換えに <span class="mono">k &lt; 0</span> で無条件安定になる。</li>
+        <li><b>なぜ RK4 がよく使われるか:</b> 1ステップの関数評価は4回と重いが、4次精度 <span class="mono">O(dt^4)</span> のため大きな <span class="mono">dt</span> でも高精度が出せ、目標誤差までの総評価回数が圧倒的に少ない。</li>
+        <li><b>刻み幅過小の罠:</b> <span class="mono">dt</span> を極端に小さくしすぎると打ち切り誤差より丸め誤差の蓄積が支配的になり、誤差が頭打ちになる。</li>
+      </ul>
+    </article>
+
+    <article class="idea-card">
+      <div class="idea-head"><span class="idea-num">発想 4</span><h3 class="idea-name">1階連立化：すべての高階ODEを「1階ベクトル系」に揃えて同じ道具で解く</h3></div>
+      <div class="core-line">コア発想: 位置と速度を並べた状態ベクトルを置けば、2階も3階もすべて同じ1階ソルバ（オイラー・RK4）に流し込める。</div>
+      <ul class="idea-list">
+        <li><b>手順:</b> 最高階微分を左辺に孤立させ（例: <span class="mono">m</span> や慣性モーメント <span class="mono">m*l^2</span> で割る）、補助変数を定義する。</li>
+        <li><b>実装の鉄則:</b> 多変数のRK4では、各段階（<span class="mono">k1 -&gt; k2 -&gt; k3 -&gt; k4</span>）ごとに <b>全成分を同時に揃えて評価</b> する。ある成分だけ先に更新すると半陰解法など別の手法になる。</li>
+      </ul>
+    </article>
+
+    <article class="idea-card">
+      <div class="idea-head"><span class="idea-num">発想 5</span><h3 class="idea-name">妥当性検証：見た目ではなく「物理保存則」と「理論次数」でバグを炙り出す</h3></div>
+      <div class="core-line">コア発想: グラフがそれらしく見えるだけでは正しいと言えない。方程式から独立に成り立つ不変量と収束次数で確認する。</div>
+      <ul class="idea-list">
+        <li><b>解析解がある場合:</b> 真値との誤差を両対数グラフに描き、傾きが理論次数（オイラー1, ホイン2, RK4 4）に一致するか見る。</li>
+        <li><b>解析解がない非線形系:</b> <span class="mono">dt</span> を半分ずつ減らして結果の収束を確認し、減衰なし単振り子なら <b>力学的エネルギー保存</b> <span class="mono">|E(t) - E(0)|</span> の傾き（次数）を確認する。</li>
+      </ul>
+    </article>
+
+    <article class="idea-card">
+      <div class="idea-head"><span class="idea-num">発想 6</span><h3 class="idea-name">固定点と線形化：近傍の「戻る・離れる・回る」は固有値で、境界と遠方は相図で読む</h3></div>
+      <div class="core-line">コア発想: 非線形系は式が解けなくても、固定点まわりのヤコビアン J を調べれば局所的な安定性と相図の形が決まる。</div>
+      <ul class="idea-list">
+        <li><b>判定の3手:</b> <span class="mono">Delta &lt; 0</span> なら即「鞍点（不安定）」。<span class="mono">Delta &gt; 0</span> なら <span class="mono">tau</span> の符号で安定/不安定/中心点を決め、<span class="mono">tau^2 - 4*Delta</span> の符号で渦状点と結節点を分ける。</li>
+        <li><b>線形化の限界:</b> <span class="mono">Re(lambda) = 0</span>（中心点や分岐点 <span class="mono">Delta = 0</span>）では高次項が効くため <b>線形化だけでは安定性を判定できない</b>。また吸引領域の境界（セパラトリクス）や大車輪回転のような大域挙動は非線形相図で確認する。</li>
+      </ul>
+    </article>
+
+    <article class="idea-card">
+      <div class="idea-head"><span class="idea-num">発想 7</span><h3 class="idea-name">制御設計：不安定な固定点の固有値を、フィードバックで左半平面へ移す</h3></div>
+      <div class="core-line">コア発想: 倒立状態のような不安定点でも、ずれに比例する復元力 (P) と速度を抑えるブレーキ (D) を足せば安定にできる。</div>
+      <ul class="idea-list">
+        <li><b>線形化と極配置:</b> 倒立振り子では重力項の符号が真上基準で <span class="mono">+</span> になる。これに負のフィードバックを入れ、<span class="mono">tau = -kd &lt; 0</span> かつ <span class="mono">Delta = kp - g/l &gt; 0</span> を満たすようにゲインを選ぶ。</li>
+        <li><b>現実・離散の制約:</b> 臨界減衰 <span class="mono">tau^2 = 4*Delta</span> はオーバーシュートなしで最速収束する基準。ただし離散制御でゲインを大きくしすぎると1ステップ変化が過大になり数値発散する。</li>
+      </ul>
+    </article>
+
+    <article class="idea-card">
+      <div class="idea-head"><span class="idea-num">発想 8</span><h3 class="idea-name">求根と線形代数：接線で追い込み、連立方程式は「分解の再利用」と「ピボット」で安定・高速に解く</h3></div>
+      <div class="core-line">コア発想: 非線形方程式はニュートン法（線形方程式の反復）に落とし、線形方程式は直接逆行列を作らずピボット付き消去・LU分解を使う。</div>
+      <ul class="idea-list">
+        <li><b>ニュートン法の罠:</b> <span class="mono">J*delta = -f</span>（マイナス符号必須）。<span class="mono">f'(x)=0</span> や <span class="mono">det J=0</span> でゼロ除算停止するほか、初期値によっては2点間を往復する周期解に入り収束しない。</li>
+        <li><b>ピボット選択と LU 分解:</b> 部分ピボットは「0除算回避」と「微小値で割る丸め誤差拡大の防止」のため。右辺 <span class="mono">b</span> だけ何度も変わる場合は <span class="mono">O(n^3)</span> の LU 分解を1回し、<span class="mono">O(n^2)</span> の前進・後退代入を再利用する。<span class="mono">inv(A)@b</span> は約3倍遅く誤差も増えるため使わない。</li>
+      </ul>
+    </article>
+
+  </div>
+
+  <h2 class="sec-title" id="idea-quiz"><span>STEP 3</span>発想チェック（クリックして即判定：8問）</h2>
+
+  <div class="quiz-hud">
+    <div class="hud-row">
+      <div>
+        <span class="hud-score" id="hud-score">正解: 0 / 8 問</span>
+        <span class="hud-sub" id="hud-sub">（解答: 0 / 8）</span>
+      </div>
+      <button type="button" class="danger" id="btn-reset">記録をリセット</button>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+
+  <div id="quiz-root"></div>
+
+  <div class="next-box">
+    <a class="btn-link solid" href="reports.html">レポート演習1・2 まとめへ進む</a>
+    <a class="btn-link" href="tool/memorize_list.html">入力チェック（32問）へ</a>
+    <a class="btn-link" href="tool/memorize_quiz.html">4択クイズ（35問）へ</a>
+  </div>
+
+  <footer>シミュレーション工学 期末試験 大事な発想と解法ガイド</footer>
+</div>
+
+<script>
+(function() {
+  "use strict";
+
+  const STORAGE_KEY = "sim_eng_ideas_v1";
+
+  const QUESTIONS = [
+    {
+      id: "iq1",
+      tag: "発想1: モデル化",
+      prompt: "落下運動の速度変化だけを知りたいとき、空気抵抗や剛体回転・地面の弾性変形まで最初から全部入れるべきか？",
+      options: [
+        "いいえ。目的に必要な最小限（質点の自由落下）から始め、不要な複雑化による計算コスト・パラメータ増を避ける。",
+        "はい。現実に近いほど計算誤差がゼロになるため、常に全要素を入れるべきである。",
+        "はい。単精度 float32 で計算するならモデルを複雑にする方が安定する。"
+      ],
+      ans: 0,
+      explain: "モデル化は現実を丸ごと再現することではなく、目的に応じて重要な要素を選び不要な要素を無視する判断です。"
+    },
+    {
+      id: "iq2",
+      tag: "発想2: 数値誤差",
+      prompt: "2次方程式 ax^2 + bx + c = 0（b = 10^5, a = c = 1）で小さい方の解 x1 を精度よく求めるための正しい発想はどれか？",
+      options: [
+        "まず (-b - sqrt(b^2 - 4ac))/(2a) で絶対値の大きい解 x2 を求め、x1 = c/(a * x2) で引き算を避ける。",
+        "単精度 float32 に型変換して計算すれば桁数が減って桁落ちが起きない。",
+        "(-b + sqrt(b^2 - 4ac))/(2a) をそのまま計算し、刻み幅 dt を小さくする。"
+      ],
+      ans: 0,
+      explain: "近い値同士の引き算で有効桁が消えるのが「桁落ち」です。解と係数の関係 x1*x2 = c/a を使えば引き算を割り算に置き換えられます。"
+    },
+    {
+      id: "iq3",
+      tag: "発想3: 時間発展",
+      prompt: "dx/dt = -9x を大きな刻み幅 dt = 0.25 で解きたい。前進オイラー法は振動発散するが、後退（陰解法）オイラー法の発想ではどうなるか？",
+      options: [
+        "更新式を x_{n+1} = x_n / (1 - k*dt) と解くことで、k < 0 なら任意の dt > 0 で絶対安定になり発散しない。",
+        "後退オイラー法でも |1 + k*dt| = 1.25 > 1 なので同じように発散する。",
+        "後退オイラー法は1ステップの誤差が O(dt^5) になるため無条件安定になる。"
+      ],
+      ans: 0,
+      explain: "後退オイラー法は次時刻の値 x_{n+1} を右辺に含めて解くため、1ステップ倍率が 1/(1 + 9*dt) < 1 となり k < 0 で発散しません。"
+    },
+    {
+      id: "iq4",
+      tag: "発想4: 1階連立化",
+      prompt: "2変数 (x, v) にRK4を適用するとき、k2x を計算した直後に更新済みの x + k2x/2 を使って k2v を計算した。これは正しいか？",
+      options: [
+        "誤り。同じ段階 (k1, k2, k3, k4) の中では、全成分を前の段階の値で揃えて右辺を評価しなければならない。",
+        "正しい。新しい値を使った方がより速く真値に収束する。",
+        "正しい。位置 x を先に進めるのが4次ルンゲ・クッタ法の定義である。"
+      ],
+      ans: 0,
+      explain: "各段階の傾きは同じ時刻・同じ中間点 (x + k1x/2, v + k1v/2) で揃えて評価しないと、段階が混ざって4次精度が崩れます。"
+    },
+    {
+      id: "iq5",
+      tag: "発想5: 妥当性検証",
+      prompt: "減衰なし単振り子のRK4シミュレーションで dt = 0.01 と dt = 0.001 の曲線がほぼ重なった。これだけで「プログラムにバグがない」と証明できるか？",
+      options: [
+        "できない。物理保存則（力学的エネルギー保存）など微分方程式から独立した性質や、誤差と dt の両対数傾き（4次）まで確認する必要がある。",
+        "できる。刻み幅を 1/10 にして曲線が重なればバグは存在しない。",
+        "できる。RK4は4次精度なので、どのような実装でもエネルギー誤差は必ず0になる。"
+      ],
+      ans: 0,
+      explain: "演習1(4)(5)の核心です。別の dt で値が一致しただけでは式自体のバグ（符号ミス等）を見落とす場合があるため、エネルギー保存則と次数傾きの確認が重要です。"
+    },
+    {
+      id: "iq6",
+      tag: "発想6: 固定点と線形化",
+      prompt: "ある非線形系の固定点でヤコビアンの固有値を計算したところ、実部が 0 の固有値（例: 純虚数、または 0 を含む）になった。このとき何をすべきか？",
+      options: [
+        "「線形化だけでは安定性を判定できない」と述べ、保存量・f(x)の符号・非線形シミュレーションなどで直接確認する。",
+        "実部が正ではないので、無条件に「漸近安定（黒丸）」と結論づける。",
+        "実部が0のときは必ず「鞍点（サドル）」と書いてよい。"
+      ],
+      ans: 0,
+      explain: "Re(lambda) = 0 のときは線形1次項が消えて高次非線形項が支配するため、線形化だけでは真の安定性を断定できません。"
+    },
+    {
+      id: "iq7",
+      tag: "発想7: 制御設計",
+      prompt: "不安定な倒立状態の逆振り子をPD制御で安定化し、さらにオーバーシュートなく最速で収束させたい。固有値・(tau, Delta) をどう設計する発想が正しいか？",
+      options: [
+        "tau = -kd < 0 かつ Delta = kp - g/l > 0 で安定領域に入れ、臨界減衰条件 tau^2 = 4*Delta（kd^2 = 4(kp - g/l)）を満たすように選ぶ。",
+        "tau = 0, Delta > 0 にして中心点にするとオーバーシュートなく最速で止まる。",
+        "Delta < 0 にすれば固有値が実数になって振動しなくなる。"
+      ],
+      ans: 0,
+      explain: "tau < 0, Delta > 0 で漸近安定領域に入り、振動と遅れの境界である tau^2 = 4*Delta（臨界減衰）がオーバーシュートなしで最速収束する条件です。"
+    },
+    {
+      id: "iq8",
+      tag: "発想8: 線形代数",
+      prompt: "同じ係数行列 A に対して右辺ベクトル b だけを何十回も変えて A x = b を解きたい。最も効率的な発想はどれか？",
+      options: [
+        "最初に A = LU と1回だけLU分解し、各 b に対しては計算量の軽い O(n^2) の前進代入・後退代入だけで解く。",
+        "毎回新たにガウスの消去法を O(n^3) かけて最初からやり直す。",
+        "毎回 np.linalg.inv(A) @ b を呼び出す方が solve より高精度で高速である。"
+      ],
+      ans: 0,
+      explain: "ガウスの消去法は A と b を同時に変形するため b が変わるたびに O(n^3) かかりますが、LU分解なら分解を1回済ませれば代入の O(n^2) で再利用できます。"
+    }
+  ];
+
+  let picked = {}; // { qid: selectedIndex }
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") picked = parsed;
+      }
+    } catch (e) {}
+  }
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(picked)); } catch (e) {}
+  }
+
+  function updateHud() {
+    let ok = 0, ansCount = 0;
+    QUESTIONS.forEach(function(q) {
+      if (picked[q.id] != null) {
+        ansCount++;
+        if (picked[q.id] === q.ans) ok++;
+      }
+    });
+    document.getElementById("hud-score").textContent = "正解: " + ok + " / " + QUESTIONS.length + " 問";
+    document.getElementById("hud-sub").textContent = "（解答: " + ansCount + " / " + QUESTIONS.length + "）";
+    document.getElementById("progress-fill").style.width = Math.round((ok / QUESTIONS.length) * 100) + "%";
+  }
+
+  function renderQuestion(q, idx) {
+    const card = document.getElementById("card-" + q.id);
+    const badge = document.getElementById("badge-" + q.id);
+    const fb = document.getElementById("fb-" + q.id);
+    const sel = picked[q.id];
+    const btns = card.querySelectorAll(".opt-btn");
+
+    card.classList.remove("is-ok", "is-ng");
+    badge.classList.remove("ok", "ng");
+    fb.classList.remove("show", "ok", "ng");
+    btns.forEach(function(b) { b.classList.remove("chosen-ok", "chosen-ng", "ans-highlight"); });
+
+    if (sel == null) {
+      badge.textContent = "未解答";
+      return;
+    }
+
+    const isOk = sel === q.ans;
+    if (isOk) {
+      card.classList.add("is-ok");
+      badge.classList.add("ok");
+      badge.textContent = "[正解]";
+      btns[sel].classList.add("chosen-ok");
+      fb.classList.add("show", "ok");
+      fb.querySelector(".fb-title").textContent = "[正解]";
+    } else {
+      card.classList.add("is-ng");
+      badge.classList.add("ng");
+      badge.textContent = "[不正解]";
+      btns[sel].classList.add("chosen-ng");
+      btns[q.ans].classList.add("ans-highlight");
+      fb.classList.add("show", "ng");
+      fb.querySelector(".fb-title").textContent = "[不正解] 正しい選択肢を確認してください。";
+    }
+  }
+
+  function renderAll() {
+    const root = document.getElementById("quiz-root");
+    root.innerHTML = "";
+    const keys = ["A", "B", "C", "D"];
+
+    QUESTIONS.forEach(function(q, idx) {
+      const card = document.createElement("article");
+      card.className = "q-card";
+      card.id = "card-" + q.id;
+
+      let html =
+        '<div class="q-top">' +
+          '<span class="q-tag">Q' + (idx + 1) + ' / ' + q.tag + '</span>' +
+          '<span class="q-badge" id="badge-' + q.id + '">未解答</span>' +
+        '</div>' +
+        '<div class="q-prompt">' + q.prompt + '</div>' +
+        '<div class="opts">';
+
+      q.options.forEach(function(opt, oi) {
+        html +=
+          '<button type="button" class="opt-btn" data-qid="' + q.id + '" data-oi="' + oi + '">' +
+            '<span class="opt-key">' + keys[oi] + '</span>' +
+            '<span>' + opt + '</span>' +
+          '</button>';
+      });
+
+      html +=
+        '</div>' +
+        '<div class="feedback" id="fb-' + q.id + '">' +
+          '<div class="fb-title"></div>' +
+          '<div>' + q.explain + '</div>' +
+        '</div>';
+
+      card.innerHTML = html;
+      root.appendChild(card);
+      renderQuestion(q, idx);
+    });
+    updateHud();
+  }
+
+  document.addEventListener("click", function(e) {
+    const btn = e.target.closest(".opt-btn");
+    if (!btn) return;
+    const qid = btn.dataset.qid;
+    const oi = Number(btn.dataset.oi);
+    picked[qid] = oi;
+    save();
+    const q = QUESTIONS.find(function(item) { return item.id === qid; });
+    if (q) renderQuestion(q);
+    updateHud();
+  });
+
+  document.getElementById("btn-reset").addEventListener("click", function() {
+    picked = {};
+    save();
+    renderAll();
+  });
+
+  if (location.protocol.indexOf("http") === 0) {
+    var bl = document.getElementById("back-link");
+    if (bl) bl.style.display = "inline-block";
+  }
+
+  window.__SIM_IDEAS_QUIZ__ = { QUESTIONS: QUESTIONS };
+
+  load();
+  renderAll();
+})();
+</script>
+</body>
+</html>
