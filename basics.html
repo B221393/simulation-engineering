@@ -29,6 +29,10 @@
   a.btn { flex:1 1 0; min-width:150px; text-align:center; text-decoration:none; padding:11px 10px;
           border-radius:9px; font-size:.9rem; font-weight:600; border:1px solid var(--accent); color:var(--accent); background:#fff; }
   a.btn.solid { background:var(--accent); color:#fff; }
+  pre { background:#fff; border:1px solid var(--line); border-radius:8px; padding:10px 12px; overflow-x:auto;
+        font-family:Consolas,"SFMono-Regular",Menlo,monospace; font-size:.82rem; line-height:1.6; margin:6px 0 4px; }
+  code { font-family:Consolas,"SFMono-Regular",Menlo,monospace; font-size:.9em; }
+  .note { color:var(--muted); font-size:.8rem; margin:0 0 14px; }
   footer { text-align:center; font-size:.75rem; color:var(--muted); margin-top:32px; }
 </style>
 </head>
@@ -36,7 +40,7 @@
 <main>
   <h1>期末試験 最小限ここだけ</h1>
   <p class="lead">
-    全部覚える必要はありません。まず<b>前提の3つ</b>を押さえ、次に<b>10個</b>だけ手で書けるようにします。
+    全部覚える必要はありません。前提の3つ → <b>手で書く更新式は4本</b> → 暗記10個、の順で十分です。
     細かい問題演習は最後に回してください。
   </p>
 
@@ -61,7 +65,56 @@
     </li>
   </ol>
 
-  <h2><span>STEP 2</span>暗記は10個だけ</h2>
+  <h2><span>STEP 2</span>手で書くのは4本だけ（ここが本体）</h2>
+  <p class="note">k は「dt × 傾き」で定義する流儀で書いています。どちらの流儀でもよいですが、途中で混ぜないこと。</p>
+
+  <ol>
+    <li>
+      <b>前進オイラー（1次）</b>
+      <pre>for n in range(N):
+    x[n+1] = x[n] + dt * f(t[n], x[n])
+    t[n+1] = t[n] + dt</pre>
+      <span class="why">x の増分 dt·f を足すだけ。t も進めるのを忘れない。</span>
+    </li>
+
+    <li>
+      <b>ホイン（2次）</b>
+      <pre>k1 = dt * f(t[n],      x[n])
+k2 = dt * f(t[n] + dt, x[n] + k1)
+x[n+1] = x[n] + 0.5 * (k1 + k2)</pre>
+      <span class="why">1回目で傾きを見て、その傾きで進んだ地点でもう一度傾きを見て平均する。</span>
+    </li>
+
+    <li>
+      <b>RK4（4次）— k1〜k4 を全部書く</b>
+      <pre>k1 = dt * f(t[n],        x[n])
+k2 = dt * f(t[n] + dt/2, x[n] + k1/2)
+k3 = dt * f(t[n] + dt/2, x[n] + k2/2)
+k4 = dt * f(t[n] + dt,   x[n] + k3)
+x[n+1] = x[n] + (k1 + 2*k2 + 2*k3 + k4) / 6</pre>
+      <span class="why">
+        覚えるのは<b>時刻の進め方（dt/2, dt/2, dt）</b>と<b>重み（1, 2, 2, 1）/6</b>の2つだけ。
+        非自律系（t を含む式）では k2, k3 の t[n]+dt/2 を落とすのが最頻出のミス。
+      </span>
+    </li>
+
+    <li>
+      <b>単振り子（2変数・sin を使う）</b>
+      <pre>def f(theta, omega):
+    return omega, -(g / l) * np.sin(theta)
+
+# オイラーで1ステップ
+theta[n+1] = theta[n] + dt * omega[n]
+omega[n+1] = omega[n] + dt * (-(g / l) * np.sin(theta[n]))</pre>
+      <ul class="note" style="margin:6px 0 0;font-size:.8rem;">
+        <li><code>sin</code> は <code>np.sin</code>（配列に一括）か <code>math.sin</code>（1個ずつ）。<code>np.sin</code> を選べば for 文が減る。</li>
+        <li>2変数の RK4 では、k1〜k4 の各段階で <b>theta と omega の両方</b>を同じ段階で揃えて評価する。</li>
+        <li>陰（後退）オイラーは次の値自身を含むので解く。例: dx/dt = kx なら <code>x[n+1] = x[n] / (1 - k*dt)</code>。</li>
+      </ul>
+    </li>
+  </ol>
+
+  <h2><span>STEP 3</span>暗記は10個だけ</h2>
   <ol>
     <li><b>誤差は4種類。</b>丸め（有限桁で表す）／打ち切り（有限回で切る）／情報落ち（大きい数＋小さい数）／桁落ち（近い値の引き算）。</li>
     <li><b>有効桁は 7 と 16。</b>float32 が約7桁、float64 が約16桁。Python のべき乗は <span class="math">**</span>（<span class="math">^</span> は別物）。</li>
@@ -75,7 +128,7 @@
     <li><b>線形代数: </b>ピボット選択は「ゼロ除算の回避」と「丸め誤差の拡大防止」。LU分解は b が変わっても代入だけで O(n²)。逆行列は solve の約3倍かかるので使わない。</li>
   </ol>
 
-  <h2><span>STEP 3</span>混同しやすい組だけ、違いを1行で</h2>
+  <h2><span>STEP 4</span>混同しやすい組だけ、違いを1行で</h2>
   <table>
     <tr><th>組</th><th>違い</th></tr>
     <tr><td>丸め / 打ち切り</td><td>丸めは「数の表し方」の限界。打ち切りは「計算を途中でやめる」こと。</td></tr>
