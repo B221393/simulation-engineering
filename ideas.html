@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>シミュレーション工学 期末試験 大事な発想と解法ガイド</title>
+<title>シミュレーション工学 相図・λ=σ±iω 導出・大事な発想ガイド</title>
 <style>
   :root {
     --fg: #1b1b1f;
@@ -31,7 +31,7 @@
     line-height: 1.65;
     -webkit-text-size-adjust: 100%;
   }
-  .wrap { max-width: 860px; margin: 0 auto; padding: 16px 14px 72px; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 16px 14px 72px; }
 
   .back-link {
     display: inline-block;
@@ -48,7 +48,7 @@
     border: 1px solid var(--line);
     border-radius: 12px;
     padding: 16px;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
   .kicker { font-size: 0.74rem; font-weight: 700; color: var(--accent); letter-spacing: 0.06em; }
   h1 { font-size: 1.28rem; margin: 4px 0 6px; line-height: 1.35; }
@@ -80,39 +80,52 @@
     letter-spacing: 0.08em;
   }
 
-  .tbl-wrap { overflow-x: auto; margin-bottom: 18px; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
+  .card {
     background: var(--card);
     border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .core-line {
+    font-size: 0.92rem;
+    font-weight: 700;
+    background: #f5f7fc;
+    border-left: 4px solid var(--accent);
+    border-radius: 6px;
+    padding: 9px 12px;
+    margin: 0 0 10px;
+  }
+  .fig-box {
+    background: #fcfdff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px 0 12px;
+  }
+  .fig-box svg { display: block; width: 100%; height: auto; }
+  .fig-cap { font-size: 0.78rem; color: var(--muted); text-align: center; margin-top: 6px; }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+  .mini-box {
+    background: #f9fafd;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
     font-size: 0.85rem;
   }
-  th, td {
-    border: 1px solid var(--line);
-    padding: 8px 10px;
-    text-align: left;
-    vertical-align: top;
-  }
-  th { background: #f2f5fb; font-size: 0.8rem; color: var(--fg); }
-  td:first-child { font-weight: 700; white-space: nowrap; }
+  .mini-box strong { display: block; margin-bottom: 3px; color: var(--fg); }
 
-  .idea-grid { display: grid; gap: 12px; }
-  .idea-card {
+  .step-flow { display: grid; gap: 10px; margin-bottom: 12px; }
+  .step-item {
     background: var(--card);
     border: 1px solid var(--line);
     border-left: 4px solid var(--accent);
     border-radius: 10px;
-    padding: 14px 16px;
+    padding: 12px 14px;
   }
-  .idea-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 8px;
-    margin-bottom: 6px;
-  }
-  .idea-num {
+  .step-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+  .step-num {
     font-size: 0.74rem;
     font-weight: 800;
     color: var(--accent);
@@ -120,23 +133,53 @@
     padding: 2px 8px;
     border-radius: 6px;
   }
-  .idea-name { font-size: 0.98rem; font-weight: 800; margin: 0; }
-  .core-line {
-    font-size: 0.9rem;
-    font-weight: 700;
-    background: #f5f7fc;
+  .step-title { font-size: 0.95rem; font-weight: 800; margin: 0; }
+  .eq-box {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.85rem;
+    background: #f4f6fb;
+    border: 1px solid var(--line);
     border-radius: 8px;
     padding: 8px 10px;
-    margin: 6px 0 8px;
+    margin: 6px 0;
+    overflow-x: auto;
+    white-space: pre-wrap;
   }
-  .idea-list { margin: 0; padding-left: 1.25em; font-size: 0.85rem; color: #2b2f38; }
-  .idea-list li { margin-bottom: 4px; }
+  .math { font-family: "Cambria Math", "Times New Roman", Georgia, serif; }
   .mono {
     font-family: Consolas, "Courier New", monospace;
     font-size: 0.88em;
     background: #f1f3f8;
     padding: 1px 4px;
     border-radius: 4px;
+  }
+  .idea-list { margin: 4px 0 0; padding-left: 1.25em; font-size: 0.85rem; color: #2b2f38; }
+  .idea-list li { margin-bottom: 4px; }
+
+  .tbl-wrap { overflow-x: auto; margin-bottom: 14px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card);
+    border: 1px solid var(--line);
+    font-size: 0.84rem;
+  }
+  th, td {
+    border: 1px solid var(--line);
+    padding: 8px 10px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th { background: #f2f5fb; font-size: 0.79rem; color: var(--fg); }
+  td:first-child { font-weight: 700; }
+
+  .idea-grid { display: grid; gap: 10px; }
+  .idea-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: 10px;
+    padding: 13px 15px;
   }
 
   /* Quiz Section */
@@ -297,156 +340,308 @@
   <a class="back-link" id="back-link" href="index.html" style="display:none;">[トップページへ戻る]</a>
 
   <header class="top-card">
-    <div class="kicker">SIMULATION ENGINEERING // CORE IDEAS &amp; STRATEGY</div>
-    <h1>期末試験 大事な発想と解法ガイド（8つの発想 + 8問診断）</h1>
+    <div class="kicker">SIMULATION ENGINEERING // SYMBOLIC GUIDE, PHASE PORTRAIT &amp; EIGENVALUES</div>
+    <h1>相図とは何か・記号で導く &lambda; = &sigma; &plusmn; i&omega;・大事な8つの発想</h1>
     <p class="sub">
-      公式の丸暗記だけでなく、「問題文を見たらどの発想で1行目を書くか」「なぜその手法を使うのか」を整理したページです。下部の動的チェックで発想の使い分けを確認できます。
+      特定の数値問題の暗記ではなく、どんな式が来ても一般記号（<span class="mono">x, v, J, &tau;, &Delta;, &lambda;, &sigma;, &omega;</span>）でそのまま道筋を立てられるように整理しました。
     </p>
   </header>
 
   <nav class="nav-pills">
-    <a class="nav-pill" href="#first-move">1. 初手マップ（8パターン）</a>
-    <a class="nav-pill" href="#eight-ideas">2. 大事な8つの発想</a>
-    <a class="nav-pill" href="#idea-quiz">3. 発想チェック（8問）</a>
+    <a class="nav-pill" href="#phase-portrait">1. 相図とは何か</a>
+    <a class="nav-pill" href="#lambda-sigma">2. &lambda; = &sigma; &plusmn; i&omega; への変換手順</a>
+    <a class="nav-pill" href="#eight-ideas">3. 大事な8つの発想と初手</a>
+    <a class="nav-pill" href="#idea-quiz">4. 記号チェック（10問）</a>
   </nav>
 
-  <h2 class="sec-title" id="first-move"><span>STEP 1</span>問題を見た瞬間の「初手マップ」</h2>
+  <!-- STEP 1: PHASE PORTRAIT -->
+  <h2 class="sec-title" id="phase-portrait"><span>STEP 1</span>そもそも「相図（位相平面）」とは何か？</h2>
+  <section class="card">
+    <div class="core-line">
+      定義: 時間 t を消去し、横軸に「状態 x」、縦軸に「変化率 v = dx/dt」をとって、「今 (x, v) にいる点はこの先どちらへ動くか」を矢印と軌道で描いた地図のこと。
+    </div>
+    <p style="font-size:0.87rem; margin:0 0 8px;">
+      時系列グラフ <span class="mono">(t, x(t))</span> は「1つの初期値から時間が経つとどうなるか」しか分かりません。相図 <span class="mono">(x, v)</span> にすると、<b>すべての初期値に対する未来の動き（収束するか・回り続けるか・発散するか）が1枚の図で一望できる</b>のが最大の強みです。
+    </p>
+
+    <div class="fig-box">
+      <svg viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="時系列グラフと相図の対応">
+        <!-- Left Panel: Time Series -->
+        <rect x="8" y="8" width="316" height="204" rx="8" fill="#ffffff" stroke="#dfe2ea"/>
+        <text x="166" y="28" font-size="12" font-weight="bold" text-anchor="middle" fill="#1b1b1f">時系列グラフ: 横軸 t, 縦軸 x(t)</text>
+        <line x1="38" y1="115" x2="306" y2="115" stroke="#5f6470" stroke-width="1.2"/>
+        <line x1="38" y1="44" x2="38" y2="192" stroke="#5f6470" stroke-width="1.2"/>
+        <text x="306" y="130" font-size="11" text-anchor="end" fill="#5f6470">t</text>
+        <text x="44" y="54" font-size="11" fill="#5f6470">x(t)</text>
+        <!-- Damped wave -->
+        <path d="M 38,56 C 65,56 76,174 102,174 C 128,174 140,74 166,74 C 192,74 204,144 230,144 C 254,144 268,104 294,113"
+              fill="none" stroke="#2b5cd9" stroke-width="2.2"/>
+        <path d="M 38,56 Q 165,98 294,112" fill="none" stroke="#b3261e" stroke-width="1.2" stroke-dasharray="4 3"/>
+        <text x="172" y="64" font-size="10.5" fill="#b3261e">包絡線 ~ exp(&sigma;t) (&sigma; &lt; 0)</text>
+        <text x="166" y="198" font-size="10.5" text-anchor="middle" fill="#5f6470">1本の波形には1つの初期値しか描けない</text>
+
+        <!-- Right Panel: Phase Portrait -->
+        <rect x="356" y="8" width="316" height="204" rx="8" fill="#ffffff" stroke="#dfe2ea"/>
+        <text x="514" y="28" font-size="12" font-weight="bold" text-anchor="middle" fill="#1b1b1f">相図: 横軸 x, 縦軸 v = dx/dt</text>
+        <line x1="386" y1="115" x2="652" y2="115" stroke="#5f6470" stroke-width="1.2"/>
+        <line x1="514" y1="42" x2="514" y2="192" stroke="#5f6470" stroke-width="1.2"/>
+        <text x="652" y="130" font-size="11" text-anchor="end" fill="#5f6470">x</text>
+        <text x="520" y="52" font-size="11" fill="#5f6470">v = dx/dt</text>
+        <!-- Half-plane labels -->
+        <text x="646" y="60" font-size="10" text-anchor="end" fill="#137333">v &gt; 0 =&gt; dx/dt &gt; 0 (右へ進む)</text>
+        <text x="392" y="182" font-size="10" fill="#137333">v &lt; 0 =&gt; dx/dt &lt; 0 (左へ進む)</text>
+        <!-- Clockwise inward spiral -->
+        <path d="M 594,115 C 594,158 552,174 514,174 C 464,174 446,144 446,115 C 446,74 476,62 514,62 C 550,62 566,84 566,115 C 566,140 544,150 514,150 C 488,150 478,136 478,115 C 478,94 494,86 514,86 C 534,86 540,100 538,115 C 535,128 524,130 514,128 C 504,126 502,116 514,115"
+              fill="none" stroke="#2b5cd9" stroke-width="2.1"/>
+        <!-- Clockwise arrow at top -->
+        <polygon points="522,62 511,57 511,67" fill="#2b5cd9"/>
+        <!-- Origin black dot -->
+        <circle cx="514" cy="115" r="4.5" fill="#1b1b1f"/>
+        <text x="514" y="201" font-size="10.5" text-anchor="middle" fill="#5f6470">時間 t を消すと必ず「時計回り」に黒丸 x* へ巻く</text>
+      </svg>
+      <div class="fig-cap">図1: 時系列グラフの減衰振動（左）と、同じ現象を状態空間に描いた相図（右）の対応</div>
+    </div>
+
+    <div class="grid-2">
+      <div class="mini-box">
+        <strong>1. 固定点（平衡点）x*</strong>
+        <span class="mono">dx/dt = 0</span> かつ <span class="mono">dv/dt = 0</span> となる静止点。相図では漸近安定なら <b>黒丸</b>、不安定なら <b>白丸</b> で描く。
+      </div>
+      <div class="mini-box">
+        <strong>2. 回転の向き（なぜ必ず時計回りか）</strong>
+        横軸 <span class="mono">x</span>・縦軸 <span class="mono">v = dx/dt</span> なら、上半分（<span class="mono">v &gt; 0</span>）では <span class="mono">x</span> が増える右向き、下半分（<span class="mono">v &lt; 0</span>）では左向きになるため <b>必ず時計回り</b> になる。
+      </div>
+      <div class="mini-box">
+        <strong>3. 固有ベクトルと直線軌道</strong>
+        <span class="mono">&lambda; &gt; 0</span> の固有ベクトル上は固定点から <b>外向き</b>（離れる）、<span class="mono">&lambda; &lt; 0</span> 上は <b>内向き</b>（近づく）の矢印になる。
+      </div>
+      <div class="mini-box">
+        <strong>4. セパラトリクス（境界線）</strong>
+        「収束する領域」と「発散・接触・回転する領域」を分ける境目の軌道。鞍点の安定多様体がこれを形成する。
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 2: LAMBDA = SIGMA +- i*OMEGA -->
+  <h2 class="sec-title" id="lambda-sigma"><span>STEP 2</span>どんな式も記号のまま &lambda; = &sigma; &plusmn; i&omega; に変える 6ステップ手順</h2>
+  <div class="step-flow">
+    <div class="step-item">
+      <div class="step-head"><span class="step-num">Step 1</span><h3 class="step-title">2階以上の式を「1階連立微分方程式」にする</h3></div>
+      <p style="font-size:0.85rem; margin:0 0 4px;">状態変数 <span class="mono">x1 = x</span>、<span class="mono">x2 = dx/dt</span> と置いて、最高階微分について解く。</p>
+      <div class="eq-box">dx1/dt = f1(x1, x2) = x2
+dx2/dt = f2(x1, x2)</div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-head"><span class="step-num">Step 2</span><h3 class="step-title">固定点 x* = (x1*, x2*) を求める</h3></div>
+      <div class="eq-box">f1(x1*, x2*) = 0  かつ  f2(x1*, x2*) = 0   =&gt;   x2* = 0 と f2(x1*, 0) = 0</div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-head"><span class="step-num">Step 3</span><h3 class="step-title">固定点まわりの偏微分でヤコビ行列 J(x*) を作る</h3></div>
+      <p style="font-size:0.85rem; margin:0 0 4px;">微小ずれ <span class="mono">&delta;x = x - x*</span> の線形近似 <span class="mono">d(&delta;x)/dt = J(x*) &delta;x</span> を得る。力学系（<span class="mono">f1 = x2</span>）なら1行目は常に <span class="mono">[0, 1]</span>。</p>
+      <div class="eq-box">J(x*) = [ [ df1/dx1 , df1/dx2 ], [ df2/dx1 , df2/dx2 ] ]_{x = x*}  =  [ [ 0 , 1 ], [ a , b ] ]</div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-head"><span class="step-num">Step 4</span><h3 class="step-title">&tau; = tr(J) と &Delta; = det(J) から特性方程式を立てる</h3></div>
+      <div class="eq-box">&tau; = tr(J) = J11 + J22 = &lambda;1 + &lambda;2       (対角成分の和 = 固有値の和)
+&Delta; = det(J) = J11*J22 - J12*J21 = &lambda;1*&lambda;2   (行列式 = 固有値の積)
+特性方程式: det(J - &lambda;I) = &lambda;^2 - &tau;*&lambda; + &Delta; = 0</div>
+    </div>
+
+    <div class="step-item">
+      <div class="step-head"><span class="step-num">Step 5</span><h3 class="step-title">解の公式で &lambda; を出し、実部 &sigma; と虚部 &omega; に分ける（ここが本質）</h3></div>
+      <div class="eq-box">&lambda; = ( &tau; &plusmn; sqrt(&tau;^2 - 4*&Delta;) ) / 2
+
+[場合A] &tau;^2 - 4*&Delta; &gt;= 0 のとき（実固有値 &lambda;1, &lambda;2、虚部 &omega; = 0）:
+  解の形: &delta;x(t) = c1 * exp(&lambda;1*t) * w1 + c2 * exp(&lambda;2*t) * w2  (回らず直線・双曲線で動く)
+
+[場合B] &tau;^2 - 4*&Delta; &lt; 0 のとき（複素固有値 &lambda; = &sigma; &plusmn; i*&omega;）:
+  実部: &sigma; = Re(&lambda;) = &tau; / 2
+  虚部: &omega; = Im(&lambda;) = sqrt(4*&Delta; - &tau;^2) / 2
+  オイラーの公式より: exp((&sigma; + i*&omega;)*t) = exp(&sigma;*t) * (cos(&omega;*t) + i*sin(&omega;*t))</div>
+      <ul class="idea-list">
+        <li><b>実部 <span class="mono">&sigma; = &tau;/2</span> の意味:</b> 振幅 <span class="mono">exp(&sigma;*t)</span> の増減を決める。<span class="mono">&sigma; &lt; 0</span> で減衰して収束（安定）、<span class="mono">&sigma; = 0</span> で大きさ一定（中心点）、<span class="mono">&sigma; &gt; 0</span> で拡大して発散（不安定）。</li>
+        <li><b>虚部 <span class="mono">&omega;</span> の意味:</b> <span class="mono">cos(&omega;*t)</span> による回転（振動）の速さを決める。<span class="mono">&omega; != 0</span> なら必ず渦や円を描いて回る。</li>
+      </ul>
+    </div>
+
+    <div class="step-item">
+      <div class="step-head"><span class="step-num">Step 6</span><h3 class="step-title">固有ベクトル w を求める（実固有値のときの直線の向き）</h3></div>
+      <div class="eq-box">(J - &lambda;I) w = 0
+特に J の1行目が [0, 1] なら 1行目は - &lambda;*w1 + w2 = 0 =&gt; w = (1, &lambda;)^T  (傾きがそのまま &lambda;)</div>
+    </div>
+  </div>
+
+  <div class="fig-box">
+    <svg viewBox="0 0 680 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="複素平面とタウ・デルタ平面の対応">
+      <!-- Left: Complex lambda plane -->
+      <rect x="8" y="8" width="316" height="214" rx="8" fill="#ffffff" stroke="#dfe2ea"/>
+      <text x="166" y="28" font-size="12" font-weight="bold" text-anchor="middle" fill="#1b1b1f">複素平面: &lambda; = &sigma; + i&omega;</text>
+      <rect x="26" y="42" width="140" height="148" fill="#e6f4ea" fill-opacity="0.7"/>
+      <rect x="166" y="42" width="140" height="148" fill="#fce8e6" fill-opacity="0.7"/>
+      <line x1="26" y1="116" x2="306" y2="116" stroke="#5f6470" stroke-width="1.2"/>
+      <line x1="166" y1="42" x2="166" y2="190" stroke="#2b5cd9" stroke-width="2.2"/>
+      <text x="304" y="131" font-size="11" text-anchor="end" fill="#1b1b1f">実部 &sigma;</text>
+      <text x="172" y="54" font-size="11" fill="#1b1b1f">虚部 i&omega;</text>
+      <text x="96" y="74" font-size="11" font-weight="bold" text-anchor="middle" fill="#137333">&sigma; &lt; 0: 安定</text>
+      <text x="96" y="89" font-size="10" text-anchor="middle" fill="#137333">exp(&sigma;t) -&gt; 0</text>
+      <text x="236" y="74" font-size="11" font-weight="bold" text-anchor="middle" fill="#b3261e">&sigma; &gt; 0: 不安定</text>
+      <text x="236" y="89" font-size="10" text-anchor="middle" fill="#b3261e">exp(&sigma;t) -&gt; inf</text>
+      <text x="166" y="206" font-size="10" text-anchor="middle" fill="#2b5cd9">虚軸 (&sigma; = 0): 中心点 (線形化だけでは判定不可)</text>
+      <!-- Sample poles -->
+      <circle cx="110" cy="70" r="3.5" fill="#137333"/>
+      <circle cx="110" cy="162" r="3.5" fill="#137333"/>
+      <text x="102" y="166" font-size="9.5" text-anchor="end" fill="#137333">&sigma; &plusmn; i&omega;</text>
+
+      <!-- Right: tau-Delta plane -->
+      <rect x="356" y="8" width="316" height="214" rx="8" fill="#ffffff" stroke="#dfe2ea"/>
+      <text x="514" y="28" font-size="12" font-weight="bold" text-anchor="middle" fill="#1b1b1f">&tau;-&Delta; 平面（特性方程式の係数だけで判定）</text>
+      <!-- Saddle region Delta < 0 -->
+      <rect x="374" y="128" width="280" height="62" fill="#fce8e6" fill-opacity="0.75"/>
+      <!-- Axes -->
+      <line x1="374" y1="128" x2="654" y2="128" stroke="#1b1b1f" stroke-width="1.4"/>
+      <line x1="514" y1="42" x2="514" y2="190" stroke="#2b5cd9" stroke-width="1.6"/>
+      <!-- Parabola tau^2 - 4Delta = 0 -->
+      <path d="M 384,46 Q 450,124 514,128 Q 578,124 644,46" fill="none" stroke="#1b1b1f" stroke-width="1.6" stroke-dasharray="4 3"/>
+      <text x="652" y="142" font-size="11" text-anchor="end" fill="#1b1b1f">&tau; (= 2&sigma;)</text>
+      <text x="520" y="54" font-size="11" fill="#1b1b1f">&Delta;</text>
+      <text x="454" y="68" font-size="10" font-weight="bold" text-anchor="middle" fill="#137333">安定渦状点</text>
+      <text x="454" y="81" font-size="9.5" text-anchor="middle" fill="#137333">(&sigma;&lt;0, 虚部あり)</text>
+      <text x="576" y="68" font-size="10" font-weight="bold" text-anchor="middle" fill="#b3261e">不安定渦状点</text>
+      <text x="415" y="116" font-size="9.5" font-weight="bold" text-anchor="middle" fill="#137333">安定結節</text>
+      <text x="613" y="116" font-size="9.5" font-weight="bold" text-anchor="middle" fill="#b3261e">不安定結節</text>
+      <text x="514" y="164" font-size="10.5" font-weight="bold" text-anchor="middle" fill="#b3261e">鞍点 (&Delta; &lt; 0: 正と負の実固有値)</text>
+      <text x="514" y="206" font-size="10" text-anchor="middle" fill="#5f6470">&tau;^2 - 4&Delta; = 0 の放物線が「回る(渦)」と「直進(結節)」の境目</text>
+    </svg>
+    <div class="fig-cap">図2: 固有値の実部・虚部 (&sigma;, &omega;)（左）と、トレース・行列式 (&tau;, &Delta;) 平面（右）の完全な対応関係</div>
+  </div>
+
+  <!-- STEP 3: 8 CORE IDEAS + FIRST-MOVE MAP -->
+  <h2 class="sec-title" id="eight-ideas"><span>STEP 3</span>記号で見る「大事な8つの発想」と初手マップ</h2>
   <div class="tbl-wrap">
     <table>
       <tr>
         <th style="width:28%;">問題文のキーワード</th>
         <th style="width:36%;">最初に取るべき発想</th>
-        <th>1行目に書くこと・使う式</th>
+        <th>1行目に書く一般記号・式</th>
       </tr>
       <tr>
-        <td>「モデル化せよ」「要素を省く理由」</td>
-        <td>目的に対して必要十分な複雑さだけ残す</td>
-        <td>目的（速度 / 姿勢 / 着地）に不要な要素を削る判断と弊害を書く</td>
+        <td>「モデル化」「省く理由」</td>
+        <td>目的に対して必要十分な要素だけ残す</td>
+        <td>状態変数とパラメータを目的に応じて最小限に絞る</td>
       </tr>
       <tr>
-        <td>「誤差の種類」「float32 で頭打ち」</td>
-        <td>有限桁表現と丸め・打ち切り・桁落ち・情報落ちを分ける</td>
-        <td>近い数の減算は式変形で回避（解と係数・有理化）、大+小の吸収は情報落ち</td>
+        <td>「誤差の種類」「頭打ち」</td>
+        <td>数の表し方（丸め）と計算の打ち切りを分ける</td>
+        <td>近い数の減算（桁落ち）は式変形で回避。大+小（情報落ち）に注意</td>
       </tr>
       <tr>
-        <td>「刻み幅 dt」「精度次数」「発散しない条件」</td>
+        <td>「刻み幅 dt」「発散条件」</td>
         <td>1ステップ誤差と積算誤差の区別、増幅率の絶対値</td>
-        <td>前進オイラーは <span class="mono">|1 + k*dt| &lt;= 1</span>、RK4は4点重み平均 <span class="mono">(1,2,2,1)/6</span></td>
+        <td>陽解法: <span class="mono">|1 + k*dt| &lt;= 1</span> / 陰解法: <span class="mono">x_{n+1} = x_n/(1 - k*dt)</span></td>
       </tr>
       <tr>
-        <td>「2階微分方程式」「プログラムに直せ」</td>
-        <td>状態変数を増やして1階連立へ統一する</td>
-        <td><span class="mono">x1=x, x2=x'</span> と置き、最高階について解く（<span class="mono">m</span> や <span class="mono">ml^2</span> で割る）</td>
+        <td>「高階ODE」「数値計算」</td>
+        <td>補助変数を置いて1階連立系へ統一する</td>
+        <td><span class="mono">x1 = x, x2 = x'</span> とし、RK4は全成分を同じ段階で揃えて進める</td>
       </tr>
       <tr>
-        <td>「妥当性を検証せよ」「バグがない根拠」</td>
-        <td>グラフの滑らかさではなく独立した保存則・次数で確かめる</td>
-        <td>エネルギー保存誤差 <span class="mono">|E(t)-E(0)|</span> の両対数傾き（1次/4次）と <span class="mono">dt</span> 収束</td>
+        <td>「妥当性検証」「バグ確認」</td>
+        <td>見た目の滑らかさではなく保存則と次数傾きで確認</td>
+        <td>保存量 <span class="mono">|E(t)-E(0)|</span> の両対数傾きが理論次数 <span class="mono">p</span> と一致するか見る</td>
       </tr>
       <tr>
         <td>「固定点」「ヤコビアン」「相図」</td>
-        <td>近傍は線形化（<span class="mono">tau, Delta</span>）、境界・遠方は非線形相図で見る</td>
-        <td><span class="mono">dx/dt=0</span> で固定点 -&gt; <span class="mono">J</span> -&gt; <span class="mono">Delta, tau, tau^2-4*Delta</span>。ただし <span class="mono">Re=0</span> は判定不可</td>
+        <td>近傍は <span class="mono">J, &tau;, &Delta;, &sigma;, &omega;</span> で線形判定、遠方は非線形相図</td>
+        <td><span class="mono">dx/dt=0 -&gt; J -&gt; &lambda; = &sigma; &plusmn; i&omega;</span>。<span class="mono">&sigma;=0</span> や <span class="mono">&Delta;=0</span> は線形化判定不可</td>
       </tr>
       <tr>
-        <td>「安定化制御」「臨界減衰ゲイン」</td>
-        <td>制御入力で固有値（極）を左半平面へ動かす</td>
-        <td>線形化して <span class="mono">tau = -kd &lt; 0, Delta = kp - g/l &gt; 0</span>、臨界は <span class="mono">tau^2 = 4*Delta</span></td>
+        <td>「安定化制御」「臨界減衰」</td>
+        <td>フィードバックで <span class="mono">&sigma; &lt; 0</span>（左半平面）へ移動する</td>
+        <td><span class="mono">&tau; = -kd &lt; 0, &Delta; = kp - g/l &gt; 0</span>、臨界条件 <span class="mono">&tau;^2 = 4*&Delta;</span></td>
       </tr>
       <tr>
-        <td>「ニュートン法」「ピボット」「LU分解」</td>
-        <td>接線で反復更新、連立方程式はピボット・分解再利用・solve優先</td>
-        <td><span class="mono">J*delta = -f</span>（マイナス必須）、LUは前・後退代入で <span class="mono">O(n^2)</span>、逆行列は使わない</td>
+        <td>「求根」「消去法」「LU分解」</td>
+        <td>接線で追い込み、連立1次方程式は分解再利用とピボット</td>
+        <td><span class="mono">J*&delta; = -f</span>（マイナス必須）。LU分解 <span class="mono">O(n^3)</span> + 前・後退代入 <span class="mono">O(n^2)</span></td>
       </tr>
     </table>
   </div>
 
-  <h2 class="sec-title" id="eight-ideas"><span>STEP 2</span>シミュレーション工学の大事な8つの発想</h2>
   <div class="idea-grid">
-
     <article class="idea-card">
-      <div class="idea-head"><span class="idea-num">発想 1</span><h3 class="idea-name">モデル化：現実を全部入れず「目的に必要十分」を残す</h3></div>
-      <div class="core-line">コア発想: 複雑なモデルが良いモデルとは限らない。目的に効く要素だけを選び、他を削ぎ落とす。</div>
+      <h3 class="step-title">発想1 [モデル化]：現実に忠実なほど良いのではなく「目的に必要十分」が最善</h3>
       <ul class="idea-list">
-        <li><b>なぜ大事か:</b> 要素を増やすほど計算コスト増・調整パラメータ増・誤差原因の不明瞭化・制御設計の困難化を招く。</li>
-        <li><b>具体例:</b> 落下速度だけ知りたいなら「質点」、姿勢変化なら「剛体」、着地後の跳ね返りなら「条件分岐付きのバネ反力」を追加する。</li>
+        <li>複雑にするほど計算コスト増・未知パラメータ増・誤差原因の切り分け困難・制御設計の複雑化を招く。</li>
       </ul>
     </article>
 
     <article class="idea-card">
-      <div class="idea-head"><span class="idea-num">発想 2</span><h3 class="idea-name">数値誤差：計算機の有限桁を意識し、近い数の引き算を避ける</h3></div>
-      <div class="core-line">コア発想: コンピュータは単精度 約7桁・倍精度 約16桁の有限桁しか持たないため、式の書き方ひとつで精度が崩れる。</div>
+      <h3 class="step-title">発想2 [数値誤差]：有限桁（float32 約7桁 / float64 約16桁）を前提に式を組む</h3>
       <ul class="idea-list">
-        <li><b>4分類の軸:</b> 「数の表し方」が原因なのが <b>丸め誤差</b>、「計算の打ち切り」が原因なのが <b>打ち切り誤差</b>。</li>
-        <li><b>2つの落とし穴:</b> 「大きい数 + 小さい数」で小さい側が消えるのが <b>情報落ち</b>、「近い数 - 近い数」で有効桁が減るのが <b>桁落ち</b>。</li>
-        <li><b>回避の発想:</b> 2次方程式では大きい解だけ公式で出し、小さい解は解と係数の関係 <span class="mono">x1 = c/(a*x2)</span> で引き算を消す。</li>
+        <li><b>丸め誤差</b>（有限桁の限界）vs <b>打ち切り誤差</b>（有限項・有限 <span class="mono">dt</span> の限界）。</li>
+        <li><b>情報落ち</b>（大きい数 + 小さい数で小さい方が消える）vs <b>桁落ち</b>（近い数の引き算で有効桁が失われる）。解と係数の関係 <span class="mono">x1 = c/(a*x2)</span> や有理化で引き算を消す。</li>
       </ul>
     </article>
 
     <article class="idea-card">
-      <div class="idea-head"><span class="idea-num">発想 3</span><h3 class="idea-name">時間発展：1ステップ誤差と積算誤差、陽解法と陰解法のトレードオフ</h3></div>
-      <div class="core-line">コア発想: 微分方程式を小さな刻み dt で進める際、「安定性」と「精度あたりの計算コスト」を天秤にかける。</div>
+      <h3 class="step-title">発想3 [時間発展]：1ステップ <span class="mono">O(dt^(p+1))</span> と積算 <span class="mono">O(dt^p)</span>、安定性とコストの天秤</h3>
       <ul class="idea-list">
-        <li><b>安定条件の意味:</b> 前進オイラー法（陽解法）は <span class="mono">|1 + k*dt| &lt;= 1</span> を超えると振動発散する。後退オイラー法（陰解法）は次時刻の式を解く手間と引き換えに <span class="mono">k &lt; 0</span> で無条件安定になる。</li>
-        <li><b>なぜ RK4 がよく使われるか:</b> 1ステップの関数評価は4回と重いが、4次精度 <span class="mono">O(dt^4)</span> のため大きな <span class="mono">dt</span> でも高精度が出せ、目標誤差までの総評価回数が圧倒的に少ない。</li>
-        <li><b>刻み幅過小の罠:</b> <span class="mono">dt</span> を極端に小さくしすぎると打ち切り誤差より丸め誤差の蓄積が支配的になり、誤差が頭打ちになる。</li>
+        <li>一定時間 <span class="mono">T</span> を進むと <span class="mono">T/dt</span> ステップ積むため、積算誤差は1ステップより次数が1つ下がる。</li>
+        <li>前進オイラー（陽解法）は条件安定 <span class="mono">|1+k*dt| &lt;= 1</span>、後退オイラー（陰解法）は次時刻の式を解くことで <span class="mono">k &lt; 0</span> で無条件安定。RK4は4点評価の重み平均 <span class="mono">(k1+2k2+2k3+k4)/6</span> で4次精度を稼ぐ。</li>
+        <li><span class="mono">dt</span> を小さくしすぎると打ち切り誤差より丸め誤差の蓄積が勝ち、精度が頭打ちになる。</li>
       </ul>
     </article>
 
     <article class="idea-card">
-      <div class="idea-head"><span class="idea-num">発想 4</span><h3 class="idea-name">1階連立化：すべての高階ODEを「1階ベクトル系」に揃えて同じ道具で解く</h3></div>
-      <div class="core-line">コア発想: 位置と速度を並べた状態ベクトルを置けば、2階も3階もすべて同じ1階ソルバ（オイラー・RK4）に流し込める。</div>
+      <h3 class="step-title">発想4 [1階連立化]：どんな高階微分方程式も1階ベクトル <span class="mono">dx/dt = f(t, x)</span> に統一</h3>
       <ul class="idea-list">
-        <li><b>手順:</b> 最高階微分を左辺に孤立させ（例: <span class="mono">m</span> や慣性モーメント <span class="mono">m*l^2</span> で割る）、補助変数を定義する。</li>
-        <li><b>実装の鉄則:</b> 多変数のRK4では、各段階（<span class="mono">k1 -&gt; k2 -&gt; k3 -&gt; k4</span>）ごとに <b>全成分を同時に揃えて評価</b> する。ある成分だけ先に更新すると半陰解法など別の手法になる。</li>
+        <li>状態変数 <span class="mono">x1 = x, x2 = x'</span> と置けば、スカラー用に組んだ数値積分アルゴリズムをそのまま流用できる。</li>
+        <li>多変数のRK4では各段階 <span class="mono">k1 -&gt; k2 -&gt; k3 -&gt; k4</span> で全成分を同じ時刻・同じ中間状態に揃えて評価する。</li>
       </ul>
     </article>
 
     <article class="idea-card">
-      <div class="idea-head"><span class="idea-num">発想 5</span><h3 class="idea-name">妥当性検証：見た目ではなく「物理保存則」と「理論次数」でバグを炙り出す</h3></div>
-      <div class="core-line">コア発想: グラフがそれらしく見えるだけでは正しいと言えない。方程式から独立に成り立つ不変量と収束次数で確認する。</div>
+      <h3 class="step-title">発想5 [妥当性検証]：見た目がそれらしいだけではダメ。保存則と理論次数で検証する</h3>
       <ul class="idea-list">
-        <li><b>解析解がある場合:</b> 真値との誤差を両対数グラフに描き、傾きが理論次数（オイラー1, ホイン2, RK4 4）に一致するか見る。</li>
-        <li><b>解析解がない非線形系:</b> <span class="mono">dt</span> を半分ずつ減らして結果の収束を確認し、減衰なし単振り子なら <b>力学的エネルギー保存</b> <span class="mono">|E(t) - E(0)|</span> の傾き（次数）を確認する。</li>
+        <li>解析解がない非線形系でも、<span class="mono">dt</span> 縮小による収束確認や、保存量（エネルギー <span class="mono">E</span>）の誤差 <span class="mono">|E(t)-E(0)|</span> の両対数傾きが手法の次数 <span class="mono">p</span> に一致するかでバグを検出できる。</li>
       </ul>
     </article>
 
     <article class="idea-card">
-      <div class="idea-head"><span class="idea-num">発想 6</span><h3 class="idea-name">固定点と線形化：近傍の「戻る・離れる・回る」は固有値で、境界と遠方は相図で読む</h3></div>
-      <div class="core-line">コア発想: 非線形系は式が解けなくても、固定点まわりのヤコビアン J を調べれば局所的な安定性と相図の形が決まる。</div>
+      <h3 class="step-title">発想6 [固定点と相図]：局所は固有値 <span class="mono">&lambda; = &sigma; &plusmn; i&omega;</span>、大域は非線形相図</h3>
       <ul class="idea-list">
-        <li><b>判定の3手:</b> <span class="mono">Delta &lt; 0</span> なら即「鞍点（不安定）」。<span class="mono">Delta &gt; 0</span> なら <span class="mono">tau</span> の符号で安定/不安定/中心点を決め、<span class="mono">tau^2 - 4*Delta</span> の符号で渦状点と結節点を分ける。</li>
-        <li><b>線形化の限界:</b> <span class="mono">Re(lambda) = 0</span>（中心点や分岐点 <span class="mono">Delta = 0</span>）では高次項が効くため <b>線形化だけでは安定性を判定できない</b>。また吸引領域の境界（セパラトリクス）や大車輪回転のような大域挙動は非線形相図で確認する。</li>
+        <li>固定点近傍だけヤコビアン <span class="mono">J(x*)</span> で線形化すれば <span class="mono">&sigma; = Re(&lambda;)</span> の符号で安定・不安定が分かる。</li>
+        <li>ただし <span class="mono">&sigma; = 0</span>（中心点・分岐点 <span class="mono">&Delta;=0</span>）では高次項が効くため線形化だけでは判定不可。遠方の境界（セパラトリクス）や周期変数の同一性（<span class="mono">&theta; = &pi;</span> と <span class="mono">-&pi;</span>）も相図で把握する。</li>
       </ul>
     </article>
 
     <article class="idea-card">
-      <div class="idea-head"><span class="idea-num">発想 7</span><h3 class="idea-name">制御設計：不安定な固定点の固有値を、フィードバックで左半平面へ移す</h3></div>
-      <div class="core-line">コア発想: 倒立状態のような不安定点でも、ずれに比例する復元力 (P) と速度を抑えるブレーキ (D) を足せば安定にできる。</div>
+      <h3 class="step-title">発想7 [安定化制御]：フィードバックで系の固有値を左半平面（<span class="mono">&sigma; &lt; 0</span>）へ移す</h3>
       <ul class="idea-list">
-        <li><b>線形化と極配置:</b> 倒立振り子では重力項の符号が真上基準で <span class="mono">+</span> になる。これに負のフィードバックを入れ、<span class="mono">tau = -kd &lt; 0</span> かつ <span class="mono">Delta = kp - g/l &gt; 0</span> を満たすようにゲインを選ぶ。</li>
-        <li><b>現実・離散の制約:</b> 臨界減衰 <span class="mono">tau^2 = 4*Delta</span> はオーバーシュートなしで最速収束する基準。ただし離散制御でゲインを大きくしすぎると1ステップ変化が過大になり数値発散する。</li>
+        <li>復元力ゲイン <span class="mono">kp</span> と減衰ゲイン <span class="mono">kd</span> を加え、特性方程式の係数から <span class="mono">&tau; &lt; 0, &Delta; &gt; 0</span> に配置する。臨界減衰 <span class="mono">&tau;^2 = 4*&Delta;</span> がオーバーシュートなしの最速収束条件。</li>
       </ul>
     </article>
 
     <article class="idea-card">
-      <div class="idea-head"><span class="idea-num">発想 8</span><h3 class="idea-name">求根と線形代数：接線で追い込み、連立方程式は「分解の再利用」と「ピボット」で安定・高速に解く</h3></div>
-      <div class="core-line">コア発想: 非線形方程式はニュートン法（線形方程式の反復）に落とし、線形方程式は直接逆行列を作らずピボット付き消去・LU分解を使う。</div>
+      <h3 class="step-title">発想8 [求根と線形代数]：ニュートン法は <span class="mono">J*&delta; = -f</span>、線形計算はピボットと分解再利用</h3>
       <ul class="idea-list">
-        <li><b>ニュートン法の罠:</b> <span class="mono">J*delta = -f</span>（マイナス符号必須）。<span class="mono">f'(x)=0</span> や <span class="mono">det J=0</span> でゼロ除算停止するほか、初期値によっては2点間を往復する周期解に入り収束しない。</li>
-        <li><b>ピボット選択と LU 分解:</b> 部分ピボットは「0除算回避」と「微小値で割る丸め誤差拡大の防止」のため。右辺 <span class="mono">b</span> だけ何度も変わる場合は <span class="mono">O(n^3)</span> の LU 分解を1回し、<span class="mono">O(n^2)</span> の前進・後退代入を再利用する。<span class="mono">inv(A)@b</span> は約3倍遅く誤差も増えるため使わない。</li>
+        <li>ニュートン法は接線で近似解を更新するが、<span class="mono">f'(x)=0</span>（<span class="mono">det J = 0</span>）で停止し、初期値によっては2周期振動で収束しない。</li>
+        <li>ガウス消去法の部分ピボットは「0除算回避」と「微小値除算による丸め誤差拡大の防止」。LU分解は <span class="mono">A=LU</span>（<span class="mono">O(n^3)</span>）を1回作り、別の右辺 <span class="mono">b</span> に対して <span class="mono">O(n^2)</span> の前進・後退代入を再利用する。<span class="mono">inv(A)@b</span> は約3倍の演算量と誤差増を招くため使わない。</li>
       </ul>
     </article>
-
   </div>
 
-  <h2 class="sec-title" id="idea-quiz"><span>STEP 3</span>発想チェック（クリックして即判定：8問）</h2>
+  <!-- STEP 4: SYMBOLIC CHECK QUIZ -->
+  <h2 class="sec-title" id="idea-quiz"><span>STEP 4</span>記号・発想チェック（クリックして即判定：10問）</h2>
 
   <div class="quiz-hud">
     <div class="hud-row">
       <div>
-        <span class="hud-score" id="hud-score">正解: 0 / 8 問</span>
-        <span class="hud-sub" id="hud-sub">（解答: 0 / 8）</span>
+        <span class="hud-score" id="hud-score">正解: 0 / 10 問</span>
+        <span class="hud-sub" id="hud-sub">（解答: 0 / 10）</span>
       </div>
       <button type="button" class="danger" id="btn-reset">記録をリセット</button>
     </div>
@@ -461,115 +656,139 @@
     <a class="btn-link" href="tool/memorize_quiz.html">4択クイズ（35問）へ</a>
   </div>
 
-  <footer>シミュレーション工学 期末試験 大事な発想と解法ガイド</footer>
+  <footer>シミュレーション工学 相図・&lambda;=&sigma;&plusmn;i&omega;・発想ガイド</footer>
 </div>
 
 <script>
 (function() {
   "use strict";
 
-  const STORAGE_KEY = "sim_eng_ideas_v1";
+  const STORAGE_KEY = "sim_eng_ideas_v2";
 
   const QUESTIONS = [
     {
       id: "iq1",
-      tag: "発想1: モデル化",
-      prompt: "落下運動の速度変化だけを知りたいとき、空気抵抗や剛体回転・地面の弾性変形まで最初から全部入れるべきか？",
+      tag: "相図の本質",
+      prompt: "時系列グラフ (t, x(t)) と比べて、「相図（位相平面）」とは何を描いた図か？",
       options: [
-        "いいえ。目的に必要な最小限（質点の自由落下）から始め、不要な複雑化による計算コスト・パラメータ増を避ける。",
-        "はい。現実に近いほど計算誤差がゼロになるため、常に全要素を入れるべきである。",
-        "はい。単精度 float32 で計算するならモデルを複雑にする方が安定する。"
+        "時間 t を消去し、横軸に状態 x・縦軸に変化率 v = dx/dt をとって、あらゆる初期値からの動きの向き（軌道）を描いた図。",
+        "横軸に刻み幅 dt、縦軸に計算誤差を描いて次数を確認するための図。",
+        "横軸に時刻 t、縦軸に固有値の実部 σ をとった図。"
       ],
       ans: 0,
-      explain: "モデル化は現実を丸ごと再現することではなく、目的に応じて重要な要素を選び不要な要素を無視する判断です。"
+      explain: "相図は状態空間上の「流れの地図」です。今の状態 (x, v) が決まれば次の瞬間の向き (dx/dt, dv/dt) が一意に決まるため、時間 t を消して全初期値の挙動を1枚で把握できます。"
     },
     {
       id: "iq2",
-      tag: "発想2: 数値誤差",
-      prompt: "2次方程式 ax^2 + bx + c = 0（b = 10^5, a = c = 1）で小さい方の解 x1 を精度よく求めるための正しい発想はどれか？",
+      tag: "相図の向き",
+      prompt: "横軸が位置 x、縦軸が速度 v = dx/dt の相図において、渦状点や中心点の軌道が必ず「時計回り」になる記号上の理由は？",
       options: [
-        "まず (-b - sqrt(b^2 - 4ac))/(2a) で絶対値の大きい解 x2 を求め、x1 = c/(a * x2) で引き算を避ける。",
-        "単精度 float32 に型変換して計算すれば桁数が減って桁落ちが起きない。",
-        "(-b + sqrt(b^2 - 4ac))/(2a) をそのまま計算し、刻み幅 dt を小さくする。"
+        "上半分 (v > 0) では dx/dt > 0 で x が増える右向きに進み、下半分 (v < 0) では dx/dt < 0 で左向きに進むから。",
+        "ヤコビアン J の行列式 Δ が常に負になるから。",
+        "時間刻み dt が常に正だから。"
       ],
       ans: 0,
-      explain: "近い値同士の引き算で有効桁が消えるのが「桁落ち」です。解と係数の関係 x1*x2 = c/a を使えば引き算を割り算に置き換えられます。"
+      explain: "縦軸 v の符号そのものが「横軸 x の増加速度 dx/dt の符号」を表すため、上半面では必ず右向き、下半面では必ず左向きになり、回転は常に時計回りになります。"
     },
     {
       id: "iq3",
-      tag: "発想3: 時間発展",
-      prompt: "dx/dt = -9x を大きな刻み幅 dt = 0.25 で解きたい。前進オイラー法は振動発散するが、後退（陰解法）オイラー法の発想ではどうなるか？",
+      tag: "λ = σ ± iω の意味",
+      prompt: "固有値が複素数 λ = σ ± iω のとき、解の主要項 exp((σ + iω)t) = exp(σt)(cos(ωt) + i sin(ωt)) における実部 σ と虚部 ω の役割は？",
       options: [
-        "更新式を x_{n+1} = x_n / (1 - k*dt) と解くことで、k < 0 なら任意の dt > 0 で絶対安定になり発散しない。",
-        "後退オイラー法でも |1 + k*dt| = 1.25 > 1 なので同じように発散する。",
-        "後退オイラー法は1ステップの誤差が O(dt^5) になるため無条件安定になる。"
+        "実部 σ が振幅の大きさの増減（σ < 0 で減衰収束、σ > 0 で発散）を決め、虚部 ω が回転・振動の速さを決める。",
+        "実部 σ が回転の速さを決め、虚部 ω が振幅の大きさを決める。",
+        "σ と ω のどちらが負であっても必ず中心点になる。"
       ],
       ans: 0,
-      explain: "後退オイラー法は次時刻の値 x_{n+1} を右辺に含めて解くため、1ステップ倍率が 1/(1 + 9*dt) < 1 となり k < 0 で発散しません。"
+      explain: "exp(σt) が半径の伸び縮み、cos(ωt), sin(ωt) が角周波数 ω の回転に対応します。したがって安定性の生死は実部 σ の符号だけで決まります。"
     },
     {
       id: "iq4",
-      tag: "発想4: 1階連立化",
-      prompt: "2変数 (x, v) にRK4を適用するとき、k2x を計算した直後に更新済みの x + k2x/2 を使って k2v を計算した。これは正しいか？",
+      tag: "τ, Δ から σ への変換",
+      prompt: "2×2 ヤコビ行列 J のトレース τ = tr(J) と行列式 Δ = det(J) を使い、τ^2 - 4Δ < 0（複素固有値 λ = σ ± iω）のとき、実部 σ を τ で表すとどうなるか？",
       options: [
-        "誤り。同じ段階 (k1, k2, k3, k4) の中では、全成分を前の段階の値で揃えて右辺を評価しなければならない。",
-        "正しい。新しい値を使った方がより速く真値に収束する。",
-        "正しい。位置 x を先に進めるのが4次ルンゲ・クッタ法の定義である。"
+        "σ = τ / 2",
+        "σ = Δ / 2",
+        "σ = sqrt(4Δ - τ^2) / 2"
       ],
       ans: 0,
-      explain: "各段階の傾きは同じ時刻・同じ中間点 (x + k1x/2, v + k1v/2) で揃えて評価しないと、段階が混ざって4次精度が崩れます。"
+      explain: "特性方程式 λ^2 - τλ + Δ = 0 の解の公式 λ = (τ ± sqrt(τ^2 - 4Δ)) / 2 より、τ^2 - 4Δ < 0 のとき実部は σ = τ / 2、虚部は ω = sqrt(4Δ - τ^2) / 2 となります。"
     },
     {
       id: "iq5",
-      tag: "発想5: 妥当性検証",
-      prompt: "減衰なし単振り子のRK4シミュレーションで dt = 0.01 と dt = 0.001 の曲線がほぼ重なった。これだけで「プログラムにバグがない」と証明できるか？",
+      tag: "固有ベクトル w の向き",
+      prompt: "J の1行目が [0, 1] のとき、実固有値 λ に対する固有ベクトル (J - λI)w = 0 は常にどの形で表され、λ > 0 のときの矢印は固定点に対してどちら向きか？",
       options: [
-        "できない。物理保存則（力学的エネルギー保存）など微分方程式から独立した性質や、誤差と dt の両対数傾き（4次）まで確認する必要がある。",
-        "できる。刻み幅を 1/10 にして曲線が重なればバグは存在しない。",
-        "できる。RK4は4次精度なので、どのような実装でもエネルギー誤差は必ず0になる。"
+        "w = (1, λ)^T（傾きが λ）、λ > 0 の直線上の矢印は固定点から離れる「外向き」。",
+        "w = (λ, 1)^T、λ > 0 の直線上の矢印は固定点へ近づく「内向き」。",
+        "w = (1, -λ)^T、λ > 0 のときは常に回転する。"
       ],
       ans: 0,
-      explain: "演習1(4)(5)の核心です。別の dt で値が一致しただけでは式自体のバグ（符号ミス等）を見落とす場合があるため、エネルギー保存則と次数傾きの確認が重要です。"
+      explain: "1行目を展開すると -λ w1 + w2 = 0 すなわち w2 = λ w1 なので、w = (1, λ)^T です。解は c * exp(λt) * w となるため λ > 0 なら時間とともに原点から外向きに離れます。"
     },
     {
       id: "iq6",
-      tag: "発想6: 固定点と線形化",
-      prompt: "ある非線形系の固定点でヤコビアンの固有値を計算したところ、実部が 0 の固有値（例: 純虚数、または 0 を含む）になった。このとき何をすべきか？",
+      tag: "線形化の限界",
+      prompt: "非線形系の固定点 x* でヤコビアンを調べたところ、固有値の実部 σ = 0（純虚数、または λ = 0 を含む Δ = 0）となった。このときの正しい判定は？",
       options: [
-        "「線形化だけでは安定性を判定できない」と述べ、保存量・f(x)の符号・非線形シミュレーションなどで直接確認する。",
-        "実部が正ではないので、無条件に「漸近安定（黒丸）」と結論づける。",
-        "実部が0のときは必ず「鞍点（サドル）」と書いてよい。"
+        "線形1次項による増減が 0 になり高次の非線形項が支配するため、線形化だけでは安定性を判定できない。",
+        "σ = 0 なので必ず漸近安定な黒丸と書いてよい。",
+        "Δ = 0 は必ず鞍点（サドル）になる。"
       ],
       ans: 0,
-      explain: "Re(lambda) = 0 のときは線形1次項が消えて高次非線形項が支配するため、線形化だけでは真の安定性を断定できません。"
+      explain: "σ < 0 や σ > 0 の場合は微小近傍で1次項が勝つため線形化の結果が非線形系にも引き継がれますが、σ = 0（非双曲型）では省略した高次項で安定・不安定・半安定がひっくり返り得ます。"
     },
     {
       id: "iq7",
-      tag: "発想7: 制御設計",
-      prompt: "不安定な倒立状態の逆振り子をPD制御で安定化し、さらにオーバーシュートなく最速で収束させたい。固有値・(tau, Delta) をどう設計する発想が正しいか？",
+      tag: "時間発散と陰解法",
+      prompt: "線形試験方程式 dx/dt = kx（k < 0）において、前進オイラー法の安定条件と後退（陰解法）オイラー法の安定性の違いを記号で表すと？",
       options: [
-        "tau = -kd < 0 かつ Delta = kp - g/l > 0 で安定領域に入れ、臨界減衰条件 tau^2 = 4*Delta（kd^2 = 4(kp - g/l)）を満たすように選ぶ。",
-        "tau = 0, Delta > 0 にして中心点にするとオーバーシュートなく最速で止まる。",
-        "Delta < 0 にすれば固有値が実数になって振動しなくなる。"
+        "前進オイラーは |1 + k*dt| <= 1（すなわち dt <= 2/|k|）の条件付き安定。後退オイラーは倍率 1/(1 - k*dt) が常に 1 未満のため任意の dt > 0 で絶対安定。",
+        "前進オイラーも後退オイラーも dt <= 2/|k| でないと発散する。",
+        "後退オイラーは |1 + k*dt| > 1 のときだけ安定になる。"
       ],
       ans: 0,
-      explain: "tau < 0, Delta > 0 で漸近安定領域に入り、振動と遅れの境界である tau^2 = 4*Delta（臨界減衰）がオーバーシュートなしで最速収束する条件です。"
+      explain: "陰解法は次時刻の値 x_{n+1} を解いて分母に (1 - k*dt) を作るため、k < 0, dt > 0 なら常に 0 < 1/(1 - k*dt) < 1 となり発散しません。"
     },
     {
       id: "iq8",
-      tag: "発想8: 線形代数",
-      prompt: "同じ係数行列 A に対して右辺ベクトル b だけを何十回も変えて A x = b を解きたい。最も効率的な発想はどれか？",
+      tag: "多変数RK4と妥当性検証",
+      prompt: "2変数 (x, v) のRK4実装と、得られたシミュレータの妥当性検証に関する正しい一般原則はどれか？",
       options: [
-        "最初に A = LU と1回だけLU分解し、各 b に対しては計算量の軽い O(n^2) の前進代入・後退代入だけで解く。",
-        "毎回新たにガウスの消去法を O(n^3) かけて最初からやり直す。",
-        "毎回 np.linalg.inv(A) @ b を呼び出す方が solve より高精度で高速である。"
+        "RK4の各段階 k1..k4 で全成分を同じ中間段階に揃えて評価し、検証には保存量（エネルギー E 等）の誤差の両対数傾きが手法の次数 p に一致するかを確認する。",
+        "RK4では x を先に更新してから v を評価し、検証はグラフが滑らかか目視するだけで十分である。",
+        "1ステップ誤差が O(dt^p) なので、一定時間 T 後の積算誤差は O(dt^(p+1)) になる。"
       ],
       ans: 0,
-      explain: "ガウスの消去法は A と b を同時に変形するため b が変わるたびに O(n^3) かかりますが、LU分解なら分解を1回済ませれば代入の O(n^2) で再利用できます。"
+      explain: "1ステップ誤差が O(dt^(p+1))、積算誤差が O(dt^p) です。成分の同時評価と「独立した保存則＋理論次数の一致」がバグ検出の基本発想です。"
+    },
+    {
+      id: "iq9",
+      tag: "倒立PD制御と極配置",
+      prompt: "不安定な倒立系 phi'' = +(g/l)phi + u に対して PD 制御 u = -kp*phi - kd*phi' を入れた。線形化後の特性方程式 λ^2 + kd*λ + (kp - g/l) = 0 から導かれる漸近安定条件と臨界減衰条件は？",
+      options: [
+        "漸近安定: τ = -kd < 0 かつ Δ = kp - g/l > 0（kd > 0, kp > g/l）。臨界減衰: τ^2 - 4Δ = 0（kd^2 = 4(kp - g/l)）。",
+        "漸近安定: kd = 0 かつ kp < g/l。臨界減衰: Δ = 0。",
+        "漸近安定: τ > 0 かつ Δ < 0。臨界減衰: τ^2 - 4Δ < 0。"
+      ],
+      ans: 0,
+      explain: "制御ゲイン kp, kd を選ぶことは、まさにヤコビアンのトレース τ と行列式 Δ を動かして固有値 λ = σ ± iω を左半平面 (σ < 0) へ配置する作業そのものです。"
+    },
+    {
+      id: "iq10",
+      tag: "連立求根と線形計算",
+      prompt: "連立非線形方程式 f(x) = 0 のニュートン法と、連立1次方程式 A x = b の数値解法について正しい記号・計算量の組合せは？",
+      options: [
+        "ニュートン法は J(x_k) δ = -f(x_k)（右辺にマイナス符号）を解き x_{k+1} = x_k + δ と更新。LU分解は O(n^3) の分解を1回作れば別の b に対して O(n^2) の前進・後退代入だけで解ける。",
+        "ニュートン法は J(x_k) δ = +f(x_k) を解き、LU分解は b が変わるたびに O(n^3) のやり直しが必要である。",
+        "A x = b は np.linalg.inv(A) @ b を使う方が np.linalg.solve(A, b) より常に高速かつ高精度である。"
+      ],
+      ans: 0,
+      explain: "ニュートン法のマイナス符号、部分ピボットによるゼロ除算・丸め誤差拡大防止、LU分解の O(n^2) 再利用、逆行列非推奨（約3倍のコスト）の4点を押さえれば万全です。"
     }
   ];
 
-  let picked = {}; // { qid: selectedIndex }
+  let picked = {};
 
   function load() {
     try {
@@ -598,7 +817,7 @@
     document.getElementById("progress-fill").style.width = Math.round((ok / QUESTIONS.length) * 100) + "%";
   }
 
-  function renderQuestion(q, idx) {
+  function renderQuestion(q) {
     const card = document.getElementById("card-" + q.id);
     const badge = document.getElementById("badge-" + q.id);
     const fb = document.getElementById("fb-" + q.id);
@@ -615,8 +834,7 @@
       return;
     }
 
-    const isOk = sel === q.ans;
-    if (isOk) {
+    if (sel === q.ans) {
       card.classList.add("is-ok");
       badge.classList.add("ok");
       badge.textContent = "[正解]";
@@ -630,7 +848,7 @@
       btns[sel].classList.add("chosen-ng");
       btns[q.ans].classList.add("ans-highlight");
       fb.classList.add("show", "ng");
-      fb.querySelector(".fb-title").textContent = "[不正解] 正しい選択肢を確認してください。";
+      fb.querySelector(".fb-title").textContent = "[不正解] 正しい考え方を確認してください。";
     }
   }
 
@@ -669,7 +887,7 @@
 
       card.innerHTML = html;
       root.appendChild(card);
-      renderQuestion(q, idx);
+      renderQuestion(q);
     });
     updateHud();
   }

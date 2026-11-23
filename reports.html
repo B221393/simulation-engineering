@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>シミュレーション工学 レポート演習1・2 完全まとめ</title>
+<title>シミュレーション工学 レポート演習1・2 一般記号・構造まとめ</title>
 <style>
   :root {
     --fg: #1b1b1f;
@@ -123,6 +123,7 @@
     font-family: Consolas, "Courier New", monospace;
     font-size: 0.84rem;
     overflow-x: auto;
+    white-space: pre-wrap;
   }
   .step-card ul { margin: 4px 0 0; padding-left: 1.3em; font-size: 0.86rem; color: #2b2f38; }
   .step-card li { margin-bottom: 3px; }
@@ -317,141 +318,133 @@
   <a class="back-link" id="back-link" href="index.html" style="display:none;">[トップページへ戻る]</a>
 
   <header class="top-card">
-    <div class="kicker">SIMULATION ENGINEERING // EXERCISE 1 &amp; 2 REPORT SUMMARY</div>
-    <h1>レポート演習1（単振り子）・演習2（静電アクチュエータ）完全まとめ</h1>
+    <div class="kicker">SIMULATION ENGINEERING // SYMBOLIC REPORT STRUCTURE (EX 1 &amp; EX 2)</div>
+    <h1>レポート演習1・2 まとめ（一般記号と物理・相図のつながり）</h1>
     <p class="sub">
-      2つのレポート課題が「何を確かめるためのストーリーになっているか」を導出・考察・物理的意味ごとに整理しました。下部の10問チェックで自分の理解を判定できます。
+      2つの演習レポートに共通する「モデル化 -&gt; 1階変換 -&gt; 固定点 -&gt; ヤコビアン(&tau;, &Delta;, &lambda;=&sigma;&plusmn;i&omega;) -&gt; 相図 -&gt; 分岐・制御」という構造を、特定数値ではなく一般記号ベースで整理しました。
     </p>
   </header>
 
   <nav class="nav-pills">
-    <a class="nav-pill" href="#compare">横断比較表</a>
+    <a class="nav-pill" href="#compare">共通構造（横断表）</a>
     <a class="nav-pill" href="#ex1">演習1: 単振り子 (1)-(8)</a>
     <a class="nav-pill" href="#ex2">演習2: 静電アクチュエータ (1)-(7)</a>
-    <a class="nav-pill" href="#report-quiz">理解度チェック (10問)</a>
+    <a class="nav-pill" href="#report-quiz">記号チェック (10問)</a>
   </nav>
 
-  <h2 class="sec-title" id="compare"><span>OVERVIEW</span>演習1 と 演習2 の共通ストーリー（横断比較）</h2>
+  <h2 class="sec-title" id="compare"><span>OVERVIEW</span>演習1 と 演習2 の共通構造（記号での比較）</h2>
   <div class="tbl-wrap">
     <table>
       <tr>
-        <th style="width:20%;">共通ステップ</th>
-        <th style="width:40%;">演習1：単振り子の運動（第7-8回・試験中心）</th>
+        <th style="width:20%;">共通の流れ</th>
+        <th style="width:40%;">演習1：単振り子（第7-8回・試験中心）</th>
         <th style="width:40%;">演習2：静電アクチュエータ（第13-14回）</th>
       </tr>
       <tr>
-        <td>1. 物理モデルと1階変換</td>
-        <td><span class="mono">theta' = omega</span>, <span class="mono">omega' = -(g/l) sin(theta)</span>（質量 <span class="mono">m</span> は消える）</td>
-        <td><span class="mono">z' = v</span>, <span class="mono">v' = -beta*v - z + alpha/(1-z)^2</span>（<span class="mono">0 &lt;= z &lt; 1</span>）</td>
+        <td>1. 状態変数と1階連立</td>
+        <td><span class="mono">d&theta;/dt = &omega;</span>, <span class="mono">d&omega;/dt = -(g/l) sin(&theta;)</span></td>
+        <td><span class="mono">dz/dt = v</span>, <span class="mono">dv/dt = -&beta;*v - z + &alpha;/(1-z)^2</span></td>
       </tr>
       <tr>
-        <td>2. 固定点の求め方</td>
-        <td><span class="mono">omega = 0, sin(theta) = 0</span> から手計算で <span class="mono">theta* = 0, pi</span>（<span class="mono">-pi</span> は同一）</td>
-        <td><span class="mono">alpha = z(1-z)^2</span> は3次式なので <b>ニュートン法</b> で <span class="mono">1/7, 4/7</span> を探索</td>
+        <td>2. 固定点 <span class="mono">f(x*) = 0</span></td>
+        <td><span class="mono">&omega;* = 0, sin(&theta;*) = 0</span> -&gt; <span class="mono">&theta;* = 0, &pi;</span></td>
+        <td><span class="mono">v* = 0, &alpha; = z*(1 - z*)^2</span>（3次式なのでニュートン法で解く）</td>
       </tr>
       <tr>
-        <td>3. 数値積分と検証</td>
-        <td>オイラー法 vs RK4（<span class="mono">dt=0.01,0.001,0.0001</span>）、エネルギー保存と両対数傾きで妥当性検証</td>
-        <td>連立RK4で <span class="mono">(0.30, 0)</span> 収束 vs <span class="mono">(0.60, 0)</span> 電極接触（プルイン）を比較</td>
+        <td>3. ヤコビアンと固有値</td>
+        <td><span class="mono">J = [[0, 1], [-(g/l)cos(&theta;*), 0]]</span><br><span class="mono">&theta;*=0</span> は純虚数（<span class="mono">&sigma;=0</span> 中心点）、<span class="mono">&theta;*=&pi;</span> は鞍点</td>
+        <td><span class="mono">J = [[0, 1], [(3z*-1)/(1-z*), -&beta;]]</span><br><span class="mono">0&lt;z*&lt;1/3</span> は安定（<span class="mono">&sigma;&lt;0</span>）、<span class="mono">1/3&lt;z*&lt;1</span> は鞍点（<span class="mono">&Delta;&lt;0</span>）</td>
       </tr>
       <tr>
-        <td>4. ヤコビアンと相図</td>
-        <td><span class="mono">(0,0)</span> は中心点（中立安定・閉軌道）、<span class="mono">(pi,0)</span> は鞍点（振動と回転を分ける境界）</td>
-        <td><span class="mono">1/7</span> は安定渦状点（黒丸・ばね勝ち）、<span class="mono">4/7</span> は鞍点（白丸・静電力勝ち）</td>
+        <td>4. 数値検証・相図</td>
+        <td>エネルギー保存誤差 <span class="mono">|E(t)-E(0)|</span> の両対数傾き＝1(オイラー)/4(RK4)<br>相図は <span class="mono">&theta;*=&pi;</span> を境に振動（閉軌道）と回転に分かれる</td>
+        <td>RK4で安定点へ収束する領域と接触（プルイン）へ飛ぶ領域が鞍点の安定多様体（セパラトリクス）で分かれる</td>
       </tr>
       <tr>
-        <td>5. 発展・制御・分岐</td>
-        <td>上死点 <span class="mono">pi</span> を重力補償＋PD制御で倒立安定化</td>
-        <td>サドルノード分岐（<span class="mono">alpha = 4/27</span> で固定点消滅）と非負電圧PD制御</td>
+        <td>5. 発展（制御・分岐）</td>
+        <td>倒立点 <span class="mono">&phi;=0</span>（重力項 <span class="mono">+</span>）をPD制御で <span class="mono">&tau;&lt;0, &Delta;&gt;0</span> へ</td>
+        <td>極大 <span class="mono">&alpha; = 4/27</span> でサドルノード分岐（<span class="mono">&Delta;=0</span>）。電圧制御は <span class="mono">&alpha; &gt;= 0</span> 制約</td>
       </tr>
     </table>
   </div>
 
-  <h2 class="sec-title" id="ex1"><span>PART 1 (試験配点の中心)</span>演習1「単振り子の運動」レポート (1)-(8) まとめ</h2>
+  <h2 class="sec-title" id="ex1"><span>PART 1 (試験配点の中心)</span>演習1「単振り子の運動」レポート (1)-(8) 記号まとめ</h2>
   <div class="step-list">
     <article class="step-card">
-      <div class="step-head"><span class="step-badge">演習1 (1)-(2)</span><h3 class="step-title">運動方程式の導出と1階連立化・エネルギー保存</h3></div>
-      <div class="eq-box">m * l * theta'' = -m * g * sin(theta)  =&gt;  theta'' = -(g/l) * sin(theta)
-d(theta)/dt = omega,   d(omega)/dt = -(g/l) * sin(theta)</div>
+      <div class="step-head"><span class="step-badge">演習1 (1)-(2)</span><h3 class="step-title">運動方程式・1階連立化・保存量 E</h3></div>
+      <div class="eq-box">回転の運動方程式: m * l^2 * &theta;'' = -m * g * l * sin(&theta;)  =&gt;  &theta;'' = -(g/l) * sin(&theta;)
+1階連立形: d&theta;/dt = &omega;,   d&omega;/dt = -(g/l) * sin(&theta;)
+力学的エネルギー: E(&theta;, &omega;) = (1/2) * m * l^2 * &omega;^2 + m * g * l * (1 - cos(&theta;))</div>
       <ul>
-        <li><b>試験のツボ:</b> 両辺を <span class="mono">ml</span>（または回転方程式 <span class="mono">ml^2 * theta'' = -mgl sin(theta)</span> を <span class="mono">ml^2</span>）で割ると質量 <span class="mono">m</span> が消え、動きは質量に依存しない（ただしエネルギー <span class="mono">E = 0.5*m*l^2*omega^2 + m*g*l*(1 - cos(theta))</span> の計算には <span class="mono">m</span> を使う）。</li>
+        <li><b>記号の本質:</b> 運動方程式を整理すると質量 <span class="mono">m</span> が約分されて消えるため、角度・角速度の動きは <span class="mono">m</span> に依存しない（エネルギー <span class="mono">E</span> を計算するときだけ <span class="mono">m</span> を使う）。</li>
       </ul>
     </article>
 
     <article class="step-card">
-      <div class="step-head"><span class="step-badge">演習1 (3)-(4)</span><h3 class="step-title">オイラー法とRK4の比較（なぜ振幅が膨らむか）</h3></div>
-      <div class="eq-box">前進オイラー: theta[n+1] = theta[n] + dt*omega[n],  omega[n+1] = omega[n] - dt*(g/l)*sin(theta[n])
-RK4(2変数): 各段階 k1 -> k2 -> k3 -> k4 ごとに theta と omega をペアで同時に進めて評価する</div>
+      <div class="step-head"><span class="step-badge">演習1 (3)-(6)</span><h3 class="step-title">オイラー法・RK4の挙動と妥当性評価・精度次数</h3></div>
+      <div class="eq-box">前進オイラー: &theta;[n+1] = &theta;[n] + dt * &omega;[n],   &omega;[n+1] = &omega;[n] - dt * (g/l) * sin(&theta;[n])
+RK4(2変数): 各段階 (k1, k2, k3, k4) で &theta; と &omega; の両方を同じ中間段階に揃えて評価する
+誤差次数: 1ステップ局所誤差 O(dt^(p+1))  =&gt;  一定時間 T 後の積算誤差 O(dt^p)</div>
       <ul>
-        <li><b>オイラー法の結果と考察:</b> 刻み幅 <span class="mono">dt</span> が大きいと前進オイラー法は <b>力学的エネルギーを人工的に増やす</b> ため、相図が閉じた円にならず外へ膨らみ振幅が増大する。<span class="mono">dt = 0.01 -&gt; 0.001 -&gt; 0.0001</span> と細かくすると真値へ近づく。</li>
-        <li><b>RK4の考察:</b> <span class="mono">dt = 0.01, 0.001, 0.0001</span> で曲線がほぼ重なるが、曲線が一致するだけでは式自体のバグがない証明にならないため、次の (5) で独立した物理保存則を確認する。</li>
+        <li><b>オイラー法で振幅が増える理由:</b> 減衰のない単振動・振り子に前進オイラー法を使うと、1ステップごとの増幅率の大きさが 1 をわずかに上回り、<b>力学的エネルギーを人工的に増やし続ける</b>ため、相図が閉じた輪にならず外へ膨らむ。</li>
+        <li><b>妥当性評価の核心:</b> 刻み幅 <span class="mono">dt</span> を細かくして曲線が重なるだけでは「式自体の間違い」を見抜けない。そこで微分方程式から独立に導かれる <b>力学的エネルギー保存</b> を使い、<span class="mono">|E(t) - E(0)|</span> の両対数グラフの傾きが理論次数 <span class="mono">p</span>（オイラー 1、RK4 4）に一致することでプログラムの正しさを裏付ける。</li>
       </ul>
     </article>
 
     <article class="step-card">
-      <div class="step-head"><span class="step-badge">演習1 (5)-(6)</span><h3 class="step-title">プログラムの妥当性評価と精度の次数</h3></div>
+      <div class="step-head"><span class="step-badge">演習1 (7)</span><h3 class="step-title">相図 <span class="mono">(&theta;, &omega;)</span> の構造と周期境界</h3></div>
       <ul>
-        <li><b>妥当性評価:</b> 減衰なし単振り子では力学的エネルギー <span class="mono">E</span> が一定に保たれる。そこでエネルギー保存誤差 <span class="mono">|E(t) - E(0)|</span> を両対数グラフに描き、傾きがオイラー法で <b>1</b>（1次精度 <span class="mono">O(dt)</span>）、RK4で <b>4</b>（4次精度 <span class="mono">O(dt^4)</span>）になることを確認すれば実装の強い根拠になる。</li>
-        <li><b>誤差次数の区別:</b> オイラー法のテイラー展開より、1ステップの局所打ち切り誤差は <span class="mono">O(dt^2)</span>、一定時間 <span class="mono">T</span>（<span class="mono">T/dt</span> ステップ）の積算（大域）誤差は <span class="mono">O(dt)</span>。</li>
+        <li><b>2つの固定点:</b> <span class="mono">&theta;* = 0</span>（最下点）はヤコビアン <span class="mono">J = [[0, 1], [-g/l, 0]]</span> より固有値 <span class="mono">&lambda; = &plusmn;i*sqrt(g/l)</span>（実部 <span class="mono">&sigma; = 0</span> の純虚数）＝ <b>中心点（中立安定・閉軌道）</b>。<span class="mono">&theta;* = &pi;</span>（真上）は <span class="mono">J = [[0, 1], [+g/l, 0]]</span> より固有値 <span class="mono">&lambda; = &plusmn;sqrt(g/l)</span> ＝ <b>鞍点（不安定）</b>。</li>
+        <li><b>周期性の注意:</b> <span class="mono">&theta;</span> は <span class="mono">2&pi;</span> 周期の変数なので、<span class="mono">&theta; = &pi;</span> と <span class="mono">&theta; = -&pi;</span> は物理的に <b>同一の固定点（真上）</b> である。</li>
+        <li><b>振動と回転を分ける境界（セパラトリクス）:</b> 真上の静止エネルギー障壁 <span class="mono">E = 2*m*g*l</span> より小さい初期値（例: 途中で止まる）は中心点周りを回る <b>往復振動（閉軌道）</b>、障壁 <span class="mono">2*m*g*l</span> を超える初期値（真上で速度を持つ）は <span class="mono">&omega;</span> の符号を保ったまま回り続ける <b>連続回転（上下の帯状軌道）</b> になる。</li>
       </ul>
     </article>
 
     <article class="step-card">
-      <div class="step-head"><span class="step-badge">演習1 (7)</span><h3 class="step-title">相図と6つの初期条件の解釈</h3></div>
-      <div class="tbl-wrap" style="margin:6px 0 4px;">
-        <table>
-          <tr><th>初期条件 <span class="mono">(theta0, omega0)</span></th><th>運動と相図上の軌道</th><th>物理的ポイント</th></tr>
-          <tr><td><span class="mono">(0, 0)</span></td><td>最下点で静止（固定点・中心点）</td><td>ヤコビ固有値 <span class="mono">+-i*sqrt(g/l)</span>、中立安定（漸近安定ではない）</td></tr>
-          <tr><td><span class="mono">(pi/2, 0)</span></td><td>行って戻る往復振動（閉軌道）</td><td>エネルギー <span class="mono">E = mgl &lt; 2mgl</span>。非線形系なので周期は振幅に依存</td></tr>
-          <tr><td><span class="mono">(pi, 0)</span> と <span class="mono">(-pi, 0)</span></td><td>真上の不安定平衡点（鞍点・同一の点）</td><td><span class="mono">2*pi</span> 周期で同一姿勢。数値上は <span class="mono">sin(pi)!=0</span> の丸め誤差でも落下する</td></tr>
-          <tr><td><span class="mono">(-pi, 1)</span> / <span class="mono">(pi, -1)</span></td><td>上下の帯状の連続回転（大車輪）</td><td>真上で速度を持つため <span class="mono">E &gt; 2mgl</span>（位置エネルギー障壁越え）</td></tr>
-        </table>
-      </div>
+      <div class="step-head"><span class="step-badge">演習1 (8) 発展</span><h3 class="step-title">倒立位置の安定化制御</h3></div>
       <ul>
-        <li><b>セパラトリクス:</b> <span class="mono">(+-pi, 0)</span> を通る軌道が「振動（閉軌道）」と「回転（上下の帯）」を分ける境界線になる。</li>
-      </ul>
-    </article>
-
-    <article class="step-card">
-      <div class="step-head"><span class="step-badge">演習1 (8) 発展</span><h3 class="step-title">倒立状態の安定化制御</h3></div>
-      <ul>
-        <li>真上（<span class="mono">phi = 0</span>）基準の座標にすると重力項の符号は <span class="mono">+(g/l)*sin(phi)</span> に変わる。</li>
-        <li>重力補償＋PD制御（または線形倒立振り子のPD制御 <span class="mono">u = -kp*phi - kd*omega</span>）により、<span class="mono">tau = -kd &lt; 0, Delta = kp - g/l &gt; 0</span>（<span class="mono">kd &gt; 0, kp &gt; g/l</span>）を満たせば上死点近傍で漸近安定化できる。ただし局所安定化であり、トルク飽和やセンサノイズには注意が必要。</li>
+        <li>真上（<span class="mono">&phi; = 0</span>）を基準にした座標では、少し傾くとさらに倒れる向きに重力トルクが働くため、重力項の符号が真下基準の <span class="mono">-</span> から <b><span class="mono">+ (g/l)*sin(&phi;)</span></b> へ反転する。</li>
+        <li>PD制御（および重力補償）を加え、線形化後の特性方程式 <span class="mono">&lambda;^2 + kd*&lambda; + (kp - g/l) = 0</span> において <span class="mono">&tau; = -kd &lt; 0</span>（<span class="mono">kd &gt; 0</span>）かつ <span class="mono">&Delta; = kp - g/l &gt; 0</span>（<span class="mono">kp &gt; g/l</span>）を満たせば、固有値の実部 <span class="mono">&sigma;</span> が負になり倒立維持できる。</li>
       </ul>
     </article>
   </div>
 
-  <h2 class="sec-title" id="ex2"><span>PART 2</span>演習2「静電アクチュエータ」レポート (1)-(7) 要点まとめ</h2>
+  <h2 class="sec-title" id="ex2"><span>PART 2</span>演習2「静電アクチュエータ」レポート (1)-(7) 記号まとめ</h2>
   <div class="warn-banner">
-    注意: 演習2（第13-14回）は今回の期末試験では範囲外の可能性もあります（掲示・告知で確認してください）。ただし「1階変換・ニュートン法・ヤコビアン・相図手描き」の手順そのものは試験でもそのまま出題される重要パターンです。
+    注意: 演習2（第13-14回）は期末試験では範囲外の可能性もあります（掲示等で確認）。ただしここで使う「1階変換 -&gt; ニュートン法 -&gt; ヤコビアン一般化 -&gt; 相図と物理の対応」は他の問題でもそのまま使えます。
   </div>
 
   <div class="step-list">
     <article class="step-card">
-      <div class="step-head"><span class="step-badge">演習2 (1)-(2)</span><h3 class="step-title">無次元運動方程式・固定点条件・ニュートン法</h3></div>
-      <div class="eq-box">z' = v,   v' = -beta*v - z + alpha/(1 - z)^2   (0 &lt;= z &lt; 1)
-固定点条件: v = 0,   alpha = z*(1 - z)^2
-ニュートン法: f(z) = alpha - z*(1 - z)^2,   f'(z) = (1 - z)*(3*z - 1)</div>
+      <div class="step-head"><span class="step-badge">演習2 (1)-(2)</span><h3 class="step-title">無次元式・固定点条件・ニュートン法</h3></div>
+      <div class="eq-box">dz/dt = v,   dv/dt = -&beta;*v - z + &alpha; / (1 - z)^2     (物理範囲 0 &lt;= z &lt; 1, &alpha; &gt;= 0, &beta; &gt; 0)
+固定点条件: dz/dt = 0, dv/dt = 0  =&gt;  v* = 0  かつ  &alpha; = z* * (1 - z*)^2
+ニュートン法: f(z) = &alpha; - z*(1 - z)^2,   f'(z) = (1 - z)*(3*z - 1),   z_{k+1} = z_k - f(z_k)/f'(z_k)</div>
       <ul>
-        <li><span class="mono">alpha = 36/343</span> での2つの物理的固定点は <span class="mono">z* = 1/7</span>（初期値 0.1 から収束）と <span class="mono">z* = 4/7</span>（初期値 0.6 から収束）。</li>
-        <li><b>失敗する初期値:</b> <span class="mono">z0 = 1/3</span>（山の頂上）および <span class="mono">z0 = 1</span> では <span class="mono">f'(z0) = 0</span> で接線が水平・分母 0 となり更新停止。<span class="mono">z0 &gt; 1</span> は範囲外の根 <span class="mono">9/7</span> に収束する。</li>
+        <li><b>停止する条件:</b> <span class="mono">f'(z) = 0</span> すなわち <span class="mono">z = 1/3</span>（曲線 <span class="mono">z(1-z)^2</span> の山の頂上）や <span class="mono">z = 1</span> では接線が水平になり分母 0 で更新が止まる。</li>
       </ul>
     </article>
 
     <article class="step-card">
-      <div class="step-head"><span class="step-badge">演習2 (3)-(5)</span><h3 class="step-title">ヤコビアン・相図手描きと物理的解釈</h3></div>
+      <div class="step-head"><span class="step-badge">演習2 (3)-(5)</span><h3 class="step-title">一般記号のまま求めるヤコビアンと物理的意味</h3></div>
+      <div class="eq-box">J(z*, 0) = [ [ 0 , 1 ], [ -1 + 2*&alpha;/(1 - z*)^3 , -&beta; ] ]
+固定点条件 &alpha; = z*(1 - z*)^2 を代入して &alpha; を消去すると:
+J(z*, 0) = [ [ 0 , 1 ], [ (3*z* - 1)/(1 - z*) , -&beta; ] ]
+よって &tau; = -&beta;,   &Delta; = (1 - 3*z*) / (1 - z*)</div>
       <ul>
-        <li><b>固定点 <span class="mono">(1/7, 0)</span>（<span class="mono">beta = 1</span>）:</b> <span class="mono">J = [[0, 1], [-2/3, -1]]</span>。<span class="mono">tau = -1, Delta = 2/3, tau^2 - 4*Delta = -5/3 &lt; 0</span> より <b>安定渦状点（黒丸・時計回り）</b>。なお <span class="mono">beta = 2</span> に強めると <span class="mono">tau^2 - 4*Delta = 4/3 &gt; 0</span> となり <b>安定結節点</b> へ変わる。</li>
-        <li><b>固定点 <span class="mono">(4/7, 0)</span>:</b> <span class="mono">J = [[0, 1], [5/3, -1]]</span>。<span class="mono">Delta = -5/3 &lt; 0</span> より <b>鞍点（不安定・白丸）</b>。固有ベクトルは <span class="mono">w = (1, lambda)^T</span>（正の固有値 <span class="mono">approx +0.88</span> は外向き、負 <span class="mono">approx -1.88</span> は内向き）。</li>
-        <li><b>物理的理由:</b> ばね力 <span class="mono">z</span> の増え方と静電力 <span class="mono">alpha/(1-z)^2</span> の増え方を比べると、<span class="mono">1/7</span> ではばねの増加率が勝って押し戻す（安定）、<span class="mono">4/7</span> では静電力の増加率が勝って引き込まれ電極接触（プルイン）する。初期値 <span class="mono">(0, 0.5)</span> は <span class="mono">1/7</span> へ収束し、<span class="mono">(0, 0.8)</span> はセパラトリクスを越えて接触する。</li>
+        <li><b>数値なしでも一発で安定性が読める:</b>
+          <span class="mono">0 &lt; z* &lt; 1/3</span> の固定点では分子 <span class="mono">1 - 3*z* &gt; 0</span> より <span class="mono">&Delta; &gt; 0</span>、かつ <span class="mono">&tau; = -&beta; &lt; 0</span>（実部 <span class="mono">&sigma; &lt; 0</span>）なので必ず <b>漸近安定（黒丸・時計回り）</b>（<span class="mono">&tau;^2 - 4&Delta; &lt; 0</span> なら渦状点、<span class="mono">&gt; 0</span> なら結節点）。<br>
+          一方、<span class="mono">1/3 &lt; z* &lt; 1</span> の固定点では <span class="mono">&Delta; &lt; 0</span> なので必ず <b>鞍点（不安定・白丸）</b> になる。
+        </li>
+        <li><b>物理的理由:</b> ばねの引き戻す力 <span class="mono">z</span> の増え方と静電力 <span class="mono">&alpha;/(1-z)^2</span> の増え方を比べると、山の左側 (<span class="mono">z* &lt; 1/3</span>) ではばねの増加率が勝って戻り、山の右側 (<span class="mono">z* &gt; 1/3</span>) では静電力の増加率が勝って電極へ引き込まれる（プルイン）。</li>
       </ul>
     </article>
 
     <article class="step-card">
       <div class="step-head"><span class="step-badge">演習2 (6)-(7)</span><h3 class="step-title">サドルノード分岐と電圧フィードバック制御</h3></div>
       <ul>
-        <li><b>サドルノード分岐:</b> <span class="mono">g(z) = z(1-z)^2</span> は <span class="mono">z = 1/3</span> で極大値 <b><span class="mono">alpha = 4/27</span></b> をとる。<span class="mono">0 &lt; alpha &lt; 4/27</span> で2個、<span class="mono">alpha = 4/27</span> で1個（固有値 <span class="mono">0, -1</span>：線形化だけでは判定不可・半安定）、<span class="mono">alpha &gt; 4/27</span> で固定点 0 個となり全初期値から必ず接触する。</li>
-        <li><b>電圧PD制御:</b> <span class="mono">alpha</span> は印加電圧の2乗（<span class="mono">V^2</span>）に比例するため負にできない。よって <span class="mono">alpha(z, v) = max(0, alpha_ff - Kp*(z - z_ref) - Kd*v)</span> と 0 でクリップして <span class="mono">z_ref &gt; 1/3</span> の位置も安定化する。</li>
+        <li><b>分岐条件（一般記号）:</b> <span class="mono">g(z) = z(1-z)^2</span> の極大点 <span class="mono">g'(z) = (1-z)(1-3z) = 0</span> は <span class="mono">z = 1/3</span>、極大値は <span class="mono">&alpha;_crit = 4/27</span>。<span class="mono">&alpha; = &alpha;_crit</span> の点では <span class="mono">&Delta; = 0</span>（固有値 <span class="mono">0, -&beta;</span>）となり <b>線形化だけでは判定不可（半安定）</b>。これを超えると固定点が消滅する。</li>
+        <li><b>非負制約の理由:</b> 電圧制御入力 <span class="mono">&alpha;</span> は <span class="mono">V^2</span> に比例し常に非負（静電力は引力のみで斥力は出せない）のため、<span class="mono">&alpha;(z, v) = max(0, &alpha;_ff - Kp*(z - z_ref) - Kd*v)</span> と 0 でクリップする。</li>
       </ul>
       <div class="tool-row">
         <a class="small-btn" href="tool/ex2_summary.html">演習2 詳細まとめ</a>
@@ -461,7 +454,7 @@ RK4(2変数): 各段階 k1 -> k2 -> k3 -> k4 ごとに theta と omega をペア
     </article>
   </div>
 
-  <h2 class="sec-title" id="report-quiz"><span>PART 3</span>レポート演習 理解度チェック（入力・選択 10問）</h2>
+  <h2 class="sec-title" id="report-quiz"><span>PART 3</span>レポート演習 記号・理解度チェック（10問）</h2>
 
   <div class="quiz-hud">
     <div class="hud-row">
@@ -480,19 +473,19 @@ RK4(2変数): 各段階 k1 -> k2 -> k3 -> k4 ごとに theta と omega をペア
   <div id="quiz-root"></div>
 
   <div class="next-box">
-    <a class="btn-link solid" href="ideas.html">大事な発想ガイド（8つの発想）へ</a>
+    <a class="btn-link solid" href="ideas.html">相図・&lambda;=&sigma;&plusmn;i&omega;・発想ガイドへ</a>
     <a class="btn-link" href="tool/memorize_list.html">全範囲 入力チェック（32問）へ</a>
     <a class="btn-link" href="tool/memorize_quiz.html">4択クイズ（35問）へ</a>
   </div>
 
-  <footer>シミュレーション工学 レポート演習1・2 完全まとめ</footer>
+  <footer>シミュレーション工学 レポート演習1・2 一般記号・構造まとめ</footer>
 </div>
 
 <script>
 (function() {
   "use strict";
 
-  const STORAGE_KEY = "sim_eng_reports_v1";
+  const STORAGE_KEY = "sim_eng_reports_v2";
 
   function normText(s) {
     return String(s || "")
@@ -593,8 +586,8 @@ RK4(2変数): 各段階 k1 -> k2 -> k3 -> k4 ごとに theta と omega をペア
   const QUESTIONS = [
     {
       id: "rq1",
-      tag: "演習1 (1)(2) 単振り子の運動方程式",
-      prompt: "単振り子 ml^2 theta'' = -mgl sin(theta) を整理したとき、質量 m = 2 kg を m = 10 kg に増やすと角度 theta(t) の時間発展は変わるか？",
+      tag: "演習1 (1)(2) 単振り子の一般式",
+      prompt: "単振り子 m l^2 theta'' = -m g l sin(theta) を整理したとき、質量 m を変えても角度 theta(t) の動きは変わるか？",
       inputs: [
         { id: "a", label: "質量 m の影響", kind: "select", options: ["", "m が両辺で約分されて消えるため角度・角速度の動きは変わらない", "m に比例して速く振動する", "重くなると必ず発散する"], answerText: "m が両辺で約分されて消えるため角度・角速度の動きは変わらない", check: checkExactList(["m が両辺で約分されて消えるため角度・角速度の動きは変わらない"]) }
       ],
@@ -602,12 +595,12 @@ RK4(2変数): 各段階 k1 -> k2 -> k3 -> k4 ごとに theta と omega をペア
     },
     {
       id: "rq2",
-      tag: "演習1 (3) オイラー法の挙動",
-      prompt: "減衰なし単振り子を前進オイラー法（大きめの dt）で計算すると、時間経過とともに振り子の振幅がだんだん大きくなってしまう。その理由は？",
+      tag: "演習1 (3) 前進オイラー法のエネルギー変化",
+      prompt: "減衰なし単振り子を前進オイラー法（大きめの刻み幅 dt）で解くと、時間経過とともに振幅がだんだん広がるのはなぜか？",
       inputs: [
-        { id: "a", label: "振幅が増える理由", kind: "select", options: ["", "前進オイラー法が力学的エネルギーを人工的に増やす傾向があるから", "重力加速度 g が時間とともに大きくなるから", "sin(theta) が 1 を超えるから"], answerText: "前進オイラー法が力学的エネルギーを人工的に増やす傾向があるから", check: checkExactList(["前進オイラー法が力学的エネルギーを人工的に増やす傾向があるから"]) }
+        { id: "a", label: "振幅が広がる理由", kind: "select", options: ["", "前進オイラー法が力学的エネルギーを人工的に増やす傾向があるから", "重力加速度 g が時間とともに大きくなるから", "sin(theta) が 1 を超えるから"], answerText: "前進オイラー法が力学的エネルギーを人工的に増やす傾向があるから", check: checkExactList(["前進オイラー法が力学的エネルギーを人工的に増やす傾向があるから"]) }
       ],
-      explain: "単振動・単振り子に前進オイラー法を適用すると更新行列の固有値の絶対値が 1 よりわずかに大きくなり、相図が閉軌道にならず外側へ広がります。"
+      explain: "減衰なし系に前進オイラー法を適用すると更新行列の固有値の絶対値が 1 より大きくなり、相図が閉軌道にならず外へ膨らみます。"
     },
     {
       id: "rq3",
@@ -624,16 +617,16 @@ RK4(2変数): 各段階 k1 -> k2 -> k3 -> k4 ごとに theta と omega をペア
     },
     {
       id: "rq4",
-      tag: "演習1 (5) プログラムの妥当性検証",
+      tag: "演習1 (5) 妥当性評価の一般原則",
       prompt: "減衰なし単振り子のシミュレーションでプログラムにバグがないかを強く検証する手順として正しいものは？",
       inputs: [
-        { id: "a", label: "妥当性検証の方法", kind: "select", options: ["", "力学的エネルギー保存誤差 |E(t)-E(0)| の両対数傾きが理論次数(オイラー1, RK4 4)に一致するか確認する", "dt = 0.01 で1回だけ theta(t) の波形を描いて滑らかか見る", "初期条件 (0, 0) で値がずっと 0 かだけ見る"], answerText: "力学的エネルギー保存誤差 |E(t)-E(0)| の両対数傾きが理論次数(オイラー1, RK4 4)に一致するか確認する", check: checkExactList(["力学的エネルギー保存誤差 |E(t)-E(0)| の両対数傾きが理論次数(オイラー1, RK4 4)に一致するか確認する"]) }
+        { id: "a", label: "妥当性検証の方法", kind: "select", options: ["", "力学的エネルギー保存誤差 |E(t)-E(0)| の両対数傾きが理論次数(オイラー1, RK4 4)に一致するか確認する", "1通りの dt で theta(t) の波形を描いて滑らかか目視する", "初期条件 (0, 0) で値がずっと 0 かだけ見る"], answerText: "力学的エネルギー保存誤差 |E(t)-E(0)| の両対数傾きが理論次数(オイラー1, RK4 4)に一致するか確認する", check: checkExactList(["力学的エネルギー保存誤差 |E(t)-E(0)| の両対数傾きが理論次数(オイラー1, RK4 4)に一致するか確認する"]) }
       ],
-      explain: "運動方程式から独立に導かれる保存量（エネルギー一定）と、dt を変えたときの収束次数を両対数グラフで確認するのが王道です。"
+      explain: "運動方程式から独立に導かれる保存量（エネルギー一定）と、dt を変えたときの収束次数 p の一致を確認するのが王道です。"
     },
     {
       id: "rq5",
-      tag: "演習1 (8) 倒立状態のPD制御",
+      tag: "演習1 (8) 倒立座標とPD制御条件",
       prompt: "倒立位置（phi = 0 が真上）の座標で運動方程式の重力項の符号 [A] と、PD制御 u = -kp*phi - kd*omega で漸近安定にする条件 [B] を答えよ。",
       inputs: [
         { id: "a", label: "[A] 重力項 (g/l)*sin(phi) の符号", kind: "select", options: ["", "+", "-"], answerText: "+", check: checkExactList(["+"]) },
@@ -643,50 +636,49 @@ RK4(2変数): 各段階 k1 -> k2 -> k3 -> k4 ごとに theta と omega をペア
     },
     {
       id: "rq6",
-      tag: "演習2 (1) 静電アクチュエータの固定点",
+      tag: "演習2 (1) 固定点条件の一般式",
       prompt: "z' = v, v' = -beta*v - z + alpha/(1-z)^2 の固定点（z'=0 かつ v'=0）では、v = [A]、alpha = [B] となる（変数 z を使用）。",
       inputs: [
         { id: "v", label: "[A] 固定点の速度 v", kind: "number", placeholder: "数値", answerText: "0", check: checkNum(0, 1e-6) },
-        { id: "a", label: "[B] alpha =", kind: "expr", placeholder: "z*(1-z)**2", answerText: "z*(1-z)**2", check: checkExprEquiv(function(p){ return p.z * (1 - p.z) * (1 - p.z); }, [{z:1/7}, {z:4/7}, {z:0.3}]) }
+        { id: "a", label: "[B] alpha =", kind: "expr", placeholder: "z*(1-z)**2", answerText: "z*(1-z)**2", check: checkExprEquiv(function(p){ return p.z * (1 - p.z) * (1 - p.z); }, [{z:0.2}, {z:0.6}, {z:0.3}]) }
       ],
       explain: "z' = 0 よりまず v = 0、次に v' = 0 に代入して z = alpha/(1-z)^2 から alpha = z*(1-z)^2 が導けます。"
     },
     {
       id: "rq7",
-      tag: "演習2 (2) ニュートン法の失敗する初期値",
-      prompt: "f(z) = alpha - z(1-z)^2 に対するニュートン法で f'(z) = (1-z)(3z-1) = 0 となり、接線が水平（分母 0）で停止する初期値 z0 を2つ答えよ（小さい方と大きい方）。",
+      tag: "演習2 (2) ニュートン法の一般停止条件",
+      prompt: "f(z) = alpha - z(1-z)^2 に対するニュートン法では f'(z) = (1-z)(3z-1) となる。接線が水平になりゼロ除算で更新停止する条件と2点を答えよ。",
       inputs: [
-        { id: "z1", label: "小さい方の z0", kind: "number", placeholder: "例: 1/3", answerText: "1/3", check: checkNum(1/3, 0.002) },
-        { id: "z2", label: "大きい方の z0", kind: "number", placeholder: "整数", answerText: "1", check: checkNum(1, 1e-6) }
+        { id: "cond", label: "停止する理由・式", kind: "select", options: ["", "f'(z) = 0 となる z = 1/3 と z = 1 で分母が 0 になるため", "f(z) = 0 となる点で停止する（これは収束ではなく失敗）"], answerText: "f'(z) = 0 となる z = 1/3 と z = 1 で分母が 0 になるため", check: checkExactList(["f'(z) = 0 となる z = 1/3 と z = 1 で分母が 0 になるため"]) }
       ],
-      explain: "z = 1/3 は曲線 y = z(1-z)^2 の山の頂上、z = 1 は電極接触点の極小点であり、どちらも傾き f'(z) = 0 になるため更新できません。"
+      explain: "ニュートン法の更新式 z_{k+1} = z_k - f(z_k)/f'(z_k) では、極値点 f'(z) = 0（接線が水平）のときに分母 0 となり停止します。"
     },
     {
       id: "rq8",
-      tag: "演習2 (3) ヤコビアンと2つの固定点",
-      prompt: "alpha = 36/343, beta = 1 のとき、2つの固定点 z* = 1/7 と z* = 4/7 はそれぞれどの分類になるか？",
+      tag: "演習2 (3) 一般記号でのヤコビアン判定",
+      prompt: "固定点条件 alpha = z*(1-z*)^2 を代入した一般ヤコビアン J = [[0, 1], [(3*z*-1)/(1-z*), -beta]] より、tau = -beta < 0, Delta = (1-3*z*)/(1-z*) となる。0 < z* < 1/3 の固定点 [A] と 1/3 < z* < 1 の固定点 [B] の分類は？",
       inputs: [
-        { id: "c1", label: "z* = 1/7 の分類", kind: "select", options: ["", "安定渦状点（黒丸・時計回り）", "鞍点（不安定・白丸）", "中心点（中立安定）"], answerText: "安定渦状点（黒丸・時計回り）", check: checkExactList(["安定渦状点（黒丸・時計回り）"]) },
-        { id: "c2", label: "z* = 4/7 の分類", kind: "select", options: ["", "鞍点（不安定・白丸）", "安定渦状点（黒丸・時計回り）", "安定結節点（黒丸）"], answerText: "鞍点（不安定・白丸）", check: checkExactList(["鞍点（不安定・白丸）"]) }
+        { id: "c1", label: "[A] 0 < z* < 1/3 の固定点", kind: "select", options: ["", "Delta > 0 かつ tau < 0（実部 sigma < 0）なので漸近安定（黒丸・時計回り）", "Delta < 0 なので鞍点（不安定・白丸）", "tau = 0 なので中心点"], answerText: "Delta > 0 かつ tau < 0（実部 sigma < 0）なので漸近安定（黒丸・時計回り）", check: checkExactList(["Delta > 0 かつ tau < 0（実部 sigma < 0）なので漸近安定（黒丸・時計回り）"]) },
+        { id: "c2", label: "[B] 1/3 < z* < 1 の固定点", kind: "select", options: ["", "Delta < 0 なので鞍点（不安定・白丸）", "Delta > 0 なので漸近安定（黒丸）", "Delta = 0 なので判定不可"], answerText: "Delta < 0 なので鞍点（不安定・白丸）", check: checkExactList(["Delta < 0 なので鞍点（不安定・白丸）"]) }
       ],
-      explain: "1/7 ではばねの増加率が静電力に勝るため安定渦状点、4/7 では静電力の増加率が勝るため Delta < 0 の鞍点になります。"
+      explain: "特定の数値を使わなくても、一般式 Delta = (1 - 3*z*)/(1 - z*) の符号だけで「山の左側 z* < 1/3 は必ず安定」「山の右側 z* > 1/3 は必ず鞍点」と証明できます。"
     },
     {
       id: "rq9",
-      tag: "演習2 (6) サドルノード分岐点",
-      prompt: "g(z) = z(1-z)^2 の極大値であり、これを越えると固定点が消滅して必ず電極接触する臨界値 alpha = [A]（分数または小数）と、分岐点での固有値判定 [B] を答えよ。",
+      tag: "演習2 (6) 分岐点での行列式と線形化判定",
+      prompt: "サドルノード分岐点 g'(z*) = 0（z* = 1/3）を上の一般式 Delta = (1 - 3*z*)/(1 - z*) に代入すると Delta の値はいくつになるか？また線形化での判定は？",
       inputs: [
-        { id: "a", label: "[A] 臨界値 alpha =", kind: "number", placeholder: "例: 4/27", answerText: "4/27 (約 0.1481)", check: checkNum(4/27, 0.002) },
+        { id: "d", label: "[A] 分岐点での Delta =", kind: "number", placeholder: "整数", answerText: "0", check: checkNum(0, 1e-6) },
         { id: "b", label: "[B] 分岐点の安定性判定", kind: "select", options: ["", "固有値 0 を含むため線形化だけでは判定不可（非線形では半安定）", "2つの固有値がともに負なので漸近安定"], answerText: "固有値 0 を含むため線形化だけでは判定不可（非線形では半安定）", check: checkExactList(["固有値 0 を含むため線形化だけでは判定不可（非線形では半安定）"]) }
       ],
-      explain: "g'(z) = (1-z)(1-3z) = 0 より z = 1/3 で極大値 g(1/3) = (1/3)*(2/3)^2 = 4/27。この点では固有値が 0, -1 になるため線形化だけでは判定できません。"
+      explain: "g'(z*) = 0 の点では Delta = 0 となり固有値に 0 が現れます（もう1つは -beta）。実部 sigma = 0 の固有値を含むため線形化だけでは判定できません。"
     },
     {
       id: "rq10",
       tag: "演習2 (7) 電圧制御の非負制約",
       prompt: "目標位置 z_ref > 1/3 に対する電圧制御則 alpha(z, v) = max(0, alpha_ff - Kp*(z - z_ref) - Kd*v) で、なぜ 0 未満を切り捨てる（非負制約）必要があるのか？",
       inputs: [
-        { id: "a", label: "非負制約の物理的理由", kind: "select", options: ["", "alpha は電圧 V の2乗に比例するため負にできず（静電力は常に引力）、斥力を出せないから", "Pythonの配列インデックスが負になるとエラーになるから", "ばね定数 k が負になるから"], answerText: "alpha は電圧 V の2乗に比例するため負にできず（静電力は常に引力）、斥力を出せないから", check: checkExactList(["alpha は電圧 V の2乗に比例するため負にできず（静電力は常に引力）、斥力を出せないから"]) }
+        { id: "a", label: "非負制約の物理的理由", kind: "select", options: ["", "alpha は電圧 V^2 に比例するため負にできず（静電力は常に引力）、斥力を出せないから", "Pythonの配列インデックスが負になるとエラーになるから", "ばね定数 k が負になるから"], answerText: "alpha は電圧 V^2 に比例するため負にできず（静電力は常に引力）、斥力を出せないから", check: checkExactList(["alpha は電圧 V^2 に比例するため負にできず（静電力は常に引力）、斥力を出せないから"]) }
       ],
       explain: "静電力は alpha = epsilon_0*A*V^2/(2*k*d^3) >= 0 であり、電極同士を引き合う向き（引力）しか作れません。"
     }
