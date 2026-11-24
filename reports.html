@@ -296,7 +296,18 @@
   .fb-title { font-weight: 800; margin-bottom: 3px; }
   .feedback.ok .fb-title { color: var(--ok); }
   .feedback.ng .fb-title { color: var(--ng); }
-  .fb-ans { font-weight: 700; margin-bottom: 3px; color: var(--fg); }
+
+  .mode-nav a[aria-current="true"] { background: var(--accent); color: #fff; }
+  .input-grid { grid-template-columns: minmax(0, 1fr); }
+  .field-result { font-weight: 700; }
+  .field-result:empty { display: none; }
+  .field-result.ok { color: var(--ok); }
+  .field-result.ng { color: var(--ng); }
+  .field-result.blank { color: #754600; }
+  .feedback summary { cursor: pointer; font-weight: 700; }
+  .feedback ul { padding-inline-start: 1.25em; overflow-wrap: anywhere; }
+  .feedback li + li { margin-top: 8px; }
+  #batch-status:empty { display: none; }
 
   .next-box {
     margin-top: 24px;
@@ -334,12 +345,16 @@
     </p>
   </header>
 
-  <nav class="nav-pills">
+  <nav class="nav-pills mode-nav" aria-label="学習コーナー">
+    <a class="nav-pill" id="mode-study" href="#study">インプット（解き方・図解）</a>
+    <a class="nav-pill" id="mode-practice" href="#report-quiz">アウトプット（15問を解く）</a>
+  </nav>
+  <section id="study" aria-label="インプット">
+  <nav class="nav-pills" aria-label="解説の目次">
     <a class="nav-pill" href="#compare">共通構造</a>
     <a class="nav-pill" href="#ex1">演習1: 単振り子 (1)-(8)</a>
     <a class="nav-pill" href="#ex2">演習2: 静電アクチュエータ (1)-(7)</a>
     <a class="nav-pill" href="#advanced">発展5攻略型 (重要)</a>
-    <a class="nav-pill" href="#report-quiz">理解度チェック (15問)</a>
   </nav>
 
   <h2 class="sec-title" id="compare"><span>OVERVIEW</span>演習1 と 演習2 の共通構造（記号での比較）</h2>
@@ -589,7 +604,11 @@ J(z*, 0) = [ [ 0 , 1 ], [ (3*z* - 1)/(1 - z*) , -&beta; ] ]
 
   </div>
 
-  <h2 class="sec-title" id="report-quiz"><span>PART 4</span>演習・発展 記号理解度チェック（15問）</h2>
+  </section>
+
+  <section id="report-quiz" aria-labelledby="practice-title" hidden>
+  <h2 class="sec-title" id="practice-title">アウトプット　演習・発展チェック（15問）</h2>
+  <p class="sub">すべての欄が合っていれば正解です。採点すると各欄の正誤、あなたの解答、模範解答と解説が表示されます。</p>
 
   <div class="quiz-hud">
     <div class="hud-row">
@@ -605,7 +624,9 @@ J(z*, 0) = [ [ 0 , 1 ], [ (3*z* - 1)/(1 - z*) , -&beta; ] ]
     <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
   </div>
 
+  <p id="batch-status" role="status"></p>
   <div id="quiz-root"></div>
+  </section>
 
   <div class="next-box">
     <a class="btn-link solid" href="ideas.html">相図・&lambda;=&sigma;&plusmn;i&omega;・発想ガイドへ</a>
@@ -745,7 +766,7 @@ J(z*, 0) = [ [ 0 , 1 ], [ (3*z* - 1)/(1 - z*) , -&beta; ] ]
         { id: "a", label: "[A] theta = +-pi の扱い", kind: "select", options: ["", "2*pi周期で同一の固定点（真上・不安定鞍点）", "座標が違うので別の2つの安定点"], answerText: "2*pi周期で同一の固定点（真上・不安定鞍点）", check: checkExactList(["2*pi周期で同一の固定点（真上・不安定鞍点）"]) },
         { id: "b", label: "[B] 真上の位置エネルギー (m, g, l)", kind: "expr", placeholder: "2*m*g*l", answerText: "2*m*g*l", check: function(raw) {
           if (checkCodeList(["2mgl", "2*mgl", "2*m*g*l"])(raw)) return true;
-          return checkExprEquiv(function(p){ return 2 * p.m * p.g * p.l; }, [{m:2, g:9.8, l:1}, {m:1.5, g:9.8, l:0.5}])(raw);
+          return checkExprEquiv(function(p){ return 2 * p.m * p.g * p.l; }, [{m:2, g:9.8, l:1}, {m:1.5, g:8.3, l:0.5}, {m:3.1, g:10.2, l:0.7}])(raw);
         } }
       ],
       explain: "E = 0.5*m*l^2*omega^2 + m*g*l*(1 - cos(theta)) より theta = +-pi (cos = -1) の静止エネルギーは 2*m*g*l です。"
@@ -824,9 +845,9 @@ J(z*, 0) = [ [ 0 , 1 ], [ (3*z* - 1)/(1 - z*) , -&beta; ] ]
       inputs: [
         { id: "c", label: "[A] 臨界減衰の c =", kind: "expr", placeholder: "2*sqrt(m*k)", answerText: "2*sqrt(m*k)", check: function(raw) {
           if (checkCodeList(["2sqrt(mk)", "2*sqrt(mk)", "2sqrt(m*k)", "2*sqrt(m*k)", "sqrt(4mk)", "sqrt(4*m*k)"])(raw)) return true;
-          return checkExprEquiv(function(p){ return 2 * Math.sqrt(p.m * p.k); }, [{m:2, k:8}, {m:1.5, k:6}])(raw);
+          return checkExprEquiv(function(p){ return 2 * Math.sqrt(p.m * p.k); }, [{m:2, k:8}, {m:1.5, k:6}, {m:3, k:5}, {m:0.7, k:11}])(raw);
         } },
-        { id: "cls", label: "[B] 0 < c < 2*sqrt(m*k) の分類", kind: "select", options: ["", "安定渦状点（不足減衰）", "中心点（中立安定）", "安定ノード（過減衰）", "鞍点（不安定）"], answerText: "安定渦状点（不足減衰）", check: checkExactList(["安定渦状点（不足減衰）"]) }
+        { id: "cls", label: "[B] 0 < c < [A] の分類", kind: "select", options: ["", "安定渦状点（不足減衰）", "中心点（中立安定）", "安定ノード（過減衰）", "鞍点（不安定）"], answerText: "安定渦状点（不足減衰）", check: checkExactList(["安定渦状点（不足減衰）"]) }
       ],
       explain: "tau = -c/m, Delta = k/m より tau^2 - 4*Delta = (c^2 - 4*m*k)/m^2 = 0 となる臨界値は c = 2*sqrt(m*k) です。これより小さい正の c では振動しながら原点へ戻る安定渦状点（不足減衰）になります。"
     },
@@ -838,16 +859,16 @@ J(z*, 0) = [ [ 0 , 1 ], [ (3*z* - 1)/(1 - z*) , -&beta; ] ]
         { id: "cond", label: "[A] 最速収束する条件", kind: "select", options: ["", "臨界減衰（kd = 2*sqrt(kp - g/l)、重解）", "kd = 0 の中心点", "kd を無限大に近づけた過減衰極限"], answerText: "臨界減衰（kd = 2*sqrt(kp - g/l)、重解）", check: checkExactList(["臨界減衰（kd = 2*sqrt(kp - g/l)、重解）"]) },
         { id: "why", label: "[B] 過減衰で遅くなる理由", kind: "select", options: ["", "2つの負実固有値のうち大きい方が 0 に近づき収束が遅くなるから", "固有値が複素数になって振動が増えるから", "行列式 Delta が負になって鞍点に変わるから"], answerText: "2つの負実固有値のうち大きい方が 0 に近づき収束が遅くなるから", check: checkExactList(["2つの負実固有値のうち大きい方が 0 に近づき収束が遅くなるから"]) }
       ],
-      explain: "kd^2 < 4(kp-g/l) では実部が -kd/2 なので kd を増やすほど速くなりますが、臨界点 kd = 2*sqrt(kp-g/l) を超えると (-kd + sqrt(kd^2 - P))/2 が 0 に近づいていくため逆に遅くなります。"
+      explain: "kd^2 < 4(kp-g/l) では実部が -kd/2 なので kd を増やすほど速くなりますが、臨界点 kd = 2*sqrt(kp-g/l) を超えると (-kd + sqrt(kd^2 - 4(kp - g/l)))/2 が 0 に近づいていくため逆に遅くなります。"
     },
     {
       id: "rq13",
       tag: "発展型3 安定ノードの相図",
-      prompt: "2つの異なる負実固有値 lambda2 < lambda1 < 0（例: |lambda2| > |lambda1|）を持つ安定ノードの相図で、一般の解軌道 x(t) = c1*exp(lambda1*t)*v1 + c2*exp(lambda2*t)*v2 が時間経過で原点へ近づくとき、軌道はどちらの固有ベクトルに接しながら吸い込まれるか？",
+      prompt: "2つの異なる負実固有値 lambda2 < lambda1 < 0（例: |lambda2| > |lambda1|）を持つ安定ノードの相図で、一般の解軌道 x(t) = c1*exp(lambda1*t)*v1 + c2*exp(lambda2*t)*v2 で c1 ≠ 0 のとき、原点へ近づく軌道はどちらの固有ベクトルに接しながら吸い込まれるか？",
       inputs: [
         { id: "dir", label: "軌道が接して吸い込まれる方向", kind: "select", options: ["", "収束が遅い方向（|lambda| が小さい lambda1 の固有ベクトル）", "収束が速い方向（|lambda| が大きい lambda2 の固有ベクトル）", "どちらにも接せず常に同じ角度の円を描く"], answerText: "収束が遅い方向（|lambda| が小さい lambda1 の固有ベクトル）", check: checkExactList(["収束が遅い方向（|lambda| が小さい lambda1 の固有ベクトル）"]) }
       ],
-      explain: "|lambda2| が大きい方の成分 exp(lambda2*t) が先に 0 へ減衰して消えるため、最後に残る「収束が遅い方」の固有ベクトル v1 に沿って原点へ入ります。"
+      explain: "|lambda2| が大きい方の成分 exp(lambda2*t) が先に 0 へ減衰して消えるため、c1 ≠ 0 なら収束が遅い成分が支配的になり、v1 に接して原点へ近づきます。c1 = 0 なら軌道は v2 上にあります。"
     },
     {
       id: "rq14",
@@ -893,63 +914,81 @@ J(z*, 0) = [ [ 0 , 1 ], [ (3*z* - 1)/(1 - z*) , -&beta; ] ]
     return QUESTIONS.find(function(q) { return q.id === qid; });
   }
 
-  function evaluateQ(q) {
-    const qAns = state.answers[q.id] || {};
-    let allFilled = true;
-    let allOk = true;
-    const per = {};
-    q.inputs.forEach(function(inp) {
-      const val = qAns[inp.id] != null ? qAns[inp.id] : "";
-      if (!String(val).trim()) {
-        allFilled = false;
-        allOk = false;
-        per[inp.id] = false;
-      } else {
-        const ok = !!inp.check(val);
-        per[inp.id] = ok;
-        if (!ok) allOk = false;
-      }
+  const verdictLabels = { ok: "正解", ng: "不正解", blank: "未入力" };
+
+  function grade(q) {
+    const answers = state.answers[q.id] || {};
+    return q.inputs.map(function(inp) {
+      const value = String(answers[inp.id] || "").trim();
+      const verdict = !value ? "blank" : inp.check(value) ? "ok" : "ng";
+      return { inp, value, verdict };
     });
-    state.results[q.id] = allOk ? "ok" : "ng";
+  }
+
+  function recordResult(q, fields) {
+    state.results[q.id] = fields.every(field => field.verdict === "ok") ? "ok" : "ng";
+  }
+
+  function evaluateQ(q) {
+    const fields = grade(q);
+    recordResult(q, fields);
     save();
-    applyQ(q, per, allFilled);
+    applyQ(q, fields);
     updateHud();
   }
 
-  function applyQ(q, per, allFilled) {
+  function applyQ(q, fields = []) {
     const card = document.getElementById("card-" + q.id);
     const badge = document.getElementById("badge-" + q.id);
     const fb = document.getElementById("fb-" + q.id);
-    const v = state.results[q.id];
+    const verdict = state.results[q.id];
+    card.classList.toggle("is-ok", verdict === "ok");
+    card.classList.toggle("is-ng", verdict === "ng");
+    badge.classList.toggle("ok", verdict === "ok");
+    badge.classList.toggle("ng", verdict === "ng");
+    badge.textContent = verdict ? verdictLabels[verdict] : "未採点";
+    fb.classList.toggle("show", Boolean(verdict));
+    fb.classList.toggle("ok", verdict === "ok");
+    fb.classList.toggle("ng", verdict === "ng");
 
-    card.classList.remove("is-ok", "is-ng");
-    badge.classList.remove("ok", "ng");
-    fb.classList.remove("show", "ok", "ng");
-
-    q.inputs.forEach(function(inp) {
-      const el = document.getElementById("in-" + q.id + "-" + inp.id);
-      if (!el) return;
-      el.classList.remove("field-ok", "field-ng");
-      if (per && v) el.classList.add(per[inp.id] ? "field-ok" : "field-ng");
+    q.inputs.forEach(function(inp, index) {
+      const domId = "in-" + q.id + "-" + inp.id;
+      const input = document.getElementById(domId);
+      const result = document.getElementById(domId + "-result");
+      const fieldVerdict = fields[index]?.verdict;
+      input.classList.toggle("field-ok", fieldVerdict === "ok");
+      input.classList.toggle("field-ng", fieldVerdict === "ng");
+      input.setAttribute("aria-invalid", String(Boolean(fieldVerdict && fieldVerdict !== "ok")));
+      if (fieldVerdict) input.setAttribute("aria-describedby", result.id);
+      else input.removeAttribute("aria-describedby");
+      result.className = "field-result" + (fieldVerdict ? " " + fieldVerdict : "");
+      result.textContent = verdictLabels[fieldVerdict] || "";
     });
 
-    if (v === "ok") {
-      card.classList.add("is-ok");
-      badge.classList.add("ok");
-      badge.textContent = "[正解]";
-      fb.classList.add("show", "ok");
-      fb.querySelector(".fb-title").textContent = "[正解]";
-    } else if (v === "ng") {
-      card.classList.add("is-ng");
-      badge.classList.add("ng");
-      badge.textContent = "[不正解]";
-      fb.classList.add("show", "ng");
-      fb.querySelector(".fb-title").textContent = allFilled === false
-        ? "[不正解] 未入力があります。下の模範解答を確認してください。"
-        : "[不正解] 下の模範解答と解説を確認してください。";
-    } else {
-      badge.textContent = "未解答";
-    }
+    const count = fields.filter(field => field.verdict === "ok").length;
+    fb.querySelector(".fb-title").textContent = verdict
+      ? verdictLabels[verdict] + "（" + count + " / " + fields.length + "欄 正解）"
+      : "";
+    const details = fb.querySelector("details");
+    details.open = Boolean(verdict);
+    const list = details.querySelector("ul");
+    list.replaceChildren();
+    fields.forEach(function({ inp, value, verdict }) {
+      const item = document.createElement("li");
+      const heading = document.createElement("strong");
+      heading.textContent = "[" + verdictLabels[verdict] + "] " + inp.label;
+      const submitted = document.createElement("div");
+      submitted.textContent = "あなたの解答　" + (value || "未入力");
+      const expected = document.createElement("div");
+      expected.textContent = "模範解答　" + inp.answerText;
+      item.append(heading, submitted, expected);
+      list.append(item);
+    });
+  }
+
+  function escapeHtml(value) {
+    return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;").replaceAll('"', "&quot;");
   }
 
   function updateHud() {
@@ -982,111 +1021,101 @@ J(z*, 0) = [ [ 0 , 1 ], [ (3*z* - 1)/(1 - z*) , -&beta; ] ]
         '<div class="q-prompt">' + q.prompt + '</div>' +
         '<div class="input-grid">';
 
-      q.inputs.forEach(function(inp) {
+      q.inputs.forEach(function(inp, inputIndex) {
         const val = qAns[inp.id] != null ? qAns[inp.id] : "";
         const domId = "in-" + q.id + "-" + inp.id;
         html += '<div class="field"><label for="' + domId + '">' + inp.label + '</label>';
+        const attributes = ' id="' + domId + '" data-qid="' + q.id +
+          '" data-iid="' + inp.id + '" aria-invalid="false"';
         if (inp.kind === "select") {
-          html += '<select id="' + domId + '" data-qid="' + q.id + '" data-iid="' + inp.id + '">';
-          inp.options.forEach(function(opt) {
-            const sel = opt === val ? " selected" : "";
-            const label = opt === "" ? "-- 選択してください --" : opt;
-            html += '<option value="' + opt.replace(/"/g, "&quot;") + '"' + sel + '>' + label + '</option>';
+          html += '<select' + attributes + '><option value="">選択してください</option>';
+          const options = inp.options.filter(Boolean);
+          const offset = (idx + inputIndex + 1) % options.length;
+          options.slice(offset).concat(options.slice(0, offset)).forEach(function(opt) {
+            const selected = opt === val ? " selected" : "";
+            html += '<option value="' + escapeHtml(opt) + '"' + selected + '>' + escapeHtml(opt) + '</option>';
           });
           html += '</select>';
         } else {
-          html += '<input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" ' +
-            'id="' + domId + '" data-qid="' + q.id + '" data-iid="' + inp.id + '" ' +
-            'placeholder="' + (inp.placeholder || "") + '" value="' + String(val).replace(/"/g, "&quot;") + '">';
+          const hint = inp.kind === "number" ? "数値または分数" : "式を入力";
+          html += '<input type="text" autocomplete="off" autocapitalize="off" spellcheck="false"' +
+            attributes + ' placeholder="' + hint + '" value="' + escapeHtml(val) + '">';
         }
-        html += '</div>';
+        html += '<span class="field-result" id="' + domId + '-result"></span></div>';
       });
-
-      const ansSummary = q.inputs.map(function(inp) {
-        return (q.inputs.length > 1 ? inp.label + ": " : "答え: ") + inp.answerText;
-      }).join(" / ");
 
       html +=
         '</div>' +
         '<div class="q-actions">' +
           '<button type="button" class="primary" data-check="' + q.id + '">判定する</button>' +
-          '<button type="button" data-peek="' + q.id + '">答えを見る / 隠す</button>' +
         '</div>' +
         '<div class="feedback" id="fb-' + q.id + '">' +
-          '<div class="fb-title"></div>' +
-          '<div class="fb-ans">' + ansSummary + '</div>' +
-          '<div>' + q.explain + '</div>' +
+          '<div class="fb-title" role="status"></div>' +
+          '<details><summary>模範解答と解説</summary><ul></ul>' +
+          '<div>' + q.explain + '</div></details>' +
         '</div>';
 
       card.innerHTML = html;
       root.appendChild(card);
 
-      if (state.results[q.id]) evaluateQ(q);
-      else applyQ(q, null, true);
+      const fields = state.results[q.id] ? grade(q) : [];
+      if (fields.length) recordResult(q, fields);
+      applyQ(q, fields);
     });
     updateHud();
   }
 
-  document.addEventListener("input", function(e) {
-    const t = e.target;
-    if (t && t.dataset && t.dataset.qid) {
-      if (!state.answers[t.dataset.qid]) state.answers[t.dataset.qid] = {};
-      state.answers[t.dataset.qid][t.dataset.iid] = t.value;
-      save();
+  function updateMode() {
+    const practice = location.hash === "#report-quiz";
+    document.getElementById("study").hidden = practice;
+    document.getElementById("report-quiz").hidden = !practice;
+    document.getElementById("mode-study").setAttribute("aria-current", String(!practice));
+    document.getElementById("mode-practice").setAttribute("aria-current", String(practice));
+  }
+
+  window.addEventListener("hashchange", updateMode);
+
+  document.getElementById("quiz-root").addEventListener("input", function(e) {
+    const { qid, iid } = e.target.dataset;
+    if (!qid) return;
+    state.answers[qid] ??= {};
+    state.answers[qid][iid] = e.target.value;
+    if (state.results[qid]) {
+      delete state.results[qid];
+      applyQ(findQ(qid));
+      updateHud();
     }
+    document.getElementById("batch-status").textContent = "";
+    save();
   });
 
-  document.addEventListener("change", function(e) {
-    const t = e.target;
-    if (t && t.tagName === "SELECT" && t.dataset && t.dataset.qid) {
-      if (!state.answers[t.dataset.qid]) state.answers[t.dataset.qid] = {};
-      state.answers[t.dataset.qid][t.dataset.iid] = t.value;
-      save();
-    }
-  });
-
-  document.addEventListener("keydown", function(e) {
-    if (e.key === "Enter" && e.target && e.target.dataset && e.target.dataset.qid) {
+  document.getElementById("quiz-root").addEventListener("keydown", function(e) {
+    if (e.key === "Enter" && !e.isComposing && e.target.matches("input[data-qid]")) {
       e.preventDefault();
-      const q = findQ(e.target.dataset.qid);
-      if (q) evaluateQ(q);
+      evaluateQ(findQ(e.target.dataset.qid));
     }
   });
 
-  document.addEventListener("click", function(e) {
-    const btn = e.target.closest("button");
-    if (!btn) return;
-    if (btn.dataset.check) {
-      const q = findQ(btn.dataset.check);
-      if (q) evaluateQ(q);
-    } else if (btn.dataset.peek) {
-      const q = findQ(btn.dataset.peek);
-      if (!q) return;
-      const fb = document.getElementById("fb-" + q.id);
-      if (fb.classList.contains("show")) fb.classList.remove("show");
-      else {
-        if (!state.results[q.id]) fb.querySelector(".fb-title").textContent = "[確認] 模範解答と解説";
-        fb.classList.add("show");
-      }
-    }
+  document.getElementById("quiz-root").addEventListener("click", function(e) {
+    const button = e.target.closest("button[data-check]");
+    if (button) evaluateQ(findQ(button.dataset.check));
   });
 
   document.getElementById("btn-check-all").addEventListener("click", function() {
-    let n = 0;
-    QUESTIONS.forEach(function(q) {
-      const qAns = state.answers[q.id] || {};
-      if (q.inputs.some(function(inp){ return String(qAns[inp.id] || "").trim().length > 0; })) {
-        evaluateQ(q);
-        n++;
-      }
-    });
-    if (n === 0) QUESTIONS.forEach(evaluateQ);
+    const answered = QUESTIONS.filter(q =>
+      q.inputs.some(inp => String(state.answers[q.id]?.[inp.id] || "").trim()));
+    answered.forEach(evaluateQ);
+    document.getElementById("batch-status").textContent = answered.length
+      ? answered.length + "問を採点しました。各問題の下に結果を表示しています。"
+      : "解答を入力または選択してから採点してください。";
   });
 
   document.getElementById("btn-reset").addEventListener("click", function() {
+    if (!confirm("演習の入力と採点結果を消去しますか？")) return;
     state = { answers: {}, results: {} };
     save();
     render();
+    document.getElementById("batch-status").textContent = "学習記録をリセットしました。";
   });
 
   if (location.protocol.indexOf("http") === 0) {
@@ -1098,6 +1127,7 @@ J(z*, 0) = [ [ 0 , 1 ], [ (3*z* - 1)/(1 - z*) , -&beta; ] ]
 
   load();
   render();
+  updateMode();
 })();
 </script>
 </body>
