@@ -147,6 +147,15 @@
   }
 
   .tool-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .fig-box {
+    background: #fcfdff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px 0 6px;
+  }
+  .fig-box svg { display: block; width: 100%; height: auto; }
+  .fig-cap { font-size: 0.78rem; color: var(--muted); text-align: center; margin-top: 6px; }
   a.small-btn {
     text-decoration: none;
     font-size: 0.8rem;
@@ -318,18 +327,19 @@
   <a class="back-link" id="back-link" href="index.html" style="display:none;">[トップページへ戻る]</a>
 
   <header class="top-card">
-    <div class="kicker">SIMULATION ENGINEERING // SYMBOLIC REPORT STRUCTURE (EX 1 &amp; EX 2)</div>
-    <h1>レポート演習1・2 まとめ（一般記号と物理・相図のつながり）</h1>
+    <div class="kicker">SIMULATION ENGINEERING // REPORTS &amp; ADVANCED EXERCISES</div>
+    <h1>演習1・2 ＋ 発展問題 重点攻略（一般記号・場合分け・相図・制御）</h1>
     <p class="sub">
-      2つの演習レポートに共通する「モデル化 -&gt; 1階変換 -&gt; 固定点 -&gt; ヤコビアン(&tau;, &Delta;, &lambda;=&sigma;&plusmn;i&omega;) -&gt; 相図 -&gt; 分岐・制御」という構造を、特定数値ではなく一般記号ベースで整理しました。
+      演習1（単振り子）・演習2（静電アクチュエータ）・講義演習（第9-12回）から出やすい「一般記号での場合分け」「最速収束条件」「実固有値の相図」「安定性の反例」「制御設計の型」を重点整理しました。
     </p>
   </header>
 
   <nav class="nav-pills">
-    <a class="nav-pill" href="#compare">共通構造（横断表）</a>
+    <a class="nav-pill" href="#compare">共通構造</a>
     <a class="nav-pill" href="#ex1">演習1: 単振り子 (1)-(8)</a>
     <a class="nav-pill" href="#ex2">演習2: 静電アクチュエータ (1)-(7)</a>
-    <a class="nav-pill" href="#report-quiz">記号チェック (10問)</a>
+    <a class="nav-pill" href="#advanced">発展5攻略型 (重要)</a>
+    <a class="nav-pill" href="#report-quiz">理解度チェック (15問)</a>
   </nav>
 
   <h2 class="sec-title" id="compare"><span>OVERVIEW</span>演習1 と 演習2 の共通構造（記号での比較）</h2>
@@ -454,13 +464,138 @@ J(z*, 0) = [ [ 0 , 1 ], [ (3*z* - 1)/(1 - z*) , -&beta; ] ]
     </article>
   </div>
 
-  <h2 class="sec-title" id="report-quiz"><span>PART 3</span>レポート演習 記号・理解度チェック（10問）</h2>
+  <h2 class="sec-title" id="advanced"><span>PART 3 (ここが差がつく)</span>演習・発展問題 5つの攻略型（初見問題への応用レシピ）</h2>
+  <div class="step-list">
+
+    <article class="step-card">
+      <div class="step-head"><span class="step-badge">発展型 1</span><h3 class="step-title">パラメータによる挙動の場合分け・分岐（バネダンパ・減衰振り子・分岐）</h3></div>
+      <div class="eq-box">線形バネダンパ系: m*y'' + c*y' + k*y = 0  (m, k &gt; 0, c &gt;= 0)
+  J = [ [ 0 , 1 ], [ -k/m , -c/m ] ]  =&gt;  &tau; = -c/m,   &Delta; = k/m,   &tau;^2 - 4*&Delta; = (c^2 - 4*m*k) / m^2</div>
+      <div class="tbl-wrap" style="margin:6px 0 8px;">
+        <table>
+          <tr><th>条件（記号）</th><th>固有値 &lambda; = &sigma; &plusmn; i&omega;</th><th>分類と相図</th><th>減衰の種類</th></tr>
+          <tr><td><span class="mono">c = 0</span></td><td><span class="mono">&plusmn;i*sqrt(k/m)</span>（純虚数 <span class="mono">&sigma;=0</span>）</td><td>中心点（中立安定・閉軌道）</td><td>減衰なし</td></tr>
+          <tr><td><span class="mono">0 &lt; c &lt; 2*sqrt(m*k)</span></td><td><span class="mono">&sigma; &lt; 0</span>, <span class="mono">&omega; != 0</span>（複素共役）</td><td>安定渦状点（黒丸・時計回り渦）</td><td>不足減衰</td></tr>
+          <tr><td><span class="mono">c = 2*sqrt(m*k)</span></td><td><span class="mono">&lambda; = -sqrt(k/m)</span>（負の実重解）</td><td>安定退化ノード（黒丸・最速収束）</td><td>臨界減衰</td></tr>
+          <tr><td><span class="mono">c &gt; 2*sqrt(m*k)</span></td><td>異なる2つの負の実数 <span class="mono">&lambda;2 &lt; &lambda;1 &lt; 0</span></td><td>安定ノード（黒丸・遅い軸へ接する）</td><td>過減衰</td></tr>
+        </table>
+      </div>
+      <ul>
+        <li><b>減衰付き単振り子 <span class="mono">&theta;'' + b*&theta;' + (g/l)*sin(&theta;) = 0</span>:</b> <span class="mono">J = [[0, 1], [-(g/l)cos(&theta;*), -b]]</span>。真下 <span class="mono">(0,0)</span> は <span class="mono">b^2 - 4*g/l</span> の符号で上記と同じく渦状・臨界・ノードに分かれ、真上 <span class="mono">(&pi;,0)</span> は <span class="mono">&Delta; = -g/l &lt; 0</span> のため <span class="mono">b</span> によらず常に <b>鞍点</b>。</li>
+        <li><b>一般の1変数分岐レシピ:</b> 固定点条件をパラメータ <span class="mono">&mu; = g(x)</span> と書けたら、<span class="mono">g'(x*) = 0</span> となる極値が固定点の個数が切り替わる分岐点（そこでは <span class="mono">&Delta; = 0</span> となり線形化だけでは判定不可）。</li>
+      </ul>
+    </article>
+
+    <article class="step-card">
+      <div class="step-head"><span class="step-badge">発展型 2</span><h3 class="step-title">最速収束ゲインの決め方と限界（なぜ臨界減衰が最速か）</h3></div>
+      <div class="eq-box">倒立PD制御の固有値: &lambda; = ( -kd &plusmn; sqrt(kd^2 - P) ) / 2     [ ただし P = 4*(kp - g/l) &gt; 0 を固定 ]
+収束の速さを決める指標: max( Re(&lambda;1), Re(&lambda;2) )   (この値が最も負に大きいほど速く 0 へ近づく)</div>
+      <div class="fig-box">
+        <svg viewBox="0 0 640 185" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ダンパゲインkdに対する固有値実部の最大値">
+          <rect x="6" y="6" width="628" height="173" rx="8" fill="#ffffff" stroke="#dfe2ea"/>
+          <text x="320" y="26" font-size="11.5" font-weight="bold" text-anchor="middle" fill="#1b1b1f">P = 4(kp - g/l) 固定のとき、max(Re &lambda;) が最小（最速収束）になる点</text>
+          <line x1="65" y1="45" x2="590" y2="45" stroke="#5f6470" stroke-width="1.2"/>
+          <line x1="65" y1="38" x2="65" y2="155" stroke="#5f6470" stroke-width="1.2"/>
+          <text x="595" y="49" font-size="11" fill="#1b1b1f">kd</text>
+          <text x="58" y="49" font-size="10.5" text-anchor="end" fill="#5f6470">0</text>
+          <text x="16" y="102" font-size="10.5" fill="#1b1b1f">max(Re &lambda;)</text>
+          <!-- Curve: linear down to critical (285, 136), then rises toward 0 -->
+          <path d="M 65,45 L 285,136 C 340,86 430,63 575,54" fill="none" stroke="#2b5cd9" stroke-width="2.4"/>
+          <line x1="285" y1="45" x2="285" y2="145" stroke="#137333" stroke-width="1.4" stroke-dasharray="4 3"/>
+          <circle cx="285" cy="136" r="4.5" fill="#137333"/>
+          <text x="285" y="162" font-size="10.5" font-weight="bold" text-anchor="middle" fill="#137333">kd = sqrt(P) = 2*sqrt(kp - g/l) [臨界減衰・最速]</text>
+          <text x="170" y="75" font-size="10" text-anchor="middle" fill="#5f6470">不足減衰: -kd/2</text>
+          <text x="455" y="88" font-size="10" text-anchor="middle" fill="#b3261e">過減衰: (-kd + sqrt(kd^2-P))/2 -&gt; 0 (遅くなる)</text>
+        </svg>
+        <div class="fig-cap">図1: kd &lt; sqrt(P) では速くなるが、kd &gt; sqrt(P) を超えると遅い方の実固有値が 0 に近づき逆に収束が遅くなる</div>
+      </div>
+      <ul>
+        <li><b>記号での結論:</b> <span class="mono">kp</span> を固定したときの最速収束条件は常に重解（臨界減衰）<b><span class="mono">kd = 2*sqrt(kp - g/l)</span></b>（<span class="mono">&tau;^2 = 4*&Delta;</span>）。</li>
+        <li><b>なぜゲインを無限に大きくできないか:</b> 実機ではトルク飽和・センサノイズ増幅があり、数値計算（離散時間）では 1ステップの変化が過大になって <b>数値発散</b> するため。</li>
+      </ul>
+    </article>
+
+    <article class="step-card">
+      <div class="step-head"><span class="step-badge">発展型 3</span><h3 class="step-title">実固有値（安定ノード・不安定ノード・退化ケース）の相図手描き</h3></div>
+      <div class="fig-box">
+        <svg viewBox="0 0 640 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="安定ノードと退化固有値0の相図">
+          <!-- Left: Stable node lambda2 < lambda1 < 0 -->
+          <rect x="6" y="6" width="306" height="178" rx="8" fill="#ffffff" stroke="#dfe2ea"/>
+          <text x="159" y="25" font-size="11" font-weight="bold" text-anchor="middle" fill="#1b1b1f">安定ノード (&lambda;2 &lt; &lambda;1 &lt; 0): 遅い方向 v1 へ接する</text>
+          <line x1="26" y1="102" x2="292" y2="102" stroke="#9aa0ad" stroke-width="1"/>
+          <line x1="159" y1="35" x2="159" y2="170" stroke="#9aa0ad" stroke-width="1"/>
+          <!-- v1 (slow, gentle slope) -->
+          <line x1="40" y1="132" x2="278" y2="72" stroke="#2b5cd9" stroke-width="1.6" stroke-dasharray="5 3"/>
+          <text x="276" y="66" font-size="10" text-anchor="end" fill="#2b5cd9">v1 (遅い |&lambda;1| 小)</text>
+          <!-- v2 (fast, steep slope) -->
+          <line x1="120" y1="38" x2="198" y2="166" stroke="#b3261e" stroke-width="1.6" stroke-dasharray="5 3"/>
+          <text x="204" y="50" font-size="10" fill="#b3261e">v2 (速い |&lambda;2| 大)</text>
+          <!-- Trajectories curving toward v1 -->
+          <path d="M 110,44 C 135,94 148,101 159,102" fill="none" stroke="#1b1b1f" stroke-width="1.6"/>
+          <path d="M 208,160 C 183,110 170,103 159,102" fill="none" stroke="#1b1b1f" stroke-width="1.6"/>
+          <path d="M 65,160 C 102,126 132,109 159,102" fill="none" stroke="#1b1b1f" stroke-width="1.6"/>
+          <path d="M 253,44 C 216,78 186,95 159,102" fill="none" stroke="#1b1b1f" stroke-width="1.6"/>
+          <circle cx="159" cy="102" r="4" fill="#1b1b1f"/>
+
+          <!-- Right: Zero eigenvalue lambda1 < 0, lambda2 = 0 -->
+          <rect x="328" y="6" width="306" height="178" rx="8" fill="#ffffff" stroke="#dfe2ea"/>
+          <text x="481" y="25" font-size="11" font-weight="bold" text-anchor="middle" fill="#1b1b1f">退化例 (&lambda;1 &lt; 0, &lambda;2 = 0): 直線上すべてが固定点</text>
+          <line x1="348" y1="102" x2="614" y2="102" stroke="#137333" stroke-width="2.4"/>
+          <line x1="481" y1="35" x2="481" y2="170" stroke="#9aa0ad" stroke-width="1"/>
+          <circle cx="401" cy="102" r="3" fill="#137333"/>
+          <circle cx="441" cy="102" r="3" fill="#137333"/>
+          <circle cx="481" cy="102" r="3" fill="#137333"/>
+          <circle cx="521" cy="102" r="3" fill="#137333"/>
+          <circle cx="561" cy="102" r="3" fill="#137333"/>
+          <text x="610" y="95" font-size="10" text-anchor="end" fill="#137333">v2 (&lambda;2=0): 動かない固定点列</text>
+          <!-- Parallel lines along v1 approaching fixed line -->
+          <line x1="376" y1="45" x2="401" y2="102" stroke="#1b1b1f" stroke-width="1.4"/>
+          <line x1="416" y1="45" x2="441" y2="102" stroke="#1b1b1f" stroke-width="1.4"/>
+          <line x1="496" y1="45" x2="521" y2="102" stroke="#1b1b1f" stroke-width="1.4"/>
+          <line x1="426" y1="159" x2="401" y2="102" stroke="#1b1b1f" stroke-width="1.4"/>
+          <line x1="506" y1="159" x2="481" y2="102" stroke="#1b1b1f" stroke-width="1.4"/>
+          <line x1="546" y1="159" x2="521" y2="102" stroke="#1b1b1f" stroke-width="1.4"/>
+          <polygon points="401,102 392,90 400,88" fill="#1b1b1f"/>
+          <polygon points="521,102 512,90 520,88" fill="#1b1b1f"/>
+          <polygon points="481,102 490,114 482,116" fill="#1b1b1f"/>
+        </svg>
+        <div class="fig-cap">図2: 一般解 x(t) = c1*exp(&lambda;1*t)*v1 + c2*exp(&lambda;2*t)*v2 から描く相図の鉄則</div>
+      </div>
+      <ul>
+        <li><b>安定ノード (<span class="mono">&lambda;2 &lt; &lambda;1 &lt; 0</span>):</b> <span class="mono">exp(&lambda;2*t)</span> が先に 0 へ消えるため、十分時間が経つと軌道は <b>収束が遅い方向（<span class="mono">|&lambda;|</span> が小さい固有ベクトル <span class="mono">v1</span>）に接しながら原点へ吸い込まれる</b>。</li>
+        <li><b>不安定ノード (<span class="mono">0 &lt; &lambda;1 &lt; &lambda;2</span>):</b> 逆に遠方では成長が速い <span class="mono">v2</span> 方向へ伸びていく（原点付近は <span class="mono">v1</span> に沿って出る）。</li>
+        <li><b>零固有値を含むとき (<span class="mono">&lambda;1 &lt; 0, &lambda;2 = 0</span>):</b> <span class="mono">v2</span> 上は一切時間変化せず直線全体が固定点となり、外れた点は <span class="mono">v1</span> と平行にそこへ吸い込まれる。</li>
+      </ul>
+    </article>
+
+    <article class="step-card">
+      <div class="step-head"><span class="step-badge">発展型 4</span><h3 class="step-title">安定性の厳密定義と2つの反例（引っかけ問題対策）</h3></div>
+      <div class="eq-box">漸近安定  &lt;=&gt;  「リアプノフ安定（近くに留まる）」 かつ 「吸引的（t -&gt; inf で近づく）」</div>
+      <ul>
+        <li><b>反例A [リアプノフ安定だが吸引的でない]:</b> 減衰なし単振り子の最下点 <span class="mono">&theta;* = 0</span>（中心点・中立安定）。近くを回り続けるだけで原点には収束しない。</li>
+        <li><b>反例B [吸引的だがリアプノフ安定でない]:</b> 円周上の系 <span class="mono">d&theta;/dt = 1 - cos(&theta;)</span> の <span class="mono">&theta;* = 0</span>。すべての軌道は <span class="mono">t -&gt; inf</span> で 0 へ吸い込まれるが、0 のすぐ手前（負側）から出発した点は円周をほぼ1周大きく離れてから戻るため、リアプノフ安定（＝漸近安定）ではない。</li>
+      </ul>
+    </article>
+
+    <article class="step-card">
+      <div class="step-head"><span class="step-badge">発展型 5</span><h3 class="step-title">初見の非線形系を目標位置へ安定化する制御設計 3ステップ</h3></div>
+      <div class="eq-box">設計公式: u(x, v) = u_ff(x_ref) - Kp * (x - x_ref) - Kd * v</div>
+      <ul>
+        <li><b>Step 1（つり合い補償 <span class="mono">u_ff</span>）:</b> 目標 <span class="mono">(x_ref, 0)</span> が固定点になるように重力・ばね力・静電力を打ち消す定常項を入れる（例: 倒立振り子の <span class="mono">mgl*sin(&theta;)</span>、静電アクチュエータの <span class="mono">&alpha;_ff = z_ref*(1 - z_ref)^2</span>）。</li>
+        <li><b>Step 2（誤差PDフィードバック）:</b> 目標まわりで線形化し、<span class="mono">&tau; &lt; 0, &Delta; &gt; 0</span>（最速なら <span class="mono">&tau;^2 = 4*&Delta;</span>）を満たすように <span class="mono">Kp, Kd</span> を決める。</li>
+        <li><b>Step 3（物理制約と限界の明記）:</b> アクチュエータの上下限・非負制約（例: 静電力は <span class="mono">&alpha; &gt;= 0</span> で <span class="mono">max(0, ...)</span> クリップ）と、「あくまで目標近傍の局所維持であり、遠い初期値からの振り上げ等は別設計が要る」ことを考察に書く。</li>
+      </ul>
+    </article>
+
+  </div>
+
+  <h2 class="sec-title" id="report-quiz"><span>PART 4</span>演習・発展 記号理解度チェック（15問）</h2>
 
   <div class="quiz-hud">
     <div class="hud-row">
       <div>
-        <span class="hud-score" id="hud-score">正解: 0 / 10 問</span>
-        <span class="hud-sub" id="hud-sub">（解答: 0 / 10）</span>
+        <span class="hud-score" id="hud-score">正解: 0 / 15 問</span>
+        <span class="hud-sub" id="hud-sub">（解答: 0 / 15）</span>
       </div>
       <div style="display:flex; gap:6px; flex-wrap:wrap;">
         <button type="button" class="primary" id="btn-check-all">入力済みをまとめて判定</button>
@@ -485,7 +620,7 @@ J(z*, 0) = [ [ 0 , 1 ], [ (3*z* - 1)/(1 - z*) , -&beta; ] ]
 (function() {
   "use strict";
 
-  const STORAGE_KEY = "sim_eng_reports_v2";
+  const STORAGE_KEY = "sim_eng_reports_v3";
 
   function normText(s) {
     return String(s || "")
@@ -558,13 +693,13 @@ J(z*, 0) = [ [ 0 , 1 ], [ (3*z* - 1)/(1 - z*) , -&beta; ] ]
       .replace(/\^/g, "**")
       .replace(/\s+/g, "");
     if (!s || !/^[a-zA-Z0-9_+\-*/().]+$/.test(s)) return NaN;
-    if (/(window|document|eval|function|return|this|global|process|constructor|prototype)/i.test(s)) return NaN;
+    if (/(window|document|eval|function|return|this|global|process|constructor|prototype|Math)/i.test(s)) return NaN;
     s = s.replace(/(\d)(?![eE][+-]?\d)([a-zA-Z(])/g, "$1*$2").replace(/(\))([a-zA-Z0-9(])/g, "$1*$2");
     try {
       const keys = Object.keys(vars);
       const vals = keys.map(function(k) { return vars[k]; });
-      const fn = new Function(keys.join(","), "return (" + s + ");");
-      const out = fn.apply(null, vals);
+      const fn = new Function("Math", keys.join(","), "var sqrt = Math.sqrt; return (" + s + ");");
+      const out = fn.apply(null, [Math].concat(vals));
       return typeof out === "number" && Number.isFinite(out) ? out : NaN;
     } catch (e) {
       return NaN;
@@ -681,6 +816,57 @@ J(z*, 0) = [ [ 0 , 1 ], [ (3*z* - 1)/(1 - z*) , -&beta; ] ]
         { id: "a", label: "非負制約の物理的理由", kind: "select", options: ["", "alpha は電圧 V^2 に比例するため負にできず（静電力は常に引力）、斥力を出せないから", "Pythonの配列インデックスが負になるとエラーになるから", "ばね定数 k が負になるから"], answerText: "alpha は電圧 V^2 に比例するため負にできず（静電力は常に引力）、斥力を出せないから", check: checkExactList(["alpha は電圧 V^2 に比例するため負にできず（静電力は常に引力）、斥力を出せないから"]) }
       ],
       explain: "静電力は alpha = epsilon_0*A*V^2/(2*k*d^3) >= 0 であり、電極同士を引き合う向き（引力）しか作れません。"
+    },
+    {
+      id: "rq11",
+      tag: "発展型1 パラメータ場合分け",
+      prompt: "線形バネダンパ系 m*y'' + c*y' + k*y = 0（m, k > 0, c >= 0）において、臨界減衰（tau^2 = 4*Delta）となる減衰係数 c の一般式 [A]（変数 m, k, sqrt() を使用）と、0 < c < [A] のときの分類 [B] を答えよ。",
+      inputs: [
+        { id: "c", label: "[A] 臨界減衰の c =", kind: "expr", placeholder: "2*sqrt(m*k)", answerText: "2*sqrt(m*k)", check: function(raw) {
+          if (checkCodeList(["2sqrt(mk)", "2*sqrt(mk)", "2sqrt(m*k)", "2*sqrt(m*k)", "sqrt(4mk)", "sqrt(4*m*k)"])(raw)) return true;
+          return checkExprEquiv(function(p){ return 2 * Math.sqrt(p.m * p.k); }, [{m:2, k:8}, {m:1.5, k:6}])(raw);
+        } },
+        { id: "cls", label: "[B] 0 < c < 2*sqrt(m*k) の分類", kind: "select", options: ["", "安定渦状点（不足減衰）", "中心点（中立安定）", "安定ノード（過減衰）", "鞍点（不安定）"], answerText: "安定渦状点（不足減衰）", check: checkExactList(["安定渦状点（不足減衰）"]) }
+      ],
+      explain: "tau = -c/m, Delta = k/m より tau^2 - 4*Delta = (c^2 - 4*m*k)/m^2 = 0 となる臨界値は c = 2*sqrt(m*k) です。これより小さい正の c では振動しながら原点へ戻る安定渦状点（不足減衰）になります。"
+    },
+    {
+      id: "rq12",
+      tag: "発展型2 最速収束ゲイン",
+      prompt: "倒立PD制御の固有値 lambda = (-kd +- sqrt(kd^2 - 4(kp - g/l))) / 2 で kp (> g/l) を固定したとき、(A) max(Re lambda1, Re lambda2) を最小（最速収束）にする条件は？ (B) kd をその値より大きくしすぎると逆に収束が遅くなる理由は？",
+      inputs: [
+        { id: "cond", label: "[A] 最速収束する条件", kind: "select", options: ["", "臨界減衰（kd = 2*sqrt(kp - g/l)、重解）", "kd = 0 の中心点", "kd を無限大に近づけた過減衰極限"], answerText: "臨界減衰（kd = 2*sqrt(kp - g/l)、重解）", check: checkExactList(["臨界減衰（kd = 2*sqrt(kp - g/l)、重解）"]) },
+        { id: "why", label: "[B] 過減衰で遅くなる理由", kind: "select", options: ["", "2つの負実固有値のうち大きい方が 0 に近づき収束が遅くなるから", "固有値が複素数になって振動が増えるから", "行列式 Delta が負になって鞍点に変わるから"], answerText: "2つの負実固有値のうち大きい方が 0 に近づき収束が遅くなるから", check: checkExactList(["2つの負実固有値のうち大きい方が 0 に近づき収束が遅くなるから"]) }
+      ],
+      explain: "kd^2 < 4(kp-g/l) では実部が -kd/2 なので kd を増やすほど速くなりますが、臨界点 kd = 2*sqrt(kp-g/l) を超えると (-kd + sqrt(kd^2 - P))/2 が 0 に近づいていくため逆に遅くなります。"
+    },
+    {
+      id: "rq13",
+      tag: "発展型3 安定ノードの相図",
+      prompt: "2つの異なる負実固有値 lambda2 < lambda1 < 0（例: |lambda2| > |lambda1|）を持つ安定ノードの相図で、一般の解軌道 x(t) = c1*exp(lambda1*t)*v1 + c2*exp(lambda2*t)*v2 が時間経過で原点へ近づくとき、軌道はどちらの固有ベクトルに接しながら吸い込まれるか？",
+      inputs: [
+        { id: "dir", label: "軌道が接して吸い込まれる方向", kind: "select", options: ["", "収束が遅い方向（|lambda| が小さい lambda1 の固有ベクトル）", "収束が速い方向（|lambda| が大きい lambda2 の固有ベクトル）", "どちらにも接せず常に同じ角度の円を描く"], answerText: "収束が遅い方向（|lambda| が小さい lambda1 の固有ベクトル）", check: checkExactList(["収束が遅い方向（|lambda| が小さい lambda1 の固有ベクトル）"]) }
+      ],
+      explain: "|lambda2| が大きい方の成分 exp(lambda2*t) が先に 0 へ減衰して消えるため、最後に残る「収束が遅い方」の固有ベクトル v1 に沿って原点へ入ります。"
+    },
+    {
+      id: "rq14",
+      tag: "発展型4 安定性の厳密定義",
+      prompt: "円周上の系 d(theta)/dt = 1 - cos(theta) の固定点 theta* = 0 は、すべての初期値から t -> inf で 0 に戻る（吸引的）のに、「漸近安定ではない」と判定される理由は？",
+      inputs: [
+        { id: "reason", label: "漸近安定でない理由", kind: "select", options: ["", "すぐ手前の初期値から円周をほぼ1周大きく離れて戻るため、リアプノフ安定ではないから", "固有値が負の実数2個になるから", "そもそも theta* = 0 が固定点ではないから"], answerText: "すぐ手前の初期値から円周をほぼ1周大きく離れて戻るため、リアプノフ安定ではないから", check: checkExactList(["すぐ手前の初期値から円周をほぼ1周大きく離れて戻るため、リアプノフ安定ではないから"]) }
+      ],
+      explain: "漸近安定 = 「リアプノフ安定（近くに留まる）かつ 吸引的（最終的に戻る）」です。すぐ近くから出発しても途中で大きく離れてしまう系はリアプノフ安定を満たしません。"
+    },
+    {
+      id: "rq15",
+      tag: "発展型5 非線形制御設計の共通構造",
+      prompt: "初見の非線形系を目標位置 x_ref（静止）へ安定化する制御則の基本構成 [A] と、離散時間の数値制御シミュレーションでゲイン Kp, Kd を過大にしすぎたときに起こる問題 [B] を答えよ。",
+      inputs: [
+        { id: "arch", label: "[A] 制御則の基本構成", kind: "select", options: ["", "目標での定常つり合い補償(FF) + 位置誤差と速度のPDフィードバック", "速度フィードバックだけを入れて位置誤差は無視する", "時間 t だけに比例して入力を増やし続ける"], answerText: "目標での定常つり合い補償(FF) + 位置誤差と速度のPDフィードバック", check: checkExactList(["目標での定常つり合い補償(FF) + 位置誤差と速度のPDフィードバック"]) },
+        { id: "disc", label: "[B] ゲイン過大の数値的問題", kind: "select", options: ["", "1ステップの変化が過大になり数値発散する", "丸め誤差が完全に 0 になる", "ステップ数が半分に減る"], answerText: "1ステップの変化が過大になり数値発散する", check: checkExactList(["1ステップの変化が過大になり数値発散する"]) }
+      ],
+      explain: "演習1(8)（重力補償 + PD）と演習2(7)（定常入力 alpha_ff + PD + 0クリップ）はどちらも「つり合い補償 + 誤差PD」の同じ設計パターンです。"
     }
   ];
 
